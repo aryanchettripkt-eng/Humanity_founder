@@ -285,7 +285,7 @@ Triggers: sync (batched, concurrency 4, emits `sync:progress`), new inbound mess
 ### 5.4 Failure handling
 Timeout/invalid JSON after retry → `aiStatus:'failed'`, `owner:'review'`, `reason:'AI unavailable — please review'`, summary = snippet. Never block the request; never 500 to the UI because of AI.
 
-### 5.5 Classification prompt (v1 — `ai/prompts/classify.js`, export `PROMPT_VERSION`)
+### 5.5 Classification prompt (v2 — built in `services/classification.service.js`, export `PROMPT_VERSION`; v2 adds the corrections block)
 ```
 SYSTEM:
 You triage email for a personal assistant (PA) who manages the inbox of their client.

@@ -11,7 +11,9 @@ import { logger } from '../utils/logger.js';
 import { recordActivity } from './activity.service.js';
 import { trimQuotedReplies } from './gmail/mapper.js';
 
-export const PROMPT_VERSION = 'v1';
+export const PROMPT_VERSION = 'v2';
+
+const MAX_CORRECTIONS = 5;
 
 function buildDateContext(timezone) {
   let tz = timezone || 'Asia/Kolkata';
@@ -56,7 +58,53 @@ function buildClassificationSystemPrompt({ todayLabel, nextDaysLabel, timezone }
   ].join('\n');
 }
 
-function buildClassificationUserPrompt({ client, assistant, messages }) {
+/**
+ * Format recent manual/client corrections as few-shot lines for the prompt (B4.5).
+ * Pure function so it can be unit-tested.
+ * @param {Array<{ subject?: string, owner: string, participants?: Array<{ email?: string }>, history?: Array<{ to: string, source: string, reason?: string }> }>} threads
+ * @returns {string[]}
+ */
+export function formatCorrections(threads = []) {
+  const lines = [];
+  for (const t of threads) {
+    if (!['assistant', 'client', 'none'].includes(t.owner)) continue;
+    const correction = [...(t.history || [])]
+      .reverse()
+      .find((h) => (h.source === 'manual' || h.source === 'client') && h.to === t.owner);
+    if (!correction) continue;
+    const sender = t.participants?.[0]?.email || 'unknown sender';
+    const subject = String(t.subject || '(no subject)').replace(/\s+/g, ' ').slice(0, 80);
+    const by = correction.source === 'client' ? 'the client handed it over' : 'the assistant corrected it';
+    const why = String(correction.reason || '').replace(/\s+/g, ' ').slice(0, 120);
+    lines.push(`- "${subject}" from ${sender} -> ${t.owner} (${by}${why ? `: ${why}` : ''})`);
+    if (lines.length >= MAX_CORRECTIONS) break;
+  }
+  return lines;
+}
+
+/**
+ * Load up to 5 recent threads whose owner was set by the assistant or the client,
+ * to use as few-shot examples. Never throws: corrections are a hint, not a requirement.
+ */
+async function loadRecentCorrections(clientId, excludeThreadId) {
+  try {
+    const threads = await Thread.find({
+      clientId,
+      _id: { $ne: excludeThreadId },
+      ownerSource: { $in: ['manual', 'client'] },
+      'history.source': { $in: ['manual', 'client'] },
+    })
+      .sort({ updatedAt: -1 })
+      .limit(MAX_CORRECTIONS * 2)
+      .select('subject owner participants history');
+    return formatCorrections(threads);
+  } catch (err) {
+    logger.warn('Could not load correction examples', { message: err?.message });
+    return [];
+  }
+}
+
+function buildClassificationUserPrompt({ client, assistant, messages, corrections = [] }) {
   const recent = messages.slice(-12);
   const older = messages.slice(0, Math.max(0, messages.length - 12));
 
@@ -65,8 +113,16 @@ function buildClassificationUserPrompt({ client, assistant, messages }) {
     `Assistant: ${assistant?.name || 'Assistant'}`,
     `Delegation notes: ${client?.profile?.delegation || 'Standard PA delegation.'}`,
     `VIP senders: ${(client?.profile?.vipSenders || []).join(', ') || 'None'}`,
-    'Conversation (oldest -> newest):',
   ];
+
+  if (corrections.length > 0) {
+    lines.push(
+      'Recent corrections by the assistant or client (follow these patterns for similar senders and requests):',
+      ...corrections
+    );
+  }
+
+  lines.push('Conversation (oldest -> newest):');
 
   for (const m of older) {
     lines.push(`- [earlier ${m.direction}] ${m.from?.email}: ${String(m.bodyText || '').slice(0, 120)}`);
@@ -134,6 +190,7 @@ export async function classifyThread(threadId, opts = {}) {
   const isFirstClassification = thread.aiStatus === 'pending';
   const isSticky = thread.ownerSource === 'manual' || thread.ownerSource === 'client';
   const matchedRule = await findMatchingRule(thread.clientId, messages);
+  const corrections = await loadRecentCorrections(thread.clientId, thread._id);
 
   const provider = getProvider();
   let aiResult = null;
@@ -149,7 +206,7 @@ export async function classifyThread(threadId, opts = {}) {
         nextDaysLabel,
         timezone: tz,
       }),
-      prompt: buildClassificationUserPrompt({ client, assistant, messages }),
+      prompt: buildClassificationUserPrompt({ client, assistant, messages, corrections }),
       schema: classificationSchema,
       fast,
     });
