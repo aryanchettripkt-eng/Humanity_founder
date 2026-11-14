@@ -18,6 +18,12 @@ _None yet._
 
 ---
 
+### 2026-11-15 04:00 · claude · Q5.5 README
+- Done: README rewritten: live links, one-click demo tour, how the AI works, real vs simulated (matches PRD §11), architecture diagram, run locally, env vars, security notes, limitations. Marked Q5.4 (deploy) done, since it's live on Vercel + Render + Atlas.
+- Changed contracts: none.
+- Next: Q5.1/Q5.3 QA pass on the live site.
+
+
 ### 2026-11-15 03:20 · gemini · Audit fixes (1–10)
 - Done:
   - #1 Classification date/timezone: added `Client.timezone` (default `Asia/Kolkata`), passed weekday + next 7 days + timezone into `buildClassificationSystemPrompt`, and requested ISO-8601 dates with offset.
