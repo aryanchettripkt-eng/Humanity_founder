@@ -1,0 +1,75 @@
+[
+  {
+    "id": "investor-term-sheet",
+    "label": "Investor needs a signature",
+    "expectedOwner": "client",
+    "mode": "new",
+    "subject": "Side letter — signature needed before Friday",
+    "from": {
+      "name": "Elena Ortiz",
+      "email": "elena@northstarvc.example.com"
+    },
+    "bodyText": "Hi Priya,\n\nOur counsel added a short side letter covering the information rights we discussed. Could you review and sign it by Friday at 5 PM? It needs to go out with the definitive docs.\n\nElena"
+  },
+  {
+    "id": "coffee-flip-to-client",
+    "label": "Coffee thread turns personal",
+    "expectedOwner": "client",
+    "mode": "append",
+    "matchSubject": "Reschedule Tuesday Coffee with Marcus",
+    "subject": "Reschedule Tuesday Coffee with Marcus",
+    "from": {
+      "name": "Marcus Vance",
+      "email": "marcus@designco.example.com"
+    },
+    "bodyText": "Wednesday works, thanks! Priya, one more thing before we meet: I'd love your personal answer on whether you'd join our design advisory board. It's about 4 hours a quarter, with equity. No pressure, but I'm putting the list together this week."
+  },
+  {
+    "id": "vendor-invoice",
+    "label": "Vendor invoice",
+    "expectedOwner": "assistant",
+    "mode": "new",
+    "subject": "Invoice #2219 — studio cleaning (November)",
+    "from": {
+      "name": "SparkClean",
+      "email": "billing@sparkclean.example.com"
+    },
+    "bodyText": "Hello,\n\nAttached is invoice #2219 for November studio cleaning (4 visits): $640.00, due in 14 days. Could you also confirm the door code still works for next Tuesday?\n\nSparkClean"
+  },
+  {
+    "id": "newsletter",
+    "label": "Newsletter",
+    "expectedOwner": "none",
+    "mode": "new",
+    "subject": "Design Weekly #340: The year in type",
+    "from": {
+      "name": "Design Weekly",
+      "email": "digest@designweekly.example.com"
+    },
+    "bodyText": "This week: the best typefaces of the year, a teardown of three rebrands, and job openings at 12 studios.\n\nRead online | Manage preferences | Unsubscribe"
+  },
+  {
+    "id": "ambiguous-followup",
+    "label": "Unclear follow-up",
+    "expectedOwner": "review",
+    "mode": "new",
+    "subject": "Following up",
+    "from": {
+      "name": "Jess Romano",
+      "email": "jess@romano.example.com"
+    },
+    "bodyText": "Hi, just following up on my note from last week. Let me know what you think!"
+  },
+  {
+    "id": "meeting-request",
+    "label": "Meeting request",
+    "expectedOwner": "assistant",
+    "mode": "new",
+    "subject": "Intro call Thursday 3 PM?",
+    "from": {
+      "name": "Hannah Brooks",
+      "email": "hannah@verdant.example.com"
+    },
+    "bodyText": "Hi Priya,\n\nMeera suggested we connect about a packaging redesign for Verdant. Would Thursday at 3 PM PT work for a 30 minute intro call? Happy to send a Zoom link.\n\nHannah"
+  }
+]

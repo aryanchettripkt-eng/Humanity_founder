@@ -19,7 +19,7 @@
 ## Phase 1 — Data & AI core (backend)
 - [x] **B1.1** Mongoose models per BACKEND §4 with indexes + toJSON transform — @gemini (gemini/B1.1-models-auth)
 - [x] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini (gemini/B1.1-models-auth)
-- [ ] **B1.3** Seed data: `threads.json` (Priya ~32, Daniel ~10) + `scenarios.json` per BACKEND §8 — @claude *(content writing; parallel‑safe, only touches `server/src/seed/data/`)*
+- [x] **B1.3** Seed data: `threads.json` (Priya ~32, Daniel ~10) + `scenarios.json` per BACKEND §8 — @claude *(content writing; parallel‑safe, only touches `server/src/seed/data/`)*
 - [x] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini (gemini/B1.4-B1.11-seed-tests)
 - [x] **B1.5** AI provider abstraction + `mock` provider — @gemini (gemini/B1.5-ai-providers)
 - [x] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini (gemini/B1.5-ai-providers; includes `groq` per D9)
