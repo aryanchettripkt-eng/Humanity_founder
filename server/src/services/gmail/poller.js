@@ -6,7 +6,13 @@ import { classifyThread } from '../classification.service.js';
 import { decryptToken } from './crypto.js';
 import { importGmailAccount, upsertMappedThread } from './import.js';
 import { mapGmailThread } from './mapper.js';
-import { createAuthedGmailClient } from './oauth.js';
+import {
+  callGmailWithRetry,
+  createAuthedGmailClient,
+  sleep,
+  tryLockAccount,
+  unlockAccount,
+} from './oauth.js';
 
 let pollTimer = null;
 
@@ -24,6 +30,12 @@ export async function pollGmailAccount(accountId) {
     return;
   }
 
+  if (!tryLockAccount(accountId)) {
+    logger.info('Gmail poll skipped; sync already running', { accountId: String(accountId) });
+    return;
+  }
+
+  let shouldReimport = false;
   try {
     const refreshToken = decryptToken(account.google.refreshTokenEnc);
     const gmail = await createAuthedGmailClient(refreshToken);
@@ -32,12 +44,14 @@ export async function pollGmailAccount(accountId) {
     let pageToken;
     let latestHistoryId;
     do {
-      const historyRes = await gmail.users.history.list({
-        userId: 'me',
-        startHistoryId: account.google.historyId,
-        historyTypes: ['messageAdded'],
-        ...(pageToken ? { pageToken } : {}),
-      });
+      const historyRes = await callGmailWithRetry(() =>
+        gmail.users.history.list({
+          userId: 'me',
+          startHistoryId: account.google.historyId,
+          historyTypes: ['messageAdded'],
+          ...(pageToken ? { pageToken } : {}),
+        })
+      );
 
       const historyItems = historyRes.data?.history || [];
       for (const h of historyItems) {
@@ -52,12 +66,17 @@ export async function pollGmailAccount(accountId) {
     } while (pageToken);
 
     let classifiedAny = false;
+    let threadIdx = 0;
     for (const gmailThreadId of changedThreadIds) {
-      const fullRes = await gmail.users.threads.get({
-        userId: 'me',
-        id: gmailThreadId,
-        format: 'full',
-      });
+      if (threadIdx > 0) await sleep(100);
+      threadIdx += 1;
+      const fullRes = await callGmailWithRetry(() =>
+        gmail.users.threads.get({
+          userId: 'me',
+          id: gmailThreadId,
+          format: 'full',
+        })
+      );
       const mapped = mapGmailThread(fullRes.data, account.address);
       const { thread, hasNewInbound, isNew } = await upsertMappedThread({ account, mapped });
       if (isNew || hasNewInbound) {
@@ -89,23 +108,25 @@ export async function pollGmailAccount(accountId) {
       logger.info('Gmail historyId expired; re-importing last 20 threads', {
         accountId: account.id,
       });
-      await importGmailAccount(account._id, { maxResults: 20 });
-      return;
-    }
-
-    if (msg.includes('invalid_grant')) {
+      shouldReimport = true;
+    } else if (msg.includes('invalid_grant')) {
       account.status = 'error';
       account.error = 'Reconnect Gmail';
       await account.save();
       emitSyncDone(account.clientId, account.toJSON(), account.assistantId);
-      return;
+    } else {
+      logger.warn('Gmail poll error', { accountId: account.id, message: msg });
+      account.status = 'connected';
+      account.error = msg;
+      await account.save();
+      emitSyncDone(account.clientId, account.toJSON(), account.assistantId);
     }
+  } finally {
+    unlockAccount(accountId);
+  }
 
-    logger.warn('Gmail poll error', { accountId: account.id, message: msg });
-    account.status = 'connected';
-    account.error = msg;
-    await account.save();
-    emitSyncDone(account.clientId, account.toJSON(), account.assistantId);
+  if (shouldReimport) {
+    await importGmailAccount(account._id, { maxResults: 20 });
   }
 }
 

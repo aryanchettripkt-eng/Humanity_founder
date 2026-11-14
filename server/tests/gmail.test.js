@@ -10,6 +10,7 @@ import {
 } from '../src/services/gmail/crypto.js';
 import { upsertMappedThread } from '../src/services/gmail/import.js';
 import { mapGmailThread, trimQuotedReplies } from '../src/services/gmail/mapper.js';
+import { callGmailWithRetry } from '../src/services/gmail/oauth.js';
 
 function b64url(str) {
   return Buffer.from(str, 'utf8').toString('base64url');
@@ -201,6 +202,24 @@ describe('quoted reply trimming & idempotent upsert dedupe (G6.7)', () => {
       expect.objectContaining({ $setOnInsert: expect.any(Object) }),
       { upsert: true }
     );
+  });
+
+  it('retries Gmail API calls on Quota exceeded / 429 and succeeds', async () => {
+    let attempts = 0;
+    const res = await callGmailWithRetry(
+      async () => {
+        attempts += 1;
+        if (attempts < 3) {
+          const err = new Error('Quota exceeded for quota metric "Queries" and limit "Units per minute per user"');
+          err.code = 429;
+          throw err;
+        }
+        return 'ok';
+      },
+      { baseDelayMs: 5, maxAttempts: 4 }
+    );
+    expect(attempts).toBe(3);
+    expect(res).toBe('ok');
   });
 });
 

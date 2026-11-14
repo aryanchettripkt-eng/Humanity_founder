@@ -18,6 +18,15 @@ _None yet._
 
 ---
 
+### 2026-11-15 02:52 · gemini · Gmail sync concurrency lock, quota retry, early historyId
+- Done:
+  - Added in-memory `activeSyncAccounts` lock (`isAccountSyncing` / `tryLockAccount` / `unlockAccount`) in `server/src/services/gmail/oauth.js` and wired it into `importGmailAccount`, `pollGmailAccount`, and `POST /accounts/:id/sync`.
+  - Saved `google.historyId` from `users.getProfile` immediately at the start of `importGmailAccount` so interrupted imports don't cause the poller to re-import.
+  - Added `callGmailWithRetry` (1s, 2s, 4s; max 4 tries) for Gmail `429` / `403 rateLimitExceeded` / `"Quota exceeded"` and `100ms` pauses between `threads.get` calls in `import.js` and `poller.js`.
+  - Lowered default `GMAIL_IMPORT_LIMIT` to `20` in `server/src/config/env.js` and `.env.example`, and added retry unit test in `server/tests/gmail.test.js` (26/26 server tests pass).
+- Changed contracts: none.
+- Next: merge `gemini/gmail-rate-limit` -> `main` and set `GMAIL_IMPORT_LIMIT=20` on Render.
+
 ### 2026-11-15 02:32 · gemini · Fix Groq classification schema validation
 - Done:
   - Logged Zod validation issue paths + codes (without email content) in `server/src/ai/utils.js` `runJSONWithRetry`.

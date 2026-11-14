@@ -5,7 +5,7 @@ import { Message } from '../models/Message.js';
 import { Thread } from '../models/Thread.js';
 import { joinAssistantClientRoom } from '../realtime/socket.js';
 import { decryptToken } from '../services/gmail/crypto.js';
-import { revokeGoogleToken } from '../services/gmail/oauth.js';
+import { isAccountSyncing, revokeGoogleToken } from '../services/gmail/oauth.js';
 import { pollGmailAccount } from '../services/gmail/poller.js';
 import { runSimulatedSync } from '../services/sync.service.js';
 import { notFound } from '../utils/errors.js';
@@ -119,6 +119,9 @@ export async function authorizeAccount(req, res, next) {
 export async function syncAccount(req, res, next) {
   try {
     const account = await findOwnedAccount(req.params.id, req.user._id);
+    if (!account.simulated && isAccountSyncing(account._id)) {
+      return res.json({ data: { started: false, alreadySyncing: true } });
+    }
     account.status = 'syncing';
     await account.save();
 
