@@ -1,0 +1,2303 @@
+[
+  {
+    "clientKey": "priya",
+    "subject": "Reschedule Tuesday Coffee with Marcus",
+    "participants": [
+      {
+        "name": "Marcus Vance",
+        "email": "marcus@designco.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.91,
+    "reason": "Routine calendar change. Alex handles scheduling for Priya.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Marcus wants to move Tuesday's coffee to Wednesday 9:30 AM at Blue Bottle SOMA.",
+    "keyPoints": [
+      "Proposes Wednesday 9:30 AM",
+      "Backup: Thursday after 2 PM",
+      "Blue Bottle SOMA"
+    ],
+    "entities": [
+      {
+        "type": "meeting",
+        "title": "Coffee with Marcus",
+        "startsInHours": 44,
+        "endsInHours": 45,
+        "location": "Blue Bottle SOMA"
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Marcus Vance",
+          "email": "marcus@designco.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -6,
+        "bodyText": "Hi Priya,\n\nSomething came up on my end Tuesday morning, sorry about that. Could we push our coffee to Wednesday at 9:30 instead? Same place, Blue Bottle on Mint Plaza.\n\nIf Wednesday doesn't work, Thursday after 2 is also open.\n\nMarcus"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Invoice #1042 — Team lunch catering (Nov 8)",
+    "participants": [
+      {
+        "name": "Olive & Thyme Catering",
+        "email": "billing@oliveandthyme.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.93,
+    "reason": "Vendor invoice for a routine expense. Alex handles vendors and payments.",
+    "category": "finance",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Olive & Thyme sent a $1,280 invoice for the Nov 8 team lunch, due in 5 days.",
+    "keyPoints": ["$1,280.00 for 24 guests", "Due Nov 19", "ACH or card"],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Catering invoice #1042 due",
+        "startsInHours": 120
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Olive & Thyme Catering",
+          "email": "billing@oliveandthyme.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -9,
+        "bodyText": "Hello Raman Studio team,\n\nPlease find attached invoice #1042 for catering on November 8 (team lunch, 24 guests).\n\nAmount due: $1,280.00\nPayment terms: Net 14, due November 19.\n\nYou can pay by ACH or card using the link in the attached PDF. Thank you for having us again!\n\nOlive & Thyme Catering"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Lisbon Web Summit — flight options",
+    "participants": [
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      {
+        "name": "Nina at Wanderly Travel",
+        "email": "nina@wanderly.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.88,
+    "reason": "Travel booking within Priya's stated preferences. Alex handles travel.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Travel agent sent three flight options to Lisbon; she needs a choice by tomorrow to hold the fare.",
+    "keyPoints": [
+      "3 options, $1,140 to $1,410",
+      "Option 1 fare hold expires tomorrow 5 PM",
+      "Aisle seat preference"
+    ],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Lisbon fare hold expires",
+        "startsInHours": 22
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -30,
+        "bodyText": "Hi Nina,\n\nPriya is speaking at Web Summit in Lisbon. Could you send flight options SFO to LIS arriving no later than the evening before her talk? She prefers aisle seats and one stop at most.\n\nThanks,\nAlex",
+        "to": [
+          {
+            "name": "Nina at Wanderly Travel",
+            "email": "nina@wanderly.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "Nina at Wanderly Travel",
+          "email": "nina@wanderly.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -5,
+        "bodyText": "Hi Alex,\n\nHere are three options:\n\n1. TAP via Newark, departs 5:40 PM, arrives 1:05 PM next day. $1,140 economy plus.\n2. United via Frankfurt, departs 3:15 PM, arrives 2:50 PM next day. $1,320.\n3. Delta via JFK, departs 7:00 AM, arrives 7:25 AM next day. $1,410, flat-bed upgrade available for $900.\n\nOption 1 fare holds until tomorrow at 5 PM. Let me know which one and I'll ticket it.\n\nNina"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Appointment reminder: Dr. Lee, Thursday 4:30 PM",
+    "participants": [
+      {
+        "name": "Bright Smile Dental",
+        "email": "frontdesk@brightsmile.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.86,
+    "reason": "Appointment confirmation request. Alex manages Priya's calendar.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Dental office asks to confirm Priya's Thursday 4:30 PM cleaning or reschedule.",
+    "keyPoints": ["Reply YES to confirm", "$50 late-cancel fee"],
+    "entities": [
+      {
+        "type": "meeting",
+        "title": "Dentist: Dr. Lee",
+        "startsInHours": 52,
+        "endsInHours": 53,
+        "location": "Bright Smile Dental"
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Bright Smile Dental",
+          "email": "frontdesk@brightsmile.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -14,
+        "bodyText": "Hi Priya,\n\nThis is a reminder of your appointment with Dr. Lee on Thursday at 4:30 PM.\n\nPlease reply YES to confirm or call us to reschedule. Cancellations within 24 hours incur a $50 fee.\n\nBright Smile Dental"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Design Matters FM — recording logistics",
+    "participants": [
+      {
+        "name": "Leah Kim",
+        "email": "leah@designmattersfm.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.84,
+    "reason": "Logistics for a confirmed booking (mic, link, time). Alex can answer these.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Podcast producer needs a mailing address for the mic kit and confirmation of the Monday 10 AM recording slot.",
+    "keyPoints": [
+      "Needs a shipping address for the mic",
+      "Monday 10 AM PT, 60 min",
+      "Riverside link to follow"
+    ],
+    "entities": [
+      {
+        "type": "meeting",
+        "title": "Podcast recording: Design Matters FM",
+        "startsInHours": 96,
+        "endsInHours": 97
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Leah Kim",
+          "email": "leah@designmattersfm.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -20,
+        "bodyText": "Hi Priya,\n\nSo excited to have you on next week! A few logistics:\n\n- We'd like to ship you a USB mic. What address should we send it to?\n- Recording is Monday at 10 AM PT on Riverside. Link to follow.\n- Please plan for 60 minutes, including a 10 minute sound check.\n\nLeah, Producer"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Office plants — quotes for the new studio",
+    "participants": [
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      {
+        "name": "GreenWorks",
+        "email": "hello@greenworks.example.com"
+      },
+      {
+        "name": "Leaf & Co",
+        "email": "quotes@leafandco.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.82,
+    "reason": "Vendor quote comparison for office upkeep. Alex handles vendors.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Two plant service quotes came in for the new studio: $180/mo vs $240/mo with a larger selection.",
+    "keyPoints": [
+      "GreenWorks: $180/mo, 14 plants",
+      "Leaf & Co: $240/mo, 20 plants, weekly",
+      "Free install if signed this month"
+    ],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -70,
+        "bodyText": "Hi both, could you send monthly quotes for plant care at our new studio (about 2,400 sq ft, lots of north light)? Thanks, Alex",
+        "to": [
+          {
+            "name": "GreenWorks",
+            "email": "hello@greenworks.example.com"
+          },
+          {
+            "name": "Leaf & Co",
+            "email": "quotes@leafandco.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "GreenWorks",
+          "email": "hello@greenworks.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -40,
+        "bodyText": "Hi Alex, we can do $180/month for 14 plants with bi-weekly visits. Install would be free if you sign by end of month."
+      },
+      {
+        "from": {
+          "name": "Leaf & Co",
+          "email": "quotes@leafandco.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -11,
+        "bodyText": "Hello Alex! Our quote is $240/month for 20 plants, weekly care, and seasonal swaps. Happy to visit the space Thursday."
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Overdue: Raman Studio invoice RS-2207",
+    "participants": [
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      {
+        "name": "Accounts — Lumen Co",
+        "email": "ap@lumenco.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.87,
+    "reason": "Routine payment follow-up with a client. Alex handles follow-ups.",
+    "category": "finance",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Lumen Co's AP team says invoice RS-2207 ($8,400) is stuck pending a W-9.",
+    "keyPoints": [
+      "$8,400, due Oct 31",
+      "Blocked on a W-9",
+      "Payment runs on Fridays"
+    ],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -50,
+        "bodyText": "Hi team, a friendly reminder that invoice RS-2207 for $8,400 was due on Oct 31. Could you confirm when payment will go out? Thanks, Alex",
+        "to": [
+          {
+            "name": "Accounts — Lumen Co",
+            "email": "ap@lumenco.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "Accounts — Lumen Co",
+          "email": "ap@lumenco.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -8,
+        "bodyText": "Hi Alex,\n\nApologies for the delay. Our system flagged the invoice because we don't have a current W-9 on file for Raman Studio. If you can send one over, we'll release payment in the next run (Fridays).\n\nThanks,\nMarta, Accounts Payable"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Team offsite — venue deposit due Friday",
+    "participants": [
+      {
+        "name": "Sofia at The Foundry",
+        "email": "events@thefoundry.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.85,
+    "reason": "Event logistics and a deposit within budget. Alex handles vendors.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "The Foundry is holding Dec 12 for the team offsite; a $1,500 deposit is due Friday to keep it.",
+    "keyPoints": [
+      "Dec 12, 18 people",
+      "$1,500 deposit due Friday",
+      "Choose a lunch menu"
+    ],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Offsite deposit due",
+        "startsInHours": 70
+      },
+      {
+        "type": "date",
+        "title": "Team offsite at The Foundry",
+        "startsInHours": 650,
+        "endsInHours": 658,
+        "location": "The Foundry"
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Sofia at The Foundry",
+          "email": "events@thefoundry.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -16,
+        "bodyText": "Hi Alex,\n\nGreat speaking earlier. We have the loft penciled in for December 12 for 18 people, 9 AM to 5 PM. To confirm the booking we need a 25% deposit ($1,500) by Friday.\n\nI've attached the contract. Lunch menu options are on page 3.\n\nSofia"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "You're invited: Config Community Night SF",
+    "participants": [
+      {
+        "name": "Figma Events",
+        "email": "events@figma.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.72,
+    "reason": "Event RSVP that Alex can accept or decline based on Priya's calendar.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Invite to a design community meetup next Wednesday evening; RSVP closes Monday.",
+    "keyPoints": ["Next Wednesday 6 to 9 PM", "RSVP by Monday"],
+    "entities": [
+      {
+        "type": "meeting",
+        "title": "Config Community Night",
+        "startsInHours": 140,
+        "endsInHours": 143,
+        "location": "SF"
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Figma Events",
+          "email": "events@figma.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -26,
+        "bodyText": "Hi Priya,\n\nYou're invited to Config Community Night in San Francisco next Wednesday, 6 to 9 PM. Talks from three design leaders, then drinks.\n\nSpots are limited, so please RSVP by Monday."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Action needed: upload proof of insurance",
+    "participants": [
+      {
+        "name": "Harbor Auto Insurance",
+        "email": "service@harborauto.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.8,
+    "reason": "Routine paperwork. Alex has Priya's documents.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "The car insurer needs an updated registration document uploaded within 7 days to avoid a lapse.",
+    "keyPoints": ["Upload registration", "7-day deadline"],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Upload vehicle registration",
+        "startsInHours": 133
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Harbor Auto Insurance",
+          "email": "service@harborauto.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -35,
+        "bodyText": "Dear Priya Raman,\n\nTo complete your policy renewal, please upload a copy of your current vehicle registration in your account within 7 days. Your coverage will continue without interruption once we receive it.\n\nHarbor Auto Insurance"
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Contractor onboarding — Jordan Ellis",
+    "participants": [
+      "client",
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      {
+        "name": "Jordan Ellis",
+        "email": "jordan.ellis@freelance.example.com"
+      }
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.83,
+    "reason": "Onboarding paperwork and access for a contractor Priya already hired. Alex handles admin.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Jordan signed the contract and is asking for a Figma seat, a Slack invite and the W-8BEN form.",
+    "keyPoints": [
+      "Figma seat + Slack invite",
+      "W-8BEN (Canada-based)",
+      "Where to send invoices"
+    ],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": "client",
+        "direction": "outbound",
+        "hoursOffset": -48,
+        "bodyText": "Alex, I've hired Jordan for the Bloom Health illustrations, starting Monday. Can you get them set up? Contract is signed.",
+        "to": [
+          {
+            "name": "Alex Morgan",
+            "email": "alex@ramanstudio.com"
+          },
+          {
+            "name": "Jordan Ellis",
+            "email": "jordan.ellis@freelance.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -46,
+        "bodyText": "Welcome Jordan! I'll send over onboarding details today.",
+        "to": [
+          {
+            "name": "Jordan Ellis",
+            "email": "jordan.ellis@freelance.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "Jordan Ellis",
+          "email": "jordan.ellis@freelance.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -4,
+        "bodyText": "Thanks Alex! To get started Monday I'll need:\n\n1. A Figma seat on the Raman Studio team\n2. A Slack invite\n3. Which tax form you need from me (I'm based in Toronto, so W-8BEN?)\n\nAlso, who should I send weekly invoices to?"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Q3 Board Deck — Final Sign-off Needed",
+    "participants": [
+      {
+        "name": "James Chen",
+        "email": "james@sequoiacap.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.95,
+    "reason": "VIP investor asks Priya personally to approve the board deck. Investors are Priya's.",
+    "category": "action",
+    "important": true,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "James needs Priya's final sign-off on the Q3 board deck before Thursday's board meeting.",
+    "keyPoints": [
+      "Revenue slide updated",
+      "Hiring plan moved to appendix",
+      "Sign-off by Wednesday EOD"
+    ],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Board deck sign-off",
+        "startsInHours": 30
+      },
+      {
+        "type": "meeting",
+        "title": "Q3 board meeting",
+        "startsInHours": 48,
+        "endsInHours": 50
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "James Chen",
+          "email": "james@sequoiacap.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -4,
+        "bodyText": "Hi Priya,\n\nFinal Q3 deck attached. I've incorporated your notes on the revenue slide and moved the hiring plan to the appendix.\n\nCould you give it a last look and sign off by Wednesday EOD? We'll circulate to the board Thursday morning.\n\nJames"
+      }
+    ],
+    "unread": true,
+    "clientReason": "James is waiting on your sign-off on the Q3 board deck by Wednesday."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Series A — revised term sheet for signature",
+    "participants": [
+      {
+        "name": "Elena Ortiz",
+        "email": "elena@northstarvc.example.com"
+      },
+      {
+        "name": "Raj Mehta (counsel)",
+        "email": "raj@mehtalaw.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.96,
+    "reason": "Legal signature on financing documents. Legal sign-off is Priya's.",
+    "category": "legal",
+    "important": true,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Lead investor sent the revised term sheet with the pro-rata change; needs Priya's signature by Monday.",
+    "keyPoints": [
+      "Pro-rata for seed investors",
+      "1x non-participating preference",
+      "Sign by Monday"
+    ],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Sign Series A term sheet",
+        "startsInHours": 90
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Elena Ortiz",
+          "email": "elena@northstarvc.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -7,
+        "bodyText": "Priya,\n\nAttached is the revised term sheet reflecting what we agreed on the call: pro-rata rights for the seed investors and the 1x non-participating preference.\n\nIf everything looks right, please sign via DocuSign by Monday so our counsel can start on definitive docs.\n\nElena",
+        "cc": [
+          {
+            "name": "Raj Mehta (counsel)",
+            "email": "raj@mehtalaw.example.com"
+          }
+        ]
+      }
+    ],
+    "unread": true,
+    "clientReason": "Elena needs your signature on the revised Series A term sheet by Monday."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Senior Designer — final two candidates",
+    "participants": [
+      {
+        "name": "Tara Singh",
+        "email": "tara@talentbridge.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.9,
+    "reason": "Hiring decision between finalists. Hiring decisions are Priya's.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Recruiter needs Priya to choose between the two senior designer finalists before Friday.",
+    "keyPoints": [
+      "Maya: systems, $165k, Jan 6",
+      "Leo: craft, $155k, 4 weeks notice",
+      "Decision by Friday"
+    ],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Pick senior designer",
+        "startsInHours": 68
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Tara Singh",
+          "email": "tara@talentbridge.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -18,
+        "bodyText": "Hi Priya,\n\nBoth finalists wrapped up their final rounds yesterday:\n\n- Maya R.: strong systems thinking, asked for $165k, can start Jan 6\n- Leo T.: stronger visual craft, asked for $155k, needs 4 weeks notice\n\nBoth have other offers, so I'd love a decision by Friday. Happy to jump on a call.\n\nTara"
+      }
+    ],
+    "unread": true,
+    "clientReason": "Tara needs your pick between the two senior designer finalists by Friday."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Mom's 60th 🎂",
+    "participants": [
+      {
+        "name": "Anika Raman",
+        "email": "anika.raman@gmail.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.89,
+    "reason": "Personal family message to Priya. Personal notes are Priya's.",
+    "category": "personal",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Priya's sister wants to plan Mom's 60th dinner and asks which Saturday Priya can make.",
+    "keyPoints": ["Surprise dinner for Mom", "Choose Nov 30 or Dec 7"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Anika Raman",
+          "email": "anika.raman@gmail.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -3,
+        "bodyText": "Hey Pri!\n\nThinking we do a surprise dinner for Mom's 60th. Would the 30th or Dec 7 work better for you? I was thinking that little Italian place she loves in Palo Alto.\n\nDon't tell Dad yet, he can't keep a secret 😂\n\nxx A"
+      }
+    ],
+    "unread": true,
+    "clientReason": "Anika is asking which Saturday works for Mom's 60th dinner."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Fast Company — quote for design leadership piece",
+    "participants": [
+      {
+        "name": "Dev Banerjee",
+        "email": "dev.banerjee@fastcompany.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.81,
+    "reason": "Press request asking for Priya's own words. Only Priya can give a quote.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "A journalist wants a 2 to 3 sentence quote from Priya on small design studios by Thursday noon.",
+    "keyPoints": ["2 to 3 sentence quote", "Deadline Thursday noon ET"],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Fast Company quote",
+        "startsInHours": 40
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Dev Banerjee",
+          "email": "dev.banerjee@fastcompany.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -10,
+        "bodyText": "Hi Priya,\n\nI'm writing a piece on how small design studios are competing with big agencies for enterprise work. Would you be open to sharing a 2 to 3 sentence quote on what's working for Raman Studio?\n\nMy deadline is Thursday at noon ET.\n\nThanks,\nDev"
+      }
+    ],
+    "unread": true,
+    "clientReason": "A Fast Company journalist wants a short quote from you by Thursday noon."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Dinner with the Kapoors",
+    "participants": [
+      {
+        "name": "Rohan Kapoor",
+        "email": "rohan@kapoorfamily.example.com"
+      },
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.86,
+    "reason": "Rohan's latest message asks about Priya's personal plans, so it moved to Priya.",
+    "category": "personal",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Started as a date-finding thread Alex was handling; Rohan now asks Priya personally about bringing the kids.",
+    "keyPoints": [
+      "Dinner on the 22nd confirmed",
+      "Asks about bringing kids",
+      "Asks about Arjun's diet"
+    ],
+    "entities": [
+      {
+        "type": "meeting",
+        "title": "Dinner at the Kapoors'",
+        "startsInHours": 180,
+        "endsInHours": 183
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Rohan Kapoor",
+          "email": "rohan@kapoorfamily.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -60,
+        "bodyText": "Hi Priya, we'd love to have you over for dinner soon! What dates work for you in the next couple of weeks?"
+      },
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -55,
+        "bodyText": "Hi Rohan, this is Alex, Priya's assistant. She's free the evenings of the 22nd and the 29th. Would either suit?",
+        "to": [
+          {
+            "name": "Rohan Kapoor",
+            "email": "rohan@kapoorfamily.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "Rohan Kapoor",
+          "email": "rohan@kapoorfamily.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -9,
+        "bodyText": "The 22nd is perfect. Priya, are you okay if we bring the kids? And is Arjun still off gluten? Want to plan the menu."
+      }
+    ],
+    "unread": true,
+    "clientReason": "Rohan asked you directly about the kids and Arjun's diet for dinner on the 22nd.",
+    "history": [
+      {
+        "from": "review",
+        "to": "assistant",
+        "source": "ai",
+        "reason": "Scheduling request, Alex can find dates.",
+        "hoursOffset": -60
+      },
+      {
+        "from": "assistant",
+        "to": "client",
+        "source": "ai",
+        "reason": "Latest message asks Priya personal questions.",
+        "hoursOffset": -9
+      }
+    ],
+    "reclassifiedHoursAgo": 9,
+    "activity": [
+      {
+        "type": "reclassified",
+        "actor": {
+          "type": "ai",
+          "name": "Relay AI"
+        },
+        "hoursOffset": -9,
+        "payload": {
+          "from": "assistant",
+          "to": "client"
+        }
+      }
+    ]
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Northwind — 20% discount on the retainer?",
+    "participants": [
+      {
+        "name": "Grace Liu",
+        "email": "grace@northwind.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.78,
+    "reason": "Pricing negotiation with a client. Commercial terms are Priya's decision.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Northwind asks for 20% off the 2026 retainer in exchange for a 12-month commitment.",
+    "keyPoints": [
+      "20% discount ask",
+      "12-month commitment",
+      "Answer by the 25th"
+    ],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Grace Liu",
+          "email": "grace@northwind.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -22,
+        "bodyText": "Hi Priya,\n\nWe're planning 2026 budgets and want to keep working with Raman Studio. Would you consider 20% off the monthly retainer if we commit to 12 months up front?\n\nOur finance team needs an answer by the 25th.\n\nGrace"
+      }
+    ],
+    "unread": true,
+    "clientReason": "Northwind wants 20% off the retainer for a 12-month commitment."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Acme Retail MSA renewal — signature required",
+    "participants": [
+      {
+        "name": "Acme Legal",
+        "email": "contracts@acmeretail.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.92,
+    "reason": "Contract signature. Legal sign-off is Priya's.",
+    "category": "legal",
+    "important": true,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Acme's legal team sent the renewed MSA with a new liability cap clause for Priya to sign.",
+    "keyPoints": [
+      "Liability cap raised to 2x fees (9.2)",
+      "Current MSA expires Nov 30"
+    ],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Acme Legal",
+          "email": "contracts@acmeretail.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -40,
+        "bodyText": "Dear Ms. Raman,\n\nAttached is the renewed Master Services Agreement for 2026. The only material change is section 9.2, which raises the liability cap to 2x annual fees.\n\nPlease review and sign at your earliest convenience. The current MSA expires on November 30.\n\nAcme Retail Legal"
+      }
+    ],
+    "unread": false,
+    "clientReason": "Acme's renewed contract needs your signature before Nov 30. Section 9.2 changed."
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Stripe Receipt — Raman Studio ($299.00)",
+    "participants": [
+      {
+        "name": "Stripe",
+        "email": "receipts@stripe.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.97,
+    "reason": "Automated payment receipt. No reply needed.",
+    "category": "finance",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Monthly Stripe receipt for $299.00 to Acme Cloud.",
+    "keyPoints": ["$299.00 paid", "Receipt #8492"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Stripe",
+          "email": "receipts@stripe.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -12,
+        "bodyText": "Your payment of $299.00 to Acme Cloud has been processed. Receipt #8492. No reply needed."
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Founder Weekly #212: Pricing your first enterprise deal",
+    "participants": [
+      {
+        "name": "Founder Weekly",
+        "email": "hello@founderweekly.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.98,
+    "reason": "Newsletter. No action needed.",
+    "category": "newsletter",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Weekly founder newsletter about enterprise pricing.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Founder Weekly",
+          "email": "hello@founderweekly.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -15,
+        "bodyText": "This week: how to price your first enterprise deal, why annual contracts beat monthly for studios, and 5 tools we're loving.\n\nRead online | Unsubscribe"
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "New comments on \"Bloom Health — Onboarding v3\"",
+    "participants": [
+      {
+        "name": "Figma",
+        "email": "notifications@figma.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.9,
+    "reason": "Automated tool notification. The team will see it in Figma.",
+    "category": "update",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Three new comments on the Bloom Health onboarding file.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Figma",
+          "email": "notifications@figma.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -2,
+        "bodyText": "Jordan Ellis and 2 others left 3 comments on Bloom Health — Onboarding v3. Open in Figma to reply."
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Your Slack digest for Raman Studio",
+    "participants": [
+      {
+        "name": "Slack",
+        "email": "feedback@slack.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.95,
+    "reason": "Automated digest. No action needed.",
+    "category": "update",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Daily Slack summary: 4 unread mentions in #bloom-health.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Slack",
+          "email": "feedback@slack.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -18,
+        "bodyText": "You have 4 unread mentions in #bloom-health and 12 new messages in #general."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Security alert: new sign-in on Mac",
+    "participants": [
+      {
+        "name": "Google",
+        "email": "no-reply@accounts.google.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.88,
+    "reason": "Automated security notice for a known device. Informational only.",
+    "category": "update",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Google noticed a new sign-in from a Mac in San Francisco.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Google",
+          "email": "no-reply@accounts.google.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -28,
+        "bodyText": "We noticed a new sign-in to your Google Account on a Mac device in San Francisco, CA. If this was you, you don't need to do anything."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Re: Studio printer repair",
+    "participants": [
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      {
+        "name": "PrintFix",
+        "email": "service@printfix.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.84,
+    "reason": "Resolved. The technician confirmed the fix and nothing is left to do.",
+    "category": "update",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "The printer was repaired on site; the technician confirmed it's working and no invoice is due (warranty).",
+    "keyPoints": ["Pinch roller replaced", "Covered under warranty"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -96,
+        "bodyText": "Hi, our studio printer (HP DesignJet T650) is jamming on every large-format print. Could someone come by this week?",
+        "to": [
+          {
+            "name": "PrintFix",
+            "email": "service@printfix.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "PrintFix",
+          "email": "service@printfix.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -90,
+        "bodyText": "We can send someone Thursday between 1 and 3 PM."
+      },
+      {
+        "from": {
+          "name": "PrintFix",
+          "email": "service@printfix.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -31,
+        "bodyText": "Repair complete: replaced the pinch roller. Covered under warranty, so no charge. Have a great week!"
+      }
+    ],
+    "unread": false,
+    "history": [
+      {
+        "from": "assistant",
+        "to": "none",
+        "source": "ai",
+        "reason": "Repair confirmed complete; nothing left to do.",
+        "hoursOffset": -31
+      }
+    ],
+    "reclassifiedHoursAgo": 31
+  },
+  {
+    "clientKey": "priya",
+    "subject": "FYI: Q3 estimated taxes filed",
+    "participants": [
+      {
+        "name": "Helen Park, CPA",
+        "email": "helen@parkcpa.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.86,
+    "reason": "FYI from the accountant. Nothing to do.",
+    "category": "finance",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "The accountant filed Q3 estimated taxes; the next payment is due January 15.",
+    "keyPoints": ["Q3 filed", "Next due Jan 15"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Helen Park, CPA",
+          "email": "helen@parkcpa.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -45,
+        "bodyText": "Hi Priya, just a heads up that we filed your Q3 estimated payment on time. Next one is due January 15. No action needed from you."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Brand photography — quote request",
+    "participants": [
+      {
+        "name": "Alex Morgan",
+        "email": "alex@ramanstudio.com"
+      },
+      {
+        "name": "Sam Okoye",
+        "email": "sam@okoyephoto.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.83,
+    "reason": "We sent the last message and are waiting on the photographer.",
+    "category": "action",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": true,
+    "summary": "Alex asked a photographer for a quote 4 days ago and hasn't heard back.",
+    "keyPoints": ["Half-day shoot, early December", "No reply in 4 days"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Alex Morgan",
+          "email": "alex@ramanstudio.com"
+        },
+        "direction": "outbound",
+        "hoursOffset": -98,
+        "bodyText": "Hi Sam, Priya loved your portfolio. Could you send a quote for a half-day team and studio shoot in early December? About 10 people. Thanks, Alex",
+        "to": [
+          {
+            "name": "Sam Okoye",
+            "email": "sam@okoyephoto.example.com"
+          }
+        ]
+      }
+    ],
+    "unread": false,
+    "history": [
+      {
+        "from": "assistant",
+        "to": "none",
+        "source": "ai",
+        "reason": "Alex replied; now waiting on the photographer.",
+        "hoursOffset": -98
+      }
+    ]
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Proposal — Bloom Health patient portal redesign",
+    "participants": [
+      "client",
+      {
+        "name": "Dana Whitfield",
+        "email": "dana@bloomhealth.example.com"
+      }
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.85,
+    "reason": "Priya sent the proposal. Waiting on Bloom Health.",
+    "category": "action",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": true,
+    "summary": "Priya sent the $64k redesign proposal two days ago; waiting for Bloom Health's response.",
+    "keyPoints": ["10 weeks, $64,000", "Start January"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": "client",
+        "direction": "outbound",
+        "hoursOffset": -50,
+        "bodyText": "Hi Dana,\n\nAs promised, attached is our proposal for the patient portal redesign: 10 weeks, $64,000, starting in January.\n\nHappy to walk through it whenever suits.\n\nPriya",
+        "to": [
+          {
+            "name": "Dana Whitfield",
+            "email": "dana@bloomhealth.example.com"
+          }
+        ]
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Quick question",
+    "participants": [
+      {
+        "name": "Samir Patel",
+        "email": "samir@unknown.example.com"
+      },
+      "client"
+    ],
+    "owner": "review",
+    "ownerSource": "ai",
+    "confidence": 0.54,
+    "reason": "Unfamiliar sender and an unclear request. Could be a sales pitch or a real lead.",
+    "category": "general",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Samir wants 15 minutes next week but doesn't say what about.",
+    "keyPoints": ["No context on the topic", "Unknown sender"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Samir Patel",
+          "email": "samir@unknown.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -2,
+        "bodyText": "Hi Priya, quick question. Are you around next week for 15 minutes? Would love to pick your brain."
+      }
+    ],
+    "unread": true,
+    "suggestedOwner": "assistant"
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Intro: Ravi <> Priya",
+    "participants": [
+      {
+        "name": "Meera Shah",
+        "email": "meera@shahangels.example.com"
+      },
+      {
+        "name": "Ravi Kumar",
+        "email": "ravi@ledgerly.example.com"
+      },
+      "client"
+    ],
+    "owner": "review",
+    "ownerSource": "ai",
+    "confidence": 0.6,
+    "reason": "Warm intro from a known contact, but it's unclear if Priya wants to take it herself.",
+    "category": "general",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Meera introduces Ravi, a fintech founder looking for a design partner.",
+    "keyPoints": ["Possible new client", "Warm intro from an angel investor"],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Meera Shah",
+          "email": "meera@shahangels.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -6,
+        "bodyText": "Priya, meet Ravi, founder of Ledgerly (fintech, just raised a seed). He's looking for a design partner for their v2 and I immediately thought of you.\n\nRavi, Priya runs Raman Studio, the best small design team I know.\n\nI'll let you two take it from here!",
+        "cc": [
+          {
+            "name": "Ravi Kumar",
+            "email": "ravi@ledgerly.example.com"
+          }
+        ]
+      }
+    ],
+    "unread": true,
+    "suggestedOwner": "client"
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Re: Saturday",
+    "participants": [
+      {
+        "name": "Kai",
+        "email": "kai.w@mail.example.com"
+      },
+      "client"
+    ],
+    "owner": "review",
+    "ownerSource": "ai",
+    "confidence": 0.48,
+    "reason": "Very short and unclear: could be personal plans or a work event.",
+    "category": "general",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Someone asks if Saturday is still on, with no other context.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Kai",
+          "email": "kai.w@mail.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -1,
+        "bodyText": "still on for saturday?"
+      }
+    ],
+    "unread": true,
+    "suggestedOwner": "client"
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Brand Refresh v4 — feedback round",
+    "participants": [
+      {
+        "name": "Chris Moreno",
+        "email": "chris@bloomhealth.example.com"
+      },
+      {
+        "name": "Dana Whitfield",
+        "email": "dana@bloomhealth.example.com"
+      },
+      {
+        "name": "Jordan Ellis",
+        "email": "jordan.ellis@freelance.example.com"
+      },
+      {
+        "name": "Sara Ng",
+        "email": "sara@bloomhealth.example.com"
+      },
+      {
+        "name": "Tom Reyes",
+        "email": "tom@bloomhealth.example.com"
+      },
+      "client"
+    ],
+    "owner": "review",
+    "ownerSource": "ai",
+    "confidence": 0.57,
+    "reason": "Many people on cc. Unclear whether Priya needs to weigh in or Alex just tracks it.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Bloom Health's team shared v4 feedback with 6 people cc'd; one comment asks for 'Priya's call' on the logo lockup.",
+    "keyPoints": [
+      "Typography light on mobile",
+      "Lockup decision for Priya",
+      "Close round by Monday"
+    ],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Chris Moreno",
+          "email": "chris@bloomhealth.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -12,
+        "bodyText": "Hi all,\n\nConsolidated feedback on v4 is in the doc. Main themes: the teal is testing well, typography is a little light on mobile, and we're split on the stacked vs horizontal lockup. Would be good to get Priya's call on that one.\n\nCan we close this round by Monday?",
+        "cc": [
+          {
+            "name": "Dana Whitfield",
+            "email": "dana@bloomhealth.example.com"
+          },
+          {
+            "name": "Jordan Ellis",
+            "email": "jordan.ellis@freelance.example.com"
+          },
+          {
+            "name": "Sara Ng",
+            "email": "sara@bloomhealth.example.com"
+          },
+          {
+            "name": "Tom Reyes",
+            "email": "tom@bloomhealth.example.com"
+          }
+        ]
+      }
+    ],
+    "unread": true,
+    "suggestedOwner": "client"
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Booking confirmed: Hotel Memmo Alfama, Lisbon",
+    "participants": [
+      {
+        "name": "Hotel Memmo Alfama",
+        "email": "reservations@memmo.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.93,
+    "reason": "Booking confirmation. Done.",
+    "category": "update",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Hotel booked in Lisbon for 3 nights during Web Summit.",
+    "keyPoints": ["3 nights", "Confirmation #LX-55821"],
+    "entities": [],
+    "status": "done",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Hotel Memmo Alfama",
+          "email": "reservations@memmo.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -72,
+        "bodyText": "Your reservation is confirmed: 3 nights, Deluxe Room, river view. Confirmation #LX-55821."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Bloom Health SOW — countersigned",
+    "participants": [
+      {
+        "name": "Dana Whitfield",
+        "email": "dana@bloomhealth.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "client",
+    "confidence": 0.9,
+    "reason": "Contract signature. Priya handled it.",
+    "category": "legal",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Priya signed the Bloom Health brand refresh SOW; it's done.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "done",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Dana Whitfield",
+          "email": "dana@bloomhealth.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -100,
+        "bodyText": "Hi Priya, attached is the SOW for the brand refresh. Please countersign when you get a chance."
+      },
+      {
+        "from": "client",
+        "direction": "outbound",
+        "hoursOffset": -80,
+        "bodyText": "Signed and attached. Excited to get going!",
+        "to": [
+          {
+            "name": "Dana Whitfield",
+            "email": "dana@bloomhealth.example.com"
+          }
+        ]
+      }
+    ],
+    "unread": false,
+    "handoff": {
+      "state": "handled",
+      "hoursOffset": -80
+    },
+    "activity": [
+      {
+        "type": "client_handled",
+        "actor": {
+          "type": "client",
+          "name": "client"
+        },
+        "hoursOffset": -80
+      }
+    ]
+  },
+  {
+    "clientKey": "priya",
+    "subject": "People you may know on LinkedIn",
+    "participants": [
+      {
+        "name": "LinkedIn",
+        "email": "notifications@linkedin.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.97,
+    "reason": "Social notification. Archived.",
+    "category": "newsletter",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "LinkedIn suggestions.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": true,
+    "messages": [
+      {
+        "from": {
+          "name": "LinkedIn",
+          "email": "notifications@linkedin.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -120,
+        "bodyText": "You appeared in 14 searches this week. See who's looking."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Podcast invite: The Studio Hour",
+    "participants": [
+      {
+        "name": "Ben Arora",
+        "email": "ben@studiohour.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "client",
+    "confidence": 0.88,
+    "reason": "Priya handed this to Alex with instructions.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Priya wants to accept The Studio Hour invite, but only for a date after Dec 1.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Ben Arora",
+          "email": "ben@studiohour.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -26,
+        "bodyText": "Hi Priya, we'd love to have you as a guest on The Studio Hour this season. Any chance you're free for a 45 minute recording in the next few weeks?"
+      }
+    ],
+    "unread": true,
+    "clientReason": "You handed this to Alex: say yes, but only after Dec 1.",
+    "history": [
+      {
+        "from": "client",
+        "to": "assistant",
+        "source": "client",
+        "reason": "Priya handed it to Alex with a note.",
+        "hoursOffset": -3
+      }
+    ],
+    "handoff": {
+      "state": "handed_to_assistant",
+      "note": "Say yes, but only after Dec 1. Mornings are best.",
+      "hoursOffset": -3
+    },
+    "activity": [
+      {
+        "type": "client_handoff",
+        "actor": {
+          "type": "client",
+          "name": "client"
+        },
+        "hoursOffset": -3,
+        "payload": {
+          "note": "Say yes, but only after Dec 1. Mornings are best."
+        }
+      }
+    ]
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Hiring: portfolio from a junior designer",
+    "participants": [
+      {
+        "name": "Zoe Park",
+        "email": "zoe.park@student.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "client",
+    "confidence": 0.74,
+    "reason": "Priya marked this as something she's handling herself.",
+    "category": "general",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "A recent grad sent their portfolio; Priya said she'll reply personally.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Zoe Park",
+          "email": "zoe.park@student.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -30,
+        "bodyText": "Hi Priya, I'm a recent RISD grad and huge fan of your studio. My portfolio is linked below. I'd love to be considered for any junior roles."
+      }
+    ],
+    "unread": false,
+    "clientReason": "You said you'd reply to Zoe yourself.",
+    "handoff": {
+      "state": "client_handling",
+      "hoursOffset": -20
+    },
+    "activity": [
+      {
+        "type": "client_handling",
+        "actor": {
+          "type": "client",
+          "name": "client"
+        },
+        "hoursOffset": -20
+      }
+    ]
+  },
+  {
+    "clientKey": "priya",
+    "subject": "Uber receipt: Tuesday evening trip",
+    "participants": [
+      {
+        "name": "Uber Receipts",
+        "email": "noreply@uber.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "rule",
+    "confidence": 0.99,
+    "reason": "Matched the rule: mail from uber.example.com is no-reply.",
+    "category": "finance",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Ride receipt, $23.40.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Uber Receipts",
+          "email": "noreply@uber.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -36,
+        "bodyText": "Thanks for riding with us. Total: $23.40. Trip from Mission to SOMA."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Flight confirmation SFO → JFK",
+    "participants": [
+      {
+        "name": "Delta Air Lines",
+        "email": "no-reply@delta.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.95,
+    "reason": "Automated flight confirmation.",
+    "category": "update",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Daniel's flight DL402 to JFK is confirmed for Friday 8:15 AM.",
+    "keyPoints": ["DL402, seat 3C"],
+    "entities": [
+      {
+        "type": "date",
+        "title": "Flight SFO → JFK",
+        "startsInHours": 72,
+        "endsInHours": 78
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Delta Air Lines",
+          "email": "no-reply@delta.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -20,
+        "bodyText": "Your flight DL402 SFO to JFK is confirmed for Friday at 8:15 AM. Seat 3C."
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Q3 LP update — draft for your review",
+    "participants": [
+      {
+        "name": "Ines Alvarez",
+        "email": "ines@okafor.vc"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.93,
+    "reason": "LP updates are Daniel's.",
+    "category": "action",
+    "important": true,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "The fund's associate drafted the Q3 LP letter and needs Daniel's edits by Wednesday.",
+    "keyPoints": [],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "LP letter edits",
+        "startsInHours": 34
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Ines Alvarez",
+          "email": "ines@okafor.vc"
+        },
+        "direction": "inbound",
+        "hoursOffset": -8,
+        "bodyText": "Daniel, Q3 LP letter draft is in the shared folder. Main open question: how much to say about the Kite Robotics markdown. Need your edits by Wednesday to hit the 15th."
+      }
+    ],
+    "unread": true,
+    "clientReason": "Ines needs your edits on the Q3 LP letter by Wednesday."
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Kite Robotics — following up on the deck",
+    "participants": [
+      {
+        "name": "Omar Haddad",
+        "email": "omar@kiterobotics.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.76,
+    "reason": "Routine follow-up: Alex can confirm receipt and set a call.",
+    "category": "action",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Kite's founder is following up on the deck and asks for a 30 minute call next week.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Omar Haddad",
+          "email": "omar@kiterobotics.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -12,
+        "bodyText": "Hi Daniel, following up on the deck I sent last week. Would love 30 minutes next week to walk through the new unit economics."
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Portfolio board meeting — new date?",
+    "participants": [
+      {
+        "name": "Lisa Grant",
+        "email": "lisa@fernbrook.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.87,
+    "reason": "Scheduling. Alex handles Daniel's calendar.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Fernbrook's CEO needs to move the board meeting and proposes two dates.",
+    "keyPoints": [],
+    "entities": [
+      {
+        "type": "meeting",
+        "title": "Fernbrook board meeting (proposed)",
+        "startsInHours": 260,
+        "endsInHours": 262
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Lisa Grant",
+          "email": "lisa@fernbrook.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -5,
+        "bodyText": "Hi all, I need to move our board meeting. Could we do Tuesday the 25th at 10 AM or Wednesday the 26th at 2 PM?"
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Reminder: October expense report",
+    "participants": [
+      {
+        "name": "Fund Ops",
+        "email": "ops@okafor.vc"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.9,
+    "reason": "Receipts and expenses are Alex's.",
+    "category": "finance",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "Fund ops reminds Daniel that October expenses are due Friday.",
+    "keyPoints": [],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "October expenses due",
+        "startsInHours": 66
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Fund Ops",
+          "email": "ops@okafor.vc"
+        },
+        "direction": "inbound",
+        "hoursOffset": -30,
+        "bodyText": "Friendly reminder: October expense reports are due this Friday. 6 receipts are still missing from your card."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Co-invest terms — Halcyon round",
+    "participants": [
+      {
+        "name": "Ken Watanabe",
+        "email": "ken@bluepeak.example.com"
+      },
+      "client"
+    ],
+    "owner": "client",
+    "ownerSource": "ai",
+    "confidence": 0.88,
+    "reason": "Deal terms are Daniel's.",
+    "category": "action",
+    "important": true,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "A co-investor proposes splitting the Halcyon allocation 60/40 and asks Daniel to confirm.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Ken Watanabe",
+          "email": "ken@bluepeak.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -15,
+        "bodyText": "Daniel, for Halcyon we're thinking 60/40 with us leading. Pro-rata split the same way. Can you confirm before we send to the founders Thursday?"
+      },
+      {
+        "from": "client",
+        "direction": "outbound",
+        "hoursOffset": -13,
+        "bodyText": "Let me think on 60/40. Can we talk tomorrow?",
+        "to": [
+          {
+            "name": "Ken Watanabe",
+            "email": "ken@bluepeak.example.com"
+          }
+        ]
+      },
+      {
+        "from": {
+          "name": "Ken Watanabe",
+          "email": "ken@bluepeak.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -6,
+        "bodyText": "Sure. I'm open 9 to 11 tomorrow. The founders want an answer Thursday regardless."
+      }
+    ],
+    "unread": true,
+    "clientReason": "Ken wants your answer on the 60/40 Halcyon split before Thursday."
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Venture Weekly: The AI infra bubble?",
+    "participants": [
+      {
+        "name": "Venture Weekly",
+        "email": "editor@ventureweekly.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.98,
+    "reason": "Newsletter.",
+    "category": "newsletter",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "Weekly VC newsletter.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Venture Weekly",
+          "email": "editor@ventureweekly.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -40,
+        "bodyText": "This week: is AI infra overbuilt, plus the 10 biggest seed rounds."
+      }
+    ],
+    "unread": false
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Parent-teacher conference sign-up",
+    "participants": [
+      {
+        "name": "Lincoln Elementary",
+        "email": "office@lincoln.example.com"
+      },
+      "client"
+    ],
+    "owner": "assistant",
+    "ownerSource": "ai",
+    "confidence": 0.8,
+    "reason": "Calendar booking. Alex handles Daniel's calendar.",
+    "category": "meeting",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "School asks Daniel to pick a parent-teacher slot next week.",
+    "keyPoints": [],
+    "entities": [
+      {
+        "type": "deadline",
+        "title": "Conference sign-up closes",
+        "startsInHours": 70
+      }
+    ],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Lincoln Elementary",
+          "email": "office@lincoln.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -24,
+        "bodyText": "Parent-teacher conferences are next week. Please pick a 15 minute slot using the sign-up link by Friday."
+      }
+    ],
+    "unread": true
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Coffee?",
+    "participants": [
+      {
+        "name": "Tess Nguyen",
+        "email": "tess@stealth.example.com"
+      },
+      "client"
+    ],
+    "owner": "review",
+    "ownerSource": "ai",
+    "confidence": 0.5,
+    "reason": "Unknown founder, no context. Could be a pitch Daniel wants or one Alex should screen.",
+    "category": "general",
+    "important": false,
+    "actionRequired": true,
+    "waitingOnOthers": false,
+    "summary": "A founder asks Daniel for coffee with no details.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "open",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "Tess Nguyen",
+          "email": "tess@stealth.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -3,
+        "bodyText": "Hi Daniel, would love to grab coffee sometime. Building something new in climate."
+      }
+    ],
+    "unread": true,
+    "suggestedOwner": "assistant"
+  },
+  {
+    "clientKey": "daniel",
+    "subject": "Completed: Fernbrook side letter",
+    "participants": [
+      {
+        "name": "DocuSign",
+        "email": "dse@docusign.example.com"
+      },
+      "client"
+    ],
+    "owner": "none",
+    "ownerSource": "ai",
+    "confidence": 0.96,
+    "reason": "DocuSign completion. No action.",
+    "category": "legal",
+    "important": false,
+    "actionRequired": false,
+    "waitingOnOthers": false,
+    "summary": "All parties signed the Fernbrook side letter.",
+    "keyPoints": [],
+    "entities": [],
+    "status": "done",
+    "archived": false,
+    "messages": [
+      {
+        "from": {
+          "name": "DocuSign",
+          "email": "dse@docusign.example.com"
+        },
+        "direction": "inbound",
+        "hoursOffset": -50,
+        "bodyText": "All parties have completed: Fernbrook side letter."
+      }
+    ],
+    "unread": false
+  }
+]
