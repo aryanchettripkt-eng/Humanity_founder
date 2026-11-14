@@ -20,14 +20,14 @@
 - [x] **B1.1** Mongoose models per BACKEND §4 with indexes + toJSON transform — @gemini (gemini/B1.1-models-auth)
 - [x] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini (gemini/B1.1-models-auth)
 - [ ] **B1.3** Seed data: `threads.json` (Priya ~32, Daniel ~10) + `scenarios.json` per BACKEND §8 — @claude *(content writing; parallel‑safe, only touches `server/src/seed/data/`)*
-- [ ] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini
+- [x] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini (gemini/B1.4-B1.11-seed-tests)
 - [x] **B1.5** AI provider abstraction + `mock` provider — @gemini (gemini/B1.5-ai-providers)
 - [x] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini (gemini/B1.5-ai-providers; includes `groq` per D9)
 - [ ] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
 - [x] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini (gemini/B1.8-threads-api)
 - [x] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini (gemini/B1.9-socket-activity)
 - [x] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini (gemini/B1.10-accounts-sync)
-- [ ] **B1.11** Tests: segment filters, owner change + rule creation, classification mapping (mock) — @gemini
+- [x] **B1.11** Tests: segment filters, owner change + rule creation, classification mapping (mock) — @gemini (gemini/B1.4-B1.11-seed-tests)
 
 ## Phase 2 — Assistant experience (frontend core)
 - [ ] **F2.1** `lib/api.ts`, `queryKeys.ts`, `socket.ts`, `types/api.ts` (mirror BACKEND) — @gemini

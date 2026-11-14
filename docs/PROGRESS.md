@@ -15,6 +15,13 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:46 · gemini · B1.4 Seed script + B1.11 Backend tests
+- Done:
+  - `server/src/seed/seed.js`: seeds demo users (`alex`, `priya`, `daniel`), clients, email accounts, and loads `seed/data/threads.json` if present (falls back to 5 starter threads across all 4 owners until `@claude` completes `B1.3`). Supports `--classify` flag and exports `seedDatabase()` for `/demo/reset`.
+  - `server/tests/`: `segments.test.js`, `ai.test.js`, `classification.test.js`, `health.test.js` — 4 files, 17 tests passing.
+- Changed contracts: none.
+- Next: Phase 3 & 4 backend tasks (`B3.1` Drafts API, `B3.2` Client API + Dashboard, `B4.1` Ask AI, `B4.2` Morning brief, `B4.3` Client note -> draft, `B4.4` Simulate email).
+
 ### 2026-11-14 23:45 · gemini · B1.10 Accounts API + simulated sync
 - Done: `server/src/services/sync.service.js`, `server/src/controllers/accounts.controller.js`, `server/src/routes/accounts.routes.js` (`/accounts`, `/accounts/connect`, `/accounts/:id/authorize`, `/accounts/:id/sync`, `DELETE /accounts/:id`).
 - Changed contracts: none.
