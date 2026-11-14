@@ -63,8 +63,8 @@
 - [ ] **Q5.1** UX review pass against DESIGN_SYSTEM §10 at 375/768/1440, file issues in PROGRESS.md — @claude
 - [ ] **Q5.2** Fix list from Q5.1 — @gemini
 - [ ] **Q5.3** Acceptance criteria run (PRD §8), all boxes ticked — @claude
-- [ ] **Q5.4** Deploy: Atlas, Render, Vercel; seed prod; verify sockets over HTTPS — @gemini (Aryan provides accounts/keys)
-- [ ] **Q5.5** README: overview, demo logins, what's simulated, architecture diagram, AI provider notes — @claude
+- [x] **Q5.4** Deploy: Atlas, Render, Vercel; seed prod; verify sockets over HTTPS — @gemini (Aryan provides accounts/keys)
+- [x] **Q5.5** README: overview, demo logins, what's simulated, architecture diagram, AI provider notes — @claude
 - [ ] **Q5.6** Demo video script (PRD §9) — @claude; recording — Aryan
 
 ## Phase 6 — Real Gmail + Sign in with Google (P1, start only after Phase 2–3 frontend is solid)
