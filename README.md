@@ -18,7 +18,23 @@ Prototype for the *AI Full‑Stack Engineer Intern* assignment. Personal assista
 | [docs/GOOGLE_SETUP.md](./docs/GOOGLE_SETUP.md) | Google Cloud setup for real Gmail + Sign in with Google |
 
 ## Run locally
-_To be written in P0.5._
+
+```bash
+# 1. Install all workspace dependencies
+npm install
+
+# 2. Configure environment variables
+cp server/.env.example server/.env   # set MONGODB_URI (and optional GROQ_API_KEY)
+cp web/.env.example web/.env         # defaults to http://localhost:4000
+
+# 3. Seed demo data (alex@example.com, priya@example.com, daniel@example.com / demo1234)
+npm run seed
+
+# 4. Start both server (port 4000) and web (port 5173)
+npm run dev
+```
+
+Open http://localhost:5173 and click **Assistant (Alex)** or **Client (Priya)** on `/login`.
 
 ## What's real vs simulated
 **Real:** accounts and login (passwords hashed, JWT), MongoDB storage, the AI (who replies + confidence + reason, summaries, dates, drafts, ask-your-inbox, morning brief) via Groq, owner overrides and sender rules, re-classification on new messages, live assistant ↔ client sync, search and filters. Planned (Phase 6): Sign in with Google and **real read-only Gmail** for approved test accounts.
