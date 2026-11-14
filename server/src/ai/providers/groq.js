@@ -5,20 +5,38 @@ import { AIError, runJSONWithRetry, sleep, withTimeout } from '../utils.js';
 let client = null;
 function getClient() {
   if (!client) {
-    client = new Groq({ apiKey: env.GROQ_API_KEY });
+    client = new Groq({
+      apiKey: env.GROQ_API_KEY,
+      maxRetries: 0,
+      timeout: env.AI_TIMEOUT_MS,
+    });
   }
   return client;
+}
+
+function getRetryAfterMs(err, fallbackMs) {
+  const headers = err?.headers;
+  const rawMs = headers?.get ? headers.get('retry-after-ms') : headers?.['retry-after-ms'];
+  if (rawMs && !Number.isNaN(Number(rawMs))) {
+    return Math.min(30000, Math.max(100, Number(rawMs)));
+  }
+  const rawSec = headers?.get ? headers.get('retry-after') : headers?.['retry-after'];
+  if (rawSec && !Number.isNaN(Number(rawSec))) {
+    return Math.min(30000, Math.max(100, Number(rawSec) * 1000));
+  }
+  return fallbackMs;
 }
 
 async function callWithBackoff(fn) {
   let delay = 500;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      return await withTimeout(fn(), env.AI_TIMEOUT_MS, 'Groq');
+      return await withTimeout((signal) => fn(signal), env.AI_TIMEOUT_MS, 'Groq');
     } catch (err) {
       const status = err?.status ?? err?.statusCode;
       if (status === 429 && attempt < 2) {
-        await sleep(delay);
+        const waitMs = getRetryAfterMs(err, delay);
+        await sleep(waitMs);
         delay *= 2;
         continue;
       }
@@ -40,17 +58,20 @@ export const groqProvider = {
       schema,
       temperature,
       callRaw: async (sys, usr, temp) => {
-        const res = await callWithBackoff(() =>
-          getClient().chat.completions.create({
-            model,
-            temperature: temp,
-            response_format: { type: 'json_object' },
-            ...(model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
-            messages: [
-              { role: 'system', content: sys },
-              { role: 'user', content: usr },
-            ],
-          })
+        const res = await callWithBackoff((signal) =>
+          getClient().chat.completions.create(
+            {
+              model,
+              temperature: temp,
+              response_format: { type: 'json_object' },
+              ...(model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
+              messages: [
+                { role: 'system', content: sys },
+                { role: 'user', content: usr },
+              ],
+            },
+            { signal }
+          )
         );
         return res.choices?.[0]?.message?.content || '';
       },
@@ -59,16 +80,19 @@ export const groqProvider = {
 
   async generateText({ system, prompt, temperature = 0.5 }) {
     const model = env.GROQ_MODEL;
-    const res = await callWithBackoff(() =>
-      getClient().chat.completions.create({
-        model,
-        temperature,
-        ...(model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: prompt },
-        ],
-      })
+    const res = await callWithBackoff((signal) =>
+      getClient().chat.completions.create(
+        {
+          model,
+          temperature,
+          ...(model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: prompt },
+          ],
+        },
+        { signal }
+      )
     );
     return (res.choices?.[0]?.message?.content || '').trim();
   },

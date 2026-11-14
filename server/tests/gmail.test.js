@@ -3,8 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Message } from '../src/models/Message.js';
 import { Thread } from '../src/models/Thread.js';
 import {
+  consumeGmailConnectToken,
   decryptToken,
   encryptToken,
+  signGmailConnectToken,
   signOAuthState,
   verifyOAuthState,
 } from '../src/services/gmail/crypto.js';
@@ -129,6 +131,25 @@ describe('gmail crypto & OAuth state (G6.7)', () => {
     expect(decoded.clientId).toBe('c1');
     expect(typeof decoded.nonce).toBe('string');
     expect(() => verifyOAuthState(`${state}tamper`, jwtSecret)).toThrow();
+  });
+
+  it('signs and consumes one-time Gmail connect handoff tokens', () => {
+    const jwtSecret = 'unit-test-secret-32-chars-minimum!';
+    const token = signGmailConnectToken(
+      {
+        userId: 'u1',
+        clientId: 'c1',
+        email: 'priya@example.com',
+        sub: 'g123',
+        refreshTokenEnc: 'enc',
+        scope: 'readonly',
+      },
+      jwtSecret
+    );
+    const decoded = consumeGmailConnectToken(token, jwtSecret);
+    expect(decoded.userId).toBe('u1');
+    expect(decoded.email).toBe('priya@example.com');
+    expect(() => consumeGmailConnectToken(token, jwtSecret)).toThrow(/already used/);
   });
 });
 

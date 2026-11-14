@@ -3,6 +3,29 @@ import { Client } from '../models/Client.js';
 import { Thread } from '../models/Thread.js';
 import { logger } from '../utils/logger.js';
 
+const BRIEF_TTL_MS = 2 * 60 * 60 * 1000;
+const inflightBriefs = new Set();
+
+function buildFallbackBrief({ clientName, counts, upcoming = [] }) {
+  const nextUp = upcoming[0]?.title ? ` Next up: ${upcoming[0].title}.` : '';
+  const assistantCount = counts.assistant ?? 0;
+  const clientCount = counts.client ?? 0;
+  const reviewCount = counts.review ?? 0;
+  const assistantPhrase = `${assistantCount} ${assistantCount === 1 ? 'thread needs' : 'threads need'} you`;
+  const clientPhrase = `${clientCount} ${clientCount === 1 ? 'needs' : 'need'} ${clientName}`;
+  return {
+    text: `${assistantPhrase}, ${clientPhrase}, ${reviewCount} to review.${nextUp}`,
+    generatedAt: new Date().toISOString(),
+    fallback: true,
+  };
+}
+
+function isBriefFresh(brief) {
+  if (!brief?.text || brief.fallback || !brief.generatedAt) return false;
+  const age = Date.now() - new Date(brief.generatedAt).getTime();
+  return age >= 0 && age < BRIEF_TTL_MS;
+}
+
 /**
  * Generate a 2-3 sentence morning brief for a client's inbox, with deterministic template fallback.
  * @param {{
@@ -10,24 +33,29 @@ import { logger } from '../utils/logger.js';
  *   counts: Record<string, number>,
  *   upcoming?: Array<{ title: string, startsAt: Date | string }>,
  *   useAI?: boolean,
+ *   force?: boolean,
  * }} opts
  */
-export async function generateMorningBrief({ clientId, counts, upcoming = [], useAI = true }) {
+export async function generateMorningBrief({
+  clientId,
+  counts,
+  upcoming = [],
+  useAI = true,
+  force = false,
+}) {
   const client = await Client.findById(clientId);
   const clientName = client?.firstName || 'your client';
-  const nextUp = upcoming[0]?.title ? ` Next up: ${upcoming[0].title}.` : '';
-  const assistantCount = counts.assistant ?? 0;
-  const clientCount = counts.client ?? 0;
-  const reviewCount = counts.review ?? 0;
-  const assistantPhrase = `${assistantCount} ${assistantCount === 1 ? 'thread needs' : 'threads need'} you`;
-  const clientPhrase = `${clientCount} ${clientCount === 1 ? 'needs' : 'need'} ${clientName}`;
-  const fallbackText = `${assistantPhrase}, ${clientPhrase}, ${reviewCount} to review.${nextUp}`;
+  const fallbackBrief = buildFallbackBrief({ clientName, counts, upcoming });
 
   if (!useAI) {
+    return fallbackBrief;
+  }
+
+  if (!force && isBriefFresh(client?.brief)) {
     return {
-      text: fallbackText,
-      generatedAt: new Date().toISOString(),
-      fallback: true,
+      text: client.brief.text,
+      generatedAt: new Date(client.brief.generatedAt).toISOString(),
+      fallback: false,
     };
   }
 
@@ -57,18 +85,69 @@ export async function generateMorningBrief({ clientId, counts, upcoming = [], us
       temperature: 0.4,
     });
 
+    const isFallback = provider.name === 'mock' || !text;
+    const finalText = text || fallbackBrief.text;
+    const generatedAt = new Date();
+
+    if (client) {
+      await Client.updateOne(
+        { _id: client._id },
+        {
+          $set: {
+            brief: {
+              text: finalText,
+              generatedAt,
+              fallback: isFallback,
+            },
+          },
+        }
+      );
+    }
+
     return {
-      text: text || fallbackText,
-      generatedAt: new Date().toISOString(),
-      fallback: provider.name === 'mock',
+      text: finalText,
+      generatedAt: generatedAt.toISOString(),
+      fallback: isFallback,
     };
   } catch (err) {
     logger.warn('Morning brief AI failed; using template fallback', { message: err?.message });
+    return fallbackBrief;
+  }
+}
+
+/**
+ * Return cached AI brief if < 2 hours old; otherwise return template fallback and
+ * kick off at most one background AI generation.
+ */
+export async function getDashboardBrief({ clientId, counts, upcoming = [] }) {
+  const client = await Client.findById(clientId);
+  if (isBriefFresh(client?.brief)) {
     return {
-      text: fallbackText,
-      generatedAt: new Date().toISOString(),
-      fallback: true,
+      text: client.brief.text,
+      generatedAt: new Date(client.brief.generatedAt).toISOString(),
+      fallback: false,
     };
   }
+
+  const key = String(clientId);
+  if (!inflightBriefs.has(key)) {
+    inflightBriefs.add(key);
+    generateMorningBrief({ clientId, counts, upcoming, useAI: true, force: true })
+      .catch((err) => {
+        logger.warn('Background morning brief generation failed', {
+          clientId: key,
+          message: err?.message,
+        });
+      })
+      .finally(() => {
+        inflightBriefs.delete(key);
+      });
+  }
+
+  return buildFallbackBrief({
+    clientName: client?.firstName || 'your client',
+    counts,
+    upcoming,
+  });
 }
 

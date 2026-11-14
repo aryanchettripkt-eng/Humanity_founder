@@ -9,6 +9,12 @@ const clientSchema = new mongoose.Schema(
     title: { type: String, trim: true },
     assistantId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    timezone: { type: String, default: 'Asia/Kolkata' },
+    brief: {
+      text: { type: String },
+      generatedAt: { type: Date },
+      fallback: { type: Boolean, default: false },
+    },
     profile: {
       delegation: { type: String, default: '' },
       vipSenders: { type: [String], default: [] },

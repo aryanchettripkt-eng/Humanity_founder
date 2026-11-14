@@ -13,7 +13,33 @@ import { trimQuotedReplies } from './gmail/mapper.js';
 
 export const PROMPT_VERSION = 'v1';
 
-function buildClassificationSystemPrompt({ today, timezone }) {
+function buildDateContext(timezone) {
+  let tz = timezone || 'Asia/Kolkata';
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: tz }).format(new Date());
+  } catch {
+    tz = 'UTC';
+  }
+  const now = new Date();
+  const dateFmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const longDayFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' });
+  const shortDayFmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'short' });
+
+  const todayLabel = `${longDayFmt.format(now)} ${dateFmt.format(now)}`;
+  const nextDays = [];
+  for (let i = 1; i <= 7; i += 1) {
+    const d = new Date(now.getTime() + i * 24 * 3600 * 1000);
+    nextDays.push(`${shortDayFmt.format(d)} ${dateFmt.format(d)}`);
+  }
+  return { tz, todayLabel, nextDaysLabel: nextDays.join(', ') };
+}
+
+function buildClassificationSystemPrompt({ todayLabel, nextDaysLabel, timezone }) {
   return [
     'You triage email for a personal assistant (PA) who manages the inbox of their client.',
     'Decide WHO must reply to the conversation:',
@@ -25,7 +51,7 @@ function buildClassificationSystemPrompt({ today, timezone }) {
     '- Do not default to a reply. Most automated or informational mail is "none".',
     '- confidence reflects how clearly the evidence supports the owner (0.9+ explicit, 0.7–0.9 strong signals, <0.7 ambiguous).',
     '- reason: one sentence that cites the evidence.',
-    `- Extract every concrete date/time/deadline as ISO-8601 in timezone ${timezone}. Today is ${today}.`,
+    `- Extract every concrete date/time/deadline as ISO-8601 with timezone offset (e.g. +05:30) in timezone ${timezone}. Today is ${todayLabel}. Next 7 days: ${nextDaysLabel}.`,
     '- Output ONLY valid JSON matching this exact shape: {"owner":"assistant|client|none","confidence":0.0-1.0,"reason":"...","clientReason":"... or null","category":"meeting|action|update|newsletter|finance|legal|personal|general","isImportant":bool,"actionRequired":bool,"waitingOnOthers":bool,"summary":"...","keyPoints":["max 6"],"entities":[{"type":"meeting|deadline|date","title":"...","startsAt":"ISO-8601","endsAt":"ISO-8601 or null","location":"... or null"}]}.',
   ].join('\n');
 }
@@ -112,12 +138,16 @@ export async function classifyThread(threadId, opts = {}) {
   const provider = getProvider();
   let aiResult = null;
   let aiFailed = false;
+  thread.aiAttempts = (thread.aiAttempts || 0) + 1;
+
+  const { tz, todayLabel, nextDaysLabel } = buildDateContext(client?.timezone);
 
   try {
     aiResult = await provider.generateJSON({
       system: buildClassificationSystemPrompt({
-        today: new Date().toISOString().slice(0, 10),
-        timezone: 'UTC',
+        todayLabel,
+        nextDaysLabel,
+        timezone: tz,
       }),
       prompt: buildClassificationUserPrompt({ client, assistant, messages }),
       schema: classificationSchema,
@@ -134,7 +164,7 @@ export async function classifyThread(threadId, opts = {}) {
   if (aiFailed || !aiResult) {
     thread.aiStatus = 'failed';
     thread.summary = thread.summary || thread.snippet || thread.subject;
-    if (!matchedRule && !isSticky) {
+    if (!matchedRule && !isSticky && isFirstClassification) {
       thread.owner = 'review';
       thread.ownerSource = 'ai';
       thread.confidence = 0;

@@ -18,23 +18,25 @@ export function sleep(ms) {
 }
 
 /**
- * Race a promise against a timeout.
+ * Race a promise (or abortable factory) against a timeout.
  * @template T
- * @param {Promise<T>} promise
+ * @param {Promise<T> | ((signal: AbortSignal) => Promise<T>)} promiseOrFn
  * @param {number} ms
  * @param {string} [label]
  * @returns {Promise<T>}
  */
-export async function withTimeout(promise, ms, label = 'AI request') {
+export async function withTimeout(promiseOrFn, ms, label = 'AI request') {
   let timer;
+  const controller = typeof promiseOrFn === 'function' ? new AbortController() : null;
+  const target = controller ? promiseOrFn(controller.signal) : promiseOrFn;
   try {
     return await Promise.race([
-      promise,
+      target,
       new Promise((_, reject) => {
-        timer = setTimeout(
-          () => reject(new AIError(`${label} timed out after ${ms}ms`, { code: 'AI_TIMEOUT' })),
-          ms
-        );
+        timer = setTimeout(() => {
+          controller?.abort();
+          reject(new AIError(`${label} timed out after ${ms}ms`, { code: 'AI_TIMEOUT' }));
+        }, ms);
       }),
     ]);
   } finally {

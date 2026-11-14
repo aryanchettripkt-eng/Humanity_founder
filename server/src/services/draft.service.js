@@ -5,6 +5,7 @@ import { Message } from '../models/Message.js';
 import { Thread } from '../models/Thread.js';
 import { User } from '../models/User.js';
 import { logger } from '../utils/logger.js';
+import { trimQuotedReplies } from './gmail/mapper.js';
 
 /**
  * Generate an AI reply draft for a thread (BACKEND §5.6).
@@ -54,7 +55,10 @@ export async function generateThreadDraft({
 
   const convo = messages
     .slice(-8)
-    .map((m) => `[${m.direction}] ${m.from?.name || m.from?.email}: ${m.bodyText}`)
+    .map((m) => {
+      const cleanBody = trimQuotedReplies(m.bodyText || '').slice(0, 2000);
+      return `[${m.direction}] ${m.from?.name || m.from?.email}: ${cleanBody}`;
+    })
     .join('\n---\n');
 
   const promptParts = [`Subject: ${thread.subject}`, `Conversation:\n${convo}`];

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, CheckCircle2, Inbox, Sparkles, Users } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import {
   useAccounts,
   useAuthorizeAccount,
+  useCompleteGmail,
   useConnectAccount,
   useStartGmail,
 } from '@/features/accounts/api';
@@ -40,6 +41,25 @@ export function OnboardingPage() {
   const connectMutation = useConnectAccount();
   const authorizeMutation = useAuthorizeAccount();
   const startGmailMutation = useStartGmail();
+  const completeGmailMutation = useCompleteGmail();
+  const connectHandledRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const code = searchParams.get('connect');
+    if (!code || connectHandledRef.current === code) return;
+    connectHandledRef.current = code;
+    completeGmailMutation.mutate(
+      { code },
+      {
+        onSuccess: (account) => {
+          setSearchParams({ step: 'sync', accountId: account.id }, { replace: true });
+        },
+        onError: (err) => {
+          setSyncError(err instanceof ApiError ? err.message : 'Could not complete Gmail connection');
+        },
+      }
+    );
+  }, [searchParams, setSearchParams, completeGmailMutation]);
 
   const handleProgress = useCallback((evt: SyncProgressEvent) => {
     setProgress(evt);

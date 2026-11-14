@@ -76,6 +76,9 @@ export async function simulateEmail(req, res, next) {
     if (!env.DEMO_MODE) {
       return next(forbidden('Demo mode is disabled'));
     }
+    if (req.user?.email !== 'alex@example.com') {
+      return next(forbidden('Simulate email is only available for the demo assistant account'));
+    }
     if (!req.clientId) {
       return next(badRequest('No client available to simulate email'));
     }
@@ -92,6 +95,9 @@ export async function simulateEmail(req, res, next) {
 
     if (!client || !account) {
       return next(badRequest('Client or email account not found'));
+    }
+    if (!account.simulated) {
+      return next(forbidden('Simulate email is only available for simulated demo accounts'));
     }
 
     const now = new Date();
@@ -166,10 +172,13 @@ export async function simulateEmail(req, res, next) {
   }
 }
 
-export async function resetDemo(_req, res, next) {
+export async function resetDemo(req, res, next) {
   try {
     if (!env.DEMO_MODE) {
       return next(forbidden('Demo mode is disabled'));
+    }
+    if (req.user?.email !== 'alex@example.com') {
+      return next(forbidden('Reset demo is only available for the demo assistant account'));
     }
     await seedDatabase({ classify: false });
     res.json({ data: { ok: true } });

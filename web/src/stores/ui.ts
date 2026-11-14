@@ -6,6 +6,7 @@ interface UiState {
   aiPanelOpen: boolean;
   theme: 'light' | 'dark';
   activeClientId: string | null;
+  activeClientUserId: string | null;
   newThreadIds: string[];
   toggleSidebar: () => void;
   setSidebarCollapsed: (v: boolean) => void;
@@ -13,6 +14,7 @@ interface UiState {
   setAiPanelOpen: (v: boolean) => void;
   toggleTheme: () => void;
   setActiveClientId: (id: string | null) => void;
+  setActiveClientUserId: (id: string | null) => void;
   markNewThread: (id: string) => void;
   clearNewThread: (id: string) => void;
 }
@@ -24,6 +26,7 @@ export const useUiStore = create<UiState>()(
       aiPanelOpen: true,
       theme: 'light',
       activeClientId: null,
+      activeClientUserId: null,
       newThreadIds: [],
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
@@ -34,6 +37,7 @@ export const useUiStore = create<UiState>()(
           theme: s.theme === 'light' ? 'dark' : 'light',
         })),
       setActiveClientId: (id) => set({ activeClientId: id }),
+      setActiveClientUserId: (id) => set({ activeClientUserId: id }),
       markNewThread: (id) =>
         set((s) => ({
           newThreadIds: s.newThreadIds.includes(id) ? s.newThreadIds : [...s.newThreadIds, id],
@@ -50,6 +54,7 @@ export const useUiStore = create<UiState>()(
         aiPanelOpen: s.aiPanelOpen,
         theme: s.theme,
         activeClientId: s.activeClientId,
+        activeClientUserId: s.activeClientUserId,
       }),
     }
   )

@@ -38,6 +38,21 @@ export function useStartGmail() {
   });
 }
 
+export function useCompleteGmail() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { code: string }) =>
+      apiFetch<EmailAccount>('/accounts/gmail/complete', {
+        method: 'POST',
+        body,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: qk.auth.me() });
+    },
+  });
+}
+
 export function useAuthorizeAccount() {
   const queryClient = useQueryClient();
   return useMutation({

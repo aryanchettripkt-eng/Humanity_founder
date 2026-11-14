@@ -14,6 +14,7 @@ import {
   suggestionSchema,
 } from '../controllers/threads.controller.js';
 import { requireAuth, requireClientScope, requireRole } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimit.js';
 import { validate } from '../middleware/validate.js';
 
 const router = Router();
@@ -25,8 +26,8 @@ router.get('/counts', requireClientScope({ optional: true }), getThreadCounts);
 router.get('/:id', getThreadDetail);
 router.patch('/:id', validate(patchThreadSchema), patchThread);
 router.patch('/:id/owner', validate(patchOwnerSchema), patchThreadOwner);
-router.post('/:id/reclassify', reclassifyThread);
+router.post('/:id/reclassify', aiLimiter, reclassifyThread);
 router.post('/:id/suggestion', validate(suggestionSchema), handleSuggestion);
-router.post('/:id/drafts', validate(createDraftSchema), createThreadDraft);
+router.post('/:id/drafts', aiLimiter, validate(createDraftSchema), createThreadDraft);
 
 export default router;

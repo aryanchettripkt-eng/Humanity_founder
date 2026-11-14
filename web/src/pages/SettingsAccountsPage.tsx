@@ -1,5 +1,6 @@
 import { RefreshCw, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ErrorState } from '@/components/common/ErrorState';
 import { SourceBadge } from '@/components/common/SourceBadge';
@@ -9,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   useAccounts,
   useAuthorizeAccount,
+  useCompleteGmail,
   useConnectAccount,
   useDisconnectAccount,
   useStartGmail,
@@ -28,8 +30,28 @@ export function SettingsAccountsPage() {
   const connectMutation = useConnectAccount();
   const authorizeMutation = useAuthorizeAccount();
   const startGmailMutation = useStartGmail();
+  const completeGmailMutation = useCompleteGmail();
   const syncMutation = useSyncAccount();
   const disconnectMutation = useDisconnectAccount();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const connectHandledRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const code = searchParams.get('connect');
+    if (!code || connectHandledRef.current === code) return;
+    connectHandledRef.current = code;
+    const next = new URLSearchParams(searchParams);
+    next.delete('connect');
+    setSearchParams(next, { replace: true });
+    completeGmailMutation.mutate(
+      { code },
+      {
+        onSuccess: () => toast.success('Gmail connected and syncing'),
+        onError: (err) =>
+          toast.error(err instanceof ApiError ? err.message : 'Could not complete Gmail connection'),
+      }
+    );
+  }, [searchParams, setSearchParams, completeGmailMutation]);
 
   const [modalProvider, setModalProvider] = useState<'gmail' | 'outlook' | null>(null);
   const [pendingAccountId, setPendingAccountId] = useState<string | null>(null);

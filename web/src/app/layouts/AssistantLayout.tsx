@@ -42,7 +42,11 @@ export function AssistantLayout() {
   const { activeClientId, setActiveClientId, theme, toggleTheme, markNewThread } = useUiStore();
   const { setOpen: setPaletteOpen, openAsk } = useCommandStore();
 
-  const clientId = activeClientId || me?.clients?.[0]?.id;
+  const validClientIds = new Set(me?.clients?.map((c) => c.id) ?? []);
+  const clientId =
+    (activeClientId && (!me || validClientIds.has(activeClientId))
+      ? activeClientId
+      : me?.clients?.[0]?.id) || undefined;
   const { data: counts } = useThreadCounts(clientId);
   const { data: accounts } = useAccounts(clientId);
   const simulateEmail = useSimulateEmail();
@@ -228,7 +232,7 @@ export function AssistantLayout() {
             </button>
 
             <div className="flex items-center gap-1.5">
-              {DEMO_MODE && (
+              {DEMO_MODE && me?.user?.email === 'alex@example.com' && primaryAccount?.simulated && (
                 <Button
                   size="sm"
                   variant="outline"
