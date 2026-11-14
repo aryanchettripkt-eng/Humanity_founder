@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { env } from '../config/env.js';
+import accountsRoutes from './accounts.routes.js';
 import authRoutes from './auth.routes.js';
 import threadsRoutes from './threads.routes.js';
 
@@ -16,6 +17,7 @@ export function healthHandler(_req, res) {
 
 router.get('/health', healthHandler);
 router.use('/auth', authRoutes);
+router.use('/accounts', accountsRoutes);
 router.use('/threads', threadsRoutes);
 
 export default router;

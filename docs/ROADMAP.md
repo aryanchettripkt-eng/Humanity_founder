@@ -26,7 +26,7 @@
 - [ ] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
 - [x] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini (gemini/B1.8-threads-api)
 - [x] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini (gemini/B1.9-socket-activity)
-- [ ] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini
+- [x] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini (gemini/B1.10-accounts-sync)
 - [ ] **B1.11** Tests: segment filters, owner change + rule creation, classification mapping (mock) — @gemini
 
 ## Phase 2 — Assistant experience (frontend core)

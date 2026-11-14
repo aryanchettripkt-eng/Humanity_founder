@@ -15,6 +15,11 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:45 · gemini · B1.10 Accounts API + simulated sync
+- Done: `server/src/services/sync.service.js`, `server/src/controllers/accounts.controller.js`, `server/src/routes/accounts.routes.js` (`/accounts`, `/accounts/connect`, `/accounts/:id/authorize`, `/accounts/:id/sync`, `DELETE /accounts/:id`).
+- Changed contracts: none.
+- Next: `B1.4` seed script (`npm run seed`, `--classify` flag) and `B1.11` tests.
+
 ### 2026-11-14 23:45 · gemini · B1.8 Threads API
 - Done:
   - `server/src/services/segments.js` (`segmentFilter` + `computeSegmentCounts` for all 12 segments).

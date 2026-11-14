@@ -1,0 +1,24 @@
+import { Router } from 'express';
+import {
+  authorizeAccount,
+  authorizeAccountSchema,
+  connectAccount,
+  connectAccountSchema,
+  disconnectAccount,
+  listAccounts,
+  syncAccount,
+} from '../controllers/accounts.controller.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+
+const router = Router();
+
+router.use(requireAuth, requireRole('assistant'));
+
+router.get('/', listAccounts);
+router.post('/connect', validate(connectAccountSchema), connectAccount);
+router.post('/:id/authorize', validate(authorizeAccountSchema), authorizeAccount);
+router.post('/:id/sync', syncAccount);
+router.delete('/:id', disconnectAccount);
+
+export default router;
