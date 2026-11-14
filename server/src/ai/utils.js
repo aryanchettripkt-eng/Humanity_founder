@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger.js';
+
 export class AIError extends Error {
   /**
    * @param {string} message
@@ -73,6 +75,13 @@ export async function runJSONWithRetry({ callRaw, system, prompt, schema, temper
       if (validated.success) {
         return validated.data;
       }
+      logger.warn('AI JSON schema validation failed', {
+        attempt: attempt + 1,
+        issues: validated.error.issues.map((i) => ({
+          path: i.path.join('.'),
+          code: i.code,
+        })),
+      });
       lastErr = new AIError('AI JSON failed schema validation', {
         code: 'AI_SCHEMA_ERROR',
         cause: validated.error.issues,

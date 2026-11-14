@@ -26,7 +26,7 @@ function buildClassificationSystemPrompt({ today, timezone }) {
     '- confidence reflects how clearly the evidence supports the owner (0.9+ explicit, 0.7–0.9 strong signals, <0.7 ambiguous).',
     '- reason: one sentence that cites the evidence.',
     `- Extract every concrete date/time/deadline as ISO-8601 in timezone ${timezone}. Today is ${today}.`,
-    '- Output ONLY valid JSON matching the schema: { owner, confidence, reason, clientReason, category, isImportant, actionRequired, waitingOnOthers, summary, keyPoints, entities }.',
+    '- Output ONLY valid JSON matching this exact shape: {"owner":"assistant|client|none","confidence":0.0-1.0,"reason":"...","clientReason":"... or null","category":"meeting|action|update|newsletter|finance|legal|personal|general","isImportant":bool,"actionRequired":bool,"waitingOnOthers":bool,"summary":"...","keyPoints":["max 6"],"entities":[{"type":"meeting|deadline|date","title":"...","startsAt":"ISO-8601","endsAt":"ISO-8601 or null","location":"... or null"}]}.',
   ].join('\n');
 }
 
@@ -147,7 +147,7 @@ export async function classifyThread(threadId, opts = {}) {
     thread.important = aiResult.isImportant;
     thread.actionRequired = aiResult.actionRequired;
     thread.waitingOnOthers = aiResult.waitingOnOthers;
-    thread.summary = aiResult.summary;
+    thread.summary = aiResult.summary || thread.snippet || thread.subject;
     thread.keyPoints = aiResult.keyPoints;
     thread.entities = (aiResult.entities || [])
       .map((e) => {
