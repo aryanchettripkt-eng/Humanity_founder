@@ -86,10 +86,21 @@ export interface ClassificationHistoryItem {
   reason: string;
 }
 
+export type ThreadSource = 'seed' | 'simulated' | 'gmail';
+
+export interface HealthInfo {
+  ok: boolean;
+  ai: string;
+  gmail?: boolean;
+  googleLogin?: boolean;
+}
+
 export interface ThreadListItem {
   id: string;
   clientId: string;
   accountId: string;
+  source?: ThreadSource;
+  externalId?: string;
   subject: string;
   snippet: string;
   participants: Participant[];

@@ -1,8 +1,9 @@
-import { ChevronUp, Crown, Inbox } from 'lucide-react';
+import { ChevronUp, Crown, ExternalLink, Inbox } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
+import { SourceBadge } from '@/components/common/SourceBadge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIPanel, MobileAISummary } from '@/features/ai/components/AIPanel';
 import { DraftComposer } from '@/features/composer/components/DraftComposer';
@@ -337,6 +338,26 @@ export function InboxPage() {
                 draft={detail.draft}
                 autoOpen={composerOpen}
               />
+
+              {detail.source === 'gmail' && (
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <SourceBadge source="gmail" />
+                    <span>Changes here stay in Relay</span>
+                  </div>
+                  {detail.externalId && (
+                    <a
+                      href={`https://mail.google.com/mail/u/0/#inbox/${detail.externalId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+                    >
+                      <span>Open in Gmail</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
           </>
         )}

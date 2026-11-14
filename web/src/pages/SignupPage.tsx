@@ -5,9 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
+import { GoogleButton } from '@/components/common/GoogleButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { signupApi } from '@/features/auth/api';
+import { getGoogleLoginUrl, signupApi, useHealth } from '@/features/auth/api';
 import { ApiError } from '@/lib/api';
 
 const schema = z.object({
@@ -21,6 +22,7 @@ type FormValues = z.infer<typeof schema>;
 export function SignupPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: health } = useHealth();
 
   const {
     register,
@@ -78,6 +80,16 @@ export function SignupPage() {
           {isSubmitting ? 'Creating account…' : 'Continue'}
         </Button>
       </form>
+
+      {health?.googleLogin && (
+        <div className="mt-3">
+          <GoogleButton
+            onClick={() => {
+              window.location.href = getGoogleLoginUrl();
+            }}
+          />
+        </div>
+      )}
 
       <p className="mt-5 text-center text-xs text-muted-foreground">
         Already have an account?{' '}

@@ -10,6 +10,8 @@ describe('Health endpoint', () => {
       data: {
         ok: true,
         ai: expect.stringMatching(/^(groq|gemini|anthropic|mock)$/),
+        gmail: expect.any(Boolean),
+        googleLogin: expect.any(Boolean),
       },
     });
   });

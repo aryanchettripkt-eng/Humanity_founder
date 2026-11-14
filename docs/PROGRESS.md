@@ -18,6 +18,17 @@ _None yet._
 
 ---
 
+### 2026-11-15 01:48 · gemini · Phase 6 (G6.2–G6.7): Real Gmail + Sign in with Google
+- Done:
+  - Backend (`server/`): added `googleapis`, Google/Gmail env flags (`REAL_GMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `WEB_URL`, `TOKEN_ENC_KEY`, `GMAIL_IMPORT_LIMIT`, `GMAIL_POLL_SECONDS`) and `/health` flags (`gmail`, `googleLogin`).
+  - Models: `User.googleId` (optional `passwordHash`), `EmailAccount.google` (`refreshTokenEnc` stripped in `toJSON`), `Thread.source` + `externalId`, `Message.externalId` with sparse unique dedupe indexes.
+  - Services (`server/src/services/gmail/`): AES-256-GCM token encryption & 10m signed JWT OAuth state (`crypto.js`), Google OAuth2 client (`oauth.js`), MIME/HTML/address mapper (`mapper.js`), idempotent initial importer with concurrency-2 classification & `sync:progress` (`import.js`), `history.list` poller + 404/invalid_grant handling (`poller.js`).
+  - Routes (`google.controller.js`, `accounts.controller.js`): `GET /api/auth/google/start`, `POST /api/accounts/gmail/start`, `GET /api/oauth/google/callback`, real Gmail `sync` & `disconnect` (revokes token + optional `?removeMail=true`).
+  - Frontend (`web/`): `GoogleButton`, `SourceBadge`, `/auth/callback` (`AuthCallbackPage`), dual actions + `not_test_user` error state on `ConnectProviderCard`/`OnboardingPage`/`SettingsAccountsPage`, and `"Changes here stay in Relay"` + `"Open in Gmail"` footer in `InboxPage`.
+  - Tests: `server/tests/gmail.test.js` (mapper multipart/html/outbound + AES-256-GCM + OAuth state verification).
+- Changed contracts: none beyond BACKEND §3/§4/§11.
+- Next: Aryan (`G6.1` Google Cloud OAuth credentials) + `@claude` (`G6.8` review).
+
 ### 2026-11-15 01:32 · gemini · QA & live-site fixes (Groq models, mobile UX, shortcuts, code splitting)
 - Done:
   - Fixed Groq model defaults in `server/src/config/env.js` and `.env.example` (`openai/gpt-oss-120b` / `openai/gpt-oss-20b` — `llama-3.3-70b-versatile` returned `model_not_found` on this Groq account).

@@ -13,6 +13,7 @@ const messageSchema = new mongoose.Schema(
   {
     threadId: { type: mongoose.Schema.Types.ObjectId, ref: 'Thread', required: true, index: true },
     clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true, index: true },
+    externalId: { type: String },
     from: { type: addressSchema, required: true },
     to: { type: [addressSchema], default: [] },
     cc: { type: [addressSchema], default: [] },
@@ -26,6 +27,7 @@ const messageSchema = new mongoose.Schema(
 );
 
 messageSchema.index({ threadId: 1, sentAt: 1 });
+messageSchema.index({ threadId: 1, externalId: 1 }, { unique: true, sparse: true });
 
 applyBaseTransform(messageSchema);
 

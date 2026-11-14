@@ -25,6 +25,21 @@ const envSchema = z.object({
   GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
   ANTHROPIC_API_KEY: z.string().optional().default(''),
   ANTHROPIC_MODEL: z.string().default('claude-sonnet-4-20250514'),
+  REAL_GMAIL: z
+    .string()
+    .optional()
+    .transform((v) => v === 'true')
+    .default('false'),
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(''),
+  GOOGLE_REDIRECT_URI: z
+    .string()
+    .optional()
+    .default('http://localhost:4000/api/oauth/google/callback'),
+  WEB_URL: z.string().optional().default('http://localhost:5173'),
+  TOKEN_ENC_KEY: z.string().optional().default(''),
+  GMAIL_IMPORT_LIMIT: z.coerce.number().int().positive().max(200).default(50),
+  GMAIL_POLL_SECONDS: z.coerce.number().int().positive().default(60),
 });
 
 /**
@@ -39,7 +54,13 @@ export function loadEnv(raw = process.env) {
   }
   const data = parsed.data;
   const effectiveAiProvider = resolveEffectiveProvider(data);
-  return { ...data, effectiveAiProvider };
+  const googleLoginEnabled = Boolean(
+    data.GOOGLE_CLIENT_ID && data.GOOGLE_CLIENT_SECRET && data.GOOGLE_REDIRECT_URI
+  );
+  const realGmailEnabled = Boolean(
+    data.REAL_GMAIL && googleLoginEnabled && data.TOKEN_ENC_KEY
+  );
+  return { ...data, effectiveAiProvider, googleLoginEnabled, realGmailEnabled };
 }
 
 function resolveEffectiveProvider(data) {

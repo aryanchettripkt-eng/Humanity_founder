@@ -15,11 +15,22 @@ const emailAccountSchema = new mongoose.Schema(
     lastSyncedAt: { type: Date },
     error: { type: String },
     simulated: { type: Boolean, default: true },
+    google: {
+      sub: { type: String },
+      refreshTokenEnc: { type: String },
+      scope: { type: String },
+      historyId: { type: String },
+      lastPolledAt: { type: Date },
+    },
   },
   { timestamps: true }
 );
 
-applyBaseTransform(emailAccountSchema);
+applyBaseTransform(emailAccountSchema, (ret) => {
+  if (ret.google) {
+    delete ret.google.refreshTokenEnc;
+  }
+});
 
 export const EmailAccount =
   mongoose.models.EmailAccount || mongoose.model('EmailAccount', emailAccountSchema);

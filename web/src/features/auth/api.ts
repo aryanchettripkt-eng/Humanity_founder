@@ -2,7 +2,22 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch, getAuthToken, setAuthToken } from '@/lib/api';
 import { qk } from '@/lib/queryKeys';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
-import type { ClientSummary, User } from '@/types/api';
+import type { ClientSummary, HealthInfo, User } from '@/types/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
+export function getGoogleLoginUrl(): string {
+  return `${API_URL}/auth/google/start`;
+}
+
+export function useHealth() {
+  return useQuery({
+    queryKey: ['health'],
+    queryFn: () => apiFetch<HealthInfo>('/health'),
+    staleTime: 60_000,
+    retry: false,
+  });
+}
 
 export interface AuthResponse {
   token: string;

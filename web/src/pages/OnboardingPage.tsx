@@ -9,7 +9,9 @@ import {
   useAccounts,
   useAuthorizeAccount,
   useConnectAccount,
+  useStartGmail,
 } from '@/features/accounts/api';
+import { useHealth } from '@/features/auth/api';
 import { ConnectProviderCard } from '@/features/accounts/components/ConnectProviderCard';
 import { SimulatedOAuthModal } from '@/features/accounts/components/SimulatedOAuthModal';
 import { SyncProgress } from '@/features/accounts/components/SyncProgress';
@@ -26,13 +28,16 @@ export function OnboardingPage() {
   const queryClient = useQueryClient();
 
   const step = (searchParams.get('step') as Step) || 'welcome';
+  const oauthError = searchParams.get('error');
   const [modalProvider, setModalProvider] = useState<'gmail' | 'outlook' | null>(null);
   const [pendingAccountId, setPendingAccountId] = useState<string | null>(null);
   const [progress, setProgress] = useState<SyncProgressEvent | null>(null);
 
+  const { data: health } = useHealth();
   const { data: accounts } = useAccounts();
   const connectMutation = useConnectAccount();
   const authorizeMutation = useAuthorizeAccount();
+  const startGmailMutation = useStartGmail();
 
   const handleProgress = useCallback((evt: SyncProgressEvent) => {
     setProgress(evt);
@@ -64,6 +69,15 @@ export function OnboardingPage() {
       setModalProvider(provider);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Could not start connection');
+    }
+  };
+
+  const startRealGmail = async () => {
+    try {
+      const res = await startGmailMutation.mutateAsync({});
+      window.location.href = res.authUrl;
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : 'Could not start Gmail OAuth');
     }
   };
 
@@ -154,12 +168,33 @@ export function OnboardingPage() {
               sample threads safely without external OAuth.
             </p>
           </div>
+          {oauthError && (
+            <div className="rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-foreground">
+              <p className="font-medium">
+                {oauthError === 'not_test_user'
+                  ? "Google didn't allow this account yet. Real Gmail only works for approved test accounts during the beta."
+                  : 'Google connection could not be completed.'}
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-2 h-7 text-xs"
+                onClick={() => startConnect('gmail')}
+              >
+                Use the demo inbox instead
+              </Button>
+            </div>
+          )}
+
           <div className="space-y-3">
             <ConnectProviderCard
               provider="gmail"
               connectedAddress={accounts?.find((a) => a.provider === 'gmail' && a.status === 'connected')?.address}
               loading={connectMutation.isPending}
+              realAvailable={Boolean(health?.gmail)}
+              realLoading={startGmailMutation.isPending}
               onConnect={() => startConnect('gmail')}
+              onConnectReal={startRealGmail}
             />
             <ConnectProviderCard
               provider="outlook"

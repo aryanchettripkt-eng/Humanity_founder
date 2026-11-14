@@ -23,6 +23,16 @@ export function useConnectAccount() {
   });
 }
 
+export function useStartGmail() {
+  return useMutation({
+    mutationFn: (body: { clientId?: string } = {}) =>
+      apiFetch<{ authUrl: string }>('/accounts/gmail/start', {
+        method: 'POST',
+        body,
+      }),
+  });
+}
+
 export function useAuthorizeAccount() {
   const queryClient = useQueryClient();
   return useMutation({

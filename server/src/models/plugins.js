@@ -3,7 +3,7 @@
  * Converts `_id` to string `id` and strips `_id`, `__v`, and `passwordHash`.
  * @param {import('mongoose').Schema} schema
  */
-export function applyBaseTransform(schema) {
+export function applyBaseTransform(schema, extraTransform) {
   const transform = (_doc, ret) => {
     if (ret._id !== undefined) {
       ret.id = String(ret._id);
@@ -11,6 +11,7 @@ export function applyBaseTransform(schema) {
     }
     delete ret.__v;
     delete ret.passwordHash;
+    if (extraTransform) extraTransform(ret);
     return ret;
   };
 
