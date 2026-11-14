@@ -94,7 +94,9 @@ Each component must support the listed states. "✓" = required.
 | `CommandPalette` | ⌘K: search, navigate, ask AI | | no results, AI answering ✓ |
 | `AskPanel` | AI Q&A with thread chips | | thinking, answer, error ✓ |
 | `ClientCard` | client view card | `thread` | default, "You're on it", exiting, note input open ✓ |
-| `ConnectProviderCard` | Gmail / Outlook | `provider, status` | idle, connecting, connected, error ✓ |
+| `ConnectProviderCard` | Gmail / Outlook | `provider, status, realAvailable` | idle, connecting, connected, error; Gmail shows primary "Use demo inbox" + secondary "Connect real Gmail (beta)" when `realAvailable` ✓ |
+| `GoogleButton` | "Continue with Google" on login | | default, loading; follows Google's button branding guidelines (white, G logo, "Continue with Google") ✓ |
+| `SourceBadge` | marks an account or thread source | `source: 'gmail'|'demo'` | *Live* (success dot) / *Demo* (muted) ✓ |
 | `SimulatedOAuthModal` | fake consent screen | `provider` | ✓ |
 | `SyncProgress` | steps w/ progress bar | | running, done, error + retry ✓ |
 | `AccountStatusBadge` | sidebar footer | | connected (green dot), syncing (spinner), error (red) ✓ |
@@ -112,6 +114,11 @@ shadcn primitives to install: button, input, textarea, badge, card, dialog, shee
 - Client view addresses the client by first name and says "your assistant" or the assistant's first name.
 - Empty states (examples): Assistant segment → "Nothing on your plate. Nice." · Client segment → "Nothing waiting on Priya." · Review → "AI is confident about everything right now." · Search → "No conversations match "{q}"."
 - Simulated features: small muted label "Simulated in prototype" with an `Info` tooltip — never hide it, never shout it.
+- Real Gmail copy:
+  - Connect card helper: "Read-only. Your emails are analysed by AI to sort them. Nothing is sent or changed in Gmail."
+  - Beta note: "Works for approved test accounts while Google reviews the app."
+  - `not_test_user` error: "Google didn't allow this account yet. Real Gmail only works for approved test accounts during the beta." + button "Use the demo inbox instead".
+  - Thread detail footer for Gmail threads: "Changes here stay in Relay" + "Open in Gmail" link.
 
 ## 8. Responsive rules
 | Breakpoint | Width | Assistant layout | Navigation |

@@ -59,7 +59,9 @@ Legend: **P0** = must ship (core, maps to a brief deliverable) · **P1** = our s
 ### 6.1 Onboarding & email connection — P0 (Deliverable 1)
 - Sign up / log in (email + password, JWT). One‑click **"Try the demo"** buttons for Assistant and Client personas on the login screen.
 - 3‑step onboarding: **Welcome** (value prop, 3 bullets) → **Connect** (Gmail / Outlook cards) → **Sync** (live progress: "Fetching 42 conversations… Classifying… Extracting dates…").
-- Connection uses a **simulated OAuth** modal that looks like a provider consent screen (clearly labelled "Simulated for prototype" in small text). See BACKEND §6.
+- Connection uses a **simulated OAuth** modal that looks like a provider consent screen (clearly labelled "Simulated for prototype" in small text). See BACKEND §6. This "demo inbox" path is the default and must always work.
+- **Real Gmail (P1, Phase 6):** the Gmail card also offers *Connect real Gmail (beta)*: real Google OAuth, read-only, imports the last ~50 inbox threads into the same AI pipeline and checks for new mail every minute. Works only for Google accounts added as test users until Google verifies the app, so it's for Aryan's demo video, not for reviewers. See BACKEND §11.
+- **Sign in with Google (P1):** "Continue with Google" on the login page, alongside email/password and the demo buttons.
 - Connection status visible in sidebar footer and Settings → Accounts: `connected` / `syncing` / `error` / `disconnected`, last synced time, **Sync now**, **Disconnect**.
 - Lands on **Today** with a 3‑stop guided tour (owner pill, review strip, client view link). Skippable, shown once.
 
@@ -134,15 +136,17 @@ Legend: **P0** = must ship (core, maps to a brief deliverable) · **P1** = our s
 | S7 | Dark mode | P1 |
 | S8 | Keyboard shortcut help overlay (`?`) | P2 |
 | S9 | Swipe gestures on mobile list | P2 |
-| S10 | Real Gmail OAuth (read‑only) behind a flag | P2 |
+| S10 | Real Gmail OAuth (read‑only) behind `REAL_GMAIL` flag + Sign in with Google — BACKEND §11, ROADMAP Phase 6 | **P1** (after core UI is solid) |
 | S11 | Custom platform‑domain email addresses | Out of scope (mention in video as future) |
 
 ### 6.11 Explicitly out of scope
-Real sending of email, real Outlook integration, attachments upload, multi‑assistant teams, billing, notifications by email/push, i18n.
+Real sending of email (even for real Gmail), writing changes back to Gmail (archive/read/labels), Gmail push notifications, real Outlook integration, attachments upload, multi‑assistant teams, billing, notifications by email/push, i18n.
 
 ## 7. Key user flows
 
 **F1 — First run (assistant):** Login → "Try demo as Assistant" *or* sign up → Welcome → Connect Gmail (simulated consent) → Sync progress → Today + tour.
+
+**F1b — Real Gmail (P1):** Settings → Accounts *or* onboarding Connect → "Connect real Gmail (beta)" → Google consent → back to Sync progress (real threads importing + classifying) → Today with a *Live* badge on that account. If Google refuses (not a test user) → friendly error + "Use the demo inbox instead".
 
 **F2 — Morning triage:** Today → read brief → click "Needs review (3)" → for each, read reason → tap correct owner (optionally "always for this sender") → undo available → Today counts update live.
 
@@ -177,6 +181,26 @@ A reviewer with no instructions can, on desktop **and** a phone:
 Script order: problem (15s) → onboarding (30s) → Today in 3 seconds (30s) → classification + override + why (45s) → draft & send (30s) → client view on phone + live handoff (45s) → simulate new email / reclassify (20s) → ask AI (15s) → what's simulated & next steps (15s).
 
 ## 10. Open questions
+- Who owns the Google Cloud project for real Gmail (Aryan's personal Google account assumed). See `docs/GOOGLE_SETUP.md`.
 - Product name: "Relay" placeholder — Aryan to confirm.
 - ~~AI provider for deployment~~ → Groq (DECISIONS D9); Gemini/Claude/mock remain switchable.
 - Deployment targets: Vercel (web) + Render (server) + MongoDB Atlas assumed.
+
+## 11. What's real vs simulated (keep in sync with README)
+| Area | Status |
+|---|---|
+| Sign up / log in, password hashing, JWT | **Real** |
+| Sign in with Google | **Real** (P1, Phase 6) |
+| MongoDB storage of threads, labels, drafts, actions, rules | **Real** |
+| AI: who-replies + confidence + reason, summaries, key points, dates, drafts, ask-your-inbox, morning brief | **Real** LLM calls via Groq when `GROQ_API_KEY` is set; deterministic keyword **mock** when no key or the provider fails |
+| Owner overrides, "always for this sender" rules, re-classification on new messages | **Real** |
+| Live assistant ↔ client sync (Socket.io) | **Real** |
+| Search, filters, segments, archive / done / important | **Real** (on stored data) |
+| Connecting Gmail / Outlook | **Simulated** consent screen (default). **Real Gmail, read-only** as optional P1 path for test users |
+| Mailbox contents | **Simulated** sample threads (seed). Real inbox when real Gmail is connected |
+| New mail arriving | **Simulated** via "Simulate new email" button. Real Gmail: polled every ~60s |
+| Sending replies | **Simulated** (saved to the thread; nothing leaves) — also for real Gmail |
+| Changes written back to Gmail | **Not done** (read-only) |
+| Outlook | **Simulated** only |
+| Add to calendar | **Simulated** (toast) |
+

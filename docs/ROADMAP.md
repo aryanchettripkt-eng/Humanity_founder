@@ -67,8 +67,20 @@
 - [ ] **Q5.5** README: overview, demo logins, what's simulated, architecture diagram, AI provider notes — @claude
 - [ ] **Q5.6** Demo video script (PRD §9) — @claude; recording — Aryan
 
+## Phase 6 — Real Gmail + Sign in with Google (P1, start only after Phase 2–3 frontend is solid)
+> Spec: BACKEND §11, PRD §6.1 / F1b, DESIGN_SYSTEM §7 copy. Demo inbox must keep working with `REAL_GMAIL=false`.
+- [ ] **G6.1** Google Cloud project, Gmail API, consent screen, test users, OAuth client, `.env` values — **Aryan** (follow `docs/GOOGLE_SETUP.md`)
+- [ ] **G6.2** OAuth plumbing: `/accounts/gmail/start`, `/auth/google/start`, `/oauth/google/callback`, signed `state`, token encryption (`TOKEN_ENC_KEY`), `/health` flags, env validation — @gemini
+- [ ] **G6.3** Gmail import: mapper (MIME → Thread/Message), upsert by `externalId`, classify with concurrency 2, `sync:progress` — @gemini
+- [ ] **G6.4** Poller: `history.list` every `GMAIL_POLL_SECONDS`, Sync now, `invalid_grant` → reconnect state, disconnect revokes token — @gemini
+- [ ] **G6.5** Sign in with Google: find/create user, `/auth/callback` token hand-off — @gemini
+- [ ] **G6.6** Frontend: `GoogleButton`, Gmail card dual actions, OAuth error states, `SourceBadge`, Settings → Accounts, "Open in Gmail" link — @gemini
+- [ ] **G6.7** Tests: mapper fixtures, state verification, dedupe (mock Google client) — @gemini
+- [ ] **G6.8** Review G6.2–G6.7 against spec + update README "What's real" + video script segment — @claude
+
 ## Backlog (P2, do not start without Aryan's OK)
 - [ ] Keyboard help overlay (`?`)
 - [ ] Mobile swipe actions
-- [ ] Real Gmail OAuth (read‑only) behind `REAL_GMAIL=true`
+- [ ] ~~Real Gmail OAuth (read‑only) behind `REAL_GMAIL=true`~~ → promoted to Phase 6 (D10)
+- [ ] Real sending via Gmail (`gmail.send`, restricted scope) — only after Phase 6 is done
 - [ ] .ics download for "Add to calendar"
