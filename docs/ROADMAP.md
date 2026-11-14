@@ -10,8 +10,8 @@
 ---
 
 ## Phase 0 — Repo & foundations
-- [ ] **P0.1** `git init`, root `.gitignore`, `.editorconfig`, root `package.json` with npm workspaces (`web`, `server`) and scripts `dev` (concurrently), `lint`, `test` — @gemini
-- [ ] **P0.2** Scaffold `server/` (Express, env validation, health route, error middleware, Mongo connect) — @gemini
+- [~] **P0.1** `git init`, root `.gitignore`, `.editorconfig`, root `package.json` with npm workspaces (`web`, `server`) and scripts `dev` (concurrently), `lint`, `test` — @gemini (gemini/P0.2-server-scaffold; server workspace done, `web` deferred per user)
+- [x] **P0.2** Scaffold `server/` (Express, env validation, health route, error middleware, Mongo connect) — @gemini (gemini/P0.2-server-scaffold)
 - [ ] **P0.3** Scaffold `web/` (Vite React TS, Tailwind, shadcn init, Inter, router with placeholder pages, providers) — @gemini
 - [ ] **P0.4** Design tokens in `globals.css` + `tailwind.config` exactly per DESIGN_SYSTEM §2–4; `lib/owners.ts`, `lib/segments.ts` — @gemini
 - [ ] **P0.5** `.env.example` for both apps; README "Run locally" — @gemini
