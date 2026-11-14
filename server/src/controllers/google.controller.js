@@ -5,16 +5,28 @@ import { Client } from '../models/Client.js';
 import { EmailAccount } from '../models/EmailAccount.js';
 import { User } from '../models/User.js';
 import { joinAssistantClientRoom } from '../realtime/socket.js';
-import { encryptToken, signOAuthState, verifyOAuthState } from '../services/gmail/crypto.js';
+import {
+  consumeGmailConnectToken,
+  encryptToken,
+  signGmailConnectToken,
+  signOAuthState,
+  verifyOAuthState,
+} from '../services/gmail/crypto.js';
 import { importGmailAccount } from '../services/gmail/import.js';
 import { buildGoogleAuthUrl, exchangeCodeForTokens } from '../services/gmail/oauth.js';
-import { AppError, notFound } from '../utils/errors.js';
+import { AppError, badRequest, forbidden, notFound } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 
 export const startGmailSchema = {
   body: z.object({
     clientId: z.string().optional(),
     returnTo: z.enum(['onboarding', 'settings']).optional(),
+  }),
+};
+
+export const completeGmailSchema = {
+  body: z.object({
+    code: z.string().min(1, 'Connect code is required'),
   }),
 };
 
@@ -157,38 +169,84 @@ export async function handleGoogleCallback(req, res) {
       return res.redirect(302, `${base}/login?error=state_invalid`);
     }
 
+    const refreshTokenEnc = tokens.refresh_token ? encryptToken(tokens.refresh_token) : undefined;
+    const connectCode = signGmailConnectToken({
+      userId: String(user._id),
+      clientId: parsedState.clientId,
+      email,
+      sub: String(userInfo.id || ''),
+      refreshTokenEnc,
+      scope: tokens.scope || '',
+    });
+
+    if (fromSettings) {
+      return res.redirect(
+        302,
+        `${base}/app/settings/accounts?connect=${encodeURIComponent(connectCode)}`
+      );
+    }
+    return res.redirect(
+      302,
+      `${base}/onboarding?step=sync&connect=${encodeURIComponent(connectCode)}`
+    );
+  } catch (err) {
+    logger.warn('Google OAuth callback exchange failed', { message: err?.message });
+    const sep = errorTarget.includes('?') ? '&' : '?';
+    return res.redirect(302, `${errorTarget}${sep}error=exchange_failed`);
+  }
+}
+
+export async function completeGmailConnect(req, res, next) {
+  try {
+    if (!env.realGmailEnabled) {
+      return next(badRequest('Real Gmail is disabled'));
+    }
+
+    let payload;
+    try {
+      payload = consumeGmailConnectToken(req.body.code);
+    } catch {
+      return next(badRequest('Invalid or expired Gmail connection token', undefined, 'STATE_INVALID'));
+    }
+
+    if (String(payload.userId) !== String(req.user.id)) {
+      return next(forbidden('This Gmail connection belongs to a different user'));
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(notFound('User not found'));
+    }
+
     const client = await resolveOrCreateClient(
       user._id,
       user.name,
       user.email,
-      parsedState.clientId
+      payload.clientId
     );
 
-    const refreshToken = tokens.refresh_token;
     let account = await EmailAccount.findOne({
       clientId: client._id,
       assistantId: user._id,
       provider: 'gmail',
-      address: email,
+      address: payload.email,
       simulated: false,
     });
 
-    if (!refreshToken && !account?.google?.refreshTokenEnc) {
-      return res.redirect(302, `${base}/onboarding?step=connect&error=exchange_failed`);
+    if (!payload.refreshTokenEnc && !account?.google?.refreshTokenEnc) {
+      return next(badRequest('Google did not return a refresh token; please try connecting again.'));
     }
 
-    const refreshTokenEnc = refreshToken
-      ? encryptToken(refreshToken)
-      : account.google.refreshTokenEnc;
+    const refreshTokenEnc = payload.refreshTokenEnc || account.google.refreshTokenEnc;
 
     if (account) {
       account.status = 'syncing';
       account.error = undefined;
       account.google = {
         ...account.google,
-        sub: String(userInfo.id || ''),
+        sub: String(payload.sub || ''),
         refreshTokenEnc,
-        scope: tokens.scope || account.google?.scope || '',
+        scope: payload.scope || account.google?.scope || '',
       };
       await account.save();
     } else {
@@ -196,32 +254,21 @@ export async function handleGoogleCallback(req, res) {
         clientId: client._id,
         assistantId: user._id,
         provider: 'gmail',
-        address: email,
+        address: payload.email,
         status: 'syncing',
         simulated: false,
         google: {
-          sub: String(userInfo.id || ''),
+          sub: String(payload.sub || ''),
           refreshTokenEnc,
-          scope: tokens.scope || '',
+          scope: payload.scope || '',
         },
       });
     }
 
     void importGmailAccount(account._id);
-    if (fromSettings) {
-      return res.redirect(
-        302,
-        `${base}/app/settings/accounts?syncing=${encodeURIComponent(account.id)}`
-      );
-    }
-    return res.redirect(
-      302,
-      `${base}/onboarding?step=sync&accountId=${encodeURIComponent(account.id)}`
-    );
+    res.json({ data: account.toJSON() });
   } catch (err) {
-    logger.warn('Google OAuth callback exchange failed', { message: err?.message });
-    const sep = errorTarget.includes('?') ? '&' : '?';
-    return res.redirect(302, `${errorTarget}${sep}error=exchange_failed`);
+    next(err);
   }
 }
 

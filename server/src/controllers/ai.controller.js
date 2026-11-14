@@ -49,6 +49,7 @@ export async function postBriefRefresh(req, res, next) {
       clientId: req.clientId,
       counts,
       useAI: true,
+      force: true,
     });
     res.json({ data: brief });
   } catch (err) {

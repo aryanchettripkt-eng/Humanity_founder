@@ -18,6 +18,21 @@ _None yet._
 
 ---
 
+### 2026-11-15 03:20 · gemini · Audit fixes (1–10)
+- Done:
+  - #1 Classification date/timezone: added `Client.timezone` (default `Asia/Kolkata`), passed weekday + next 7 days + timezone into `buildClassificationSystemPrompt`, and requested ISO-8601 dates with offset.
+  - #2 Account switch safety: added `activeClientUserId` to `useUiStore`; `useMe` resets `activeClientId` if user changes or client is invalid, `useLogout` clears it, and `AssistantLayout` validates against `me.clients`.
+  - #3 Cached AI morning brief: added `Client.brief` (`{ text, generatedAt, fallback }`), `getDashboardBrief` returns cached AI brief if `< 2h` old or triggers one background refresh, and `postBriefRefresh` updates cache.
+  - #4 Preserve owner on AI failure: `classifyThread` only falls back to `owner: 'review'` on `isFirstClassification`.
+  - #5 Groq rate limits & cancellation: `Groq` client uses `maxRetries: 0` + `timeout`, `withTimeout` passes `AbortSignal`, `callWithBackoff` honours `retry-after-ms`/`retry-after`, and `draft.service.js` trims quoted replies + caps message bodies at 2,000 chars.
+  - #6 Poller retries & sync events: added `Thread.aiAttempts` (poller retries `pending`/`failed` up to 3 attempts) and `pollGmailAccount` emits `sync:done` only when threads changed or on manual sync.
+  - #7 Two-step Gmail connect: `/oauth/google/callback` redirects with a 5-min one-time `connect` token instead of creating `EmailAccount` directly; `POST /accounts/gmail/complete` verifies `req.user.id === payload.userId` before saving & importing.
+  - #8 Production `JWT_SECRET` guard: `loadEnv` throws if `NODE_ENV === 'production'` and `JWT_SECRET` is the default dev string.
+  - #9 Demo lockdown: `/demo/simulate-email` and `/demo/reset` require `alex@example.com` (and simulated account for simulate-email); `Simulate email` button in `AssistantLayout` hidden for non-demo users.
+  - #10 Rate limiting & `trust proxy`: `app.set('trust proxy', 1)`, shared `aiLimiter` applied to `reclassify`, `drafts`, `simulate-email`, and client `note`, and `authLimiter` (10/min) applied to `/auth/login` and `/auth/signup`.
+- Changed contracts: added `POST /api/accounts/gmail/complete { code }` for two-step Gmail OAuth handoff.
+- Next: merge `gemini/audit-fixes` -> `main`.
+
 ### 2026-11-15 03:04 · gemini · Fast Gmail classification & pending thread retry
 - Done:
   - Gmail `import.js` and `poller.js` now call `classifyThread(..., { fast: true })` so they use `GROQ_FAST_MODEL` (`openai/gpt-oss-20b`).

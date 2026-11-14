@@ -20,11 +20,13 @@ let pollTimer = null;
 /**
  * Poll a single real Gmail account for new messages via `users.history.list`.
  */
-export async function pollGmailAccount(accountId) {
+export async function pollGmailAccount(accountId, { manual = false } = {}) {
   const account = await EmailAccount.findById(accountId);
   if (!account || account.simulated || account.status === 'disconnected' || !account.google?.refreshTokenEnc) {
     return;
   }
+
+  const wasSyncing = manual || account.status === 'syncing';
 
   if (!account.google.historyId) {
     await importGmailAccount(account._id, { maxResults: 20 });
@@ -88,10 +90,11 @@ export async function pollGmailAccount(accountId) {
       }
     }
 
-    // Retry up to 5 interrupted/failed threads (oldest first) on each poll tick
+    // Retry up to 5 interrupted/failed threads (oldest first, max 3 attempts) on each poll tick
     const pendingThreads = await Thread.find({
       accountId: account._id,
       aiStatus: { $in: ['pending', 'failed'] },
+      $or: [{ aiAttempts: { $lt: 3 } }, { aiAttempts: { $exists: false } }],
     })
       .sort({ createdAt: 1 })
       .limit(5)
@@ -119,7 +122,9 @@ export async function pollGmailAccount(accountId) {
     if (classifiedAny) {
       emitCountsChanged(account.clientId);
     }
-    emitSyncDone(account.clientId, account.toJSON(), account.assistantId);
+    if (classifiedAny || changedThreadIds.size > 0 || wasSyncing) {
+      emitSyncDone(account.clientId, account.toJSON(), account.assistantId);
+    }
   } catch (err) {
     const status = err?.code || err?.status || err?.response?.status;
     const msg = String(err?.message || '');

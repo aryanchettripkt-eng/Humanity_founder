@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { app } from '../src/app.js';
+import { loadEnv } from '../src/config/env.js';
 
 describe('Health endpoint', () => {
   it('GET /api/health returns ok and active ai provider', async () => {
@@ -26,6 +27,15 @@ describe('Health endpoint', () => {
     const res = await request(app).get('/api/does-not-exist');
     expect(res.status).toBe(404);
     expect(res.body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('refuses to boot in production with default JWT_SECRET', () => {
+    expect(() =>
+      loadEnv({
+        NODE_ENV: 'production',
+        JWT_SECRET: 'dev-secret-change-me-in-production-32chars',
+      })
+    ).toThrow(/JWT_SECRET/);
   });
 });
 

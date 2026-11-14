@@ -6,6 +6,7 @@ import {
   postClientAction,
 } from '../controllers/client.controller.js';
 import { requireAuth, requireClientScope, requireRole } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimit.js';
 import { validate } from '../middleware/validate.js';
 
 const router = Router();
@@ -14,7 +15,12 @@ router.use(requireAuth, requireRole('client'), requireClientScope());
 
 router.get('/queue', getClientQueue);
 router.get('/threads/:id', getClientThreadDetail);
-router.post('/threads/:id/action', validate(clientActionSchema), postClientAction);
+router.post(
+  '/threads/:id/action',
+  validate(clientActionSchema),
+  (req, res, next) => (req.body?.action === 'note' ? aiLimiter(req, res, next) : next()),
+  postClientAction
+);
 
 export default router;
 

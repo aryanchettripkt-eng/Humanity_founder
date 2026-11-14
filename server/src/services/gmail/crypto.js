@@ -57,3 +57,40 @@ export function verifyOAuthState(stateToken, secret = env.JWT_SECRET) {
   return payload;
 }
 
+const consumedConnectJtis = new Map();
+
+/** Sign a short-lived (5 min) one-time Gmail connect handoff JWT. */
+export function signGmailConnectToken(
+  { userId, clientId, email, sub, refreshTokenEnc, scope },
+  secret = env.JWT_SECRET
+) {
+  const jti = crypto.randomBytes(16).toString('hex');
+  return jwt.sign(
+    { purpose: 'gmail_complete', jti, userId, clientId, email, sub, refreshTokenEnc, scope },
+    secret,
+    { expiresIn: '5m' }
+  );
+}
+
+/** Verify and consume a one-time Gmail connect handoff JWT. */
+export function consumeGmailConnectToken(token, secret = env.JWT_SECRET) {
+  const payload = jwt.verify(token, secret);
+  if (
+    !payload ||
+    typeof payload !== 'object' ||
+    payload.purpose !== 'gmail_complete' ||
+    !payload.jti
+  ) {
+    throw new Error('Invalid Gmail connect token');
+  }
+  const now = Date.now();
+  for (const [k, exp] of consumedConnectJtis.entries()) {
+    if (exp < now) consumedConnectJtis.delete(k);
+  }
+  if (consumedConnectJtis.has(payload.jti)) {
+    throw new Error('Gmail connect token already used');
+  }
+  consumedConnectJtis.set(payload.jti, now + 5 * 60 * 1000);
+  return payload;
+}
+

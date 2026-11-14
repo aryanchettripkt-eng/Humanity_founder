@@ -78,6 +78,7 @@ const threadSchema = new mongoose.Schema(
     entities: { type: [entitySchema], default: [] },
     reclassifiedAt: { type: Date },
     aiStatus: { type: String, enum: ['pending', 'done', 'failed'], default: 'pending' },
+    aiAttempts: { type: Number, default: 0 },
     aiModel: { type: String },
     history: { type: [historyItemSchema], default: [] },
     handoff: {

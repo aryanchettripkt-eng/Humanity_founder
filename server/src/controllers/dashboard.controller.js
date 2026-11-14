@@ -1,6 +1,6 @@
 import { Activity } from '../models/Activity.js';
 import { Thread } from '../models/Thread.js';
-import { generateMorningBrief } from '../services/brief.service.js';
+import { getDashboardBrief } from '../services/brief.service.js';
 import { computeSegmentCounts, SEGMENT_IDS } from '../services/segments.js';
 
 export async function getDashboard(req, res, next) {
@@ -77,11 +77,10 @@ export async function getDashboard(req, res, next) {
     }
     upcoming.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
 
-    const brief = await generateMorningBrief({
+    const brief = await getDashboardBrief({
       clientId: req.clientId,
       counts,
       upcoming,
-      useAI: false,
     });
 
     res.json({

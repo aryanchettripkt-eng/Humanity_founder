@@ -53,6 +53,12 @@ export function loadEnv(raw = process.env) {
     throw new Error(`Invalid environment configuration: ${issues}`);
   }
   const data = parsed.data;
+  if (
+    data.NODE_ENV === 'production' &&
+    data.JWT_SECRET === 'dev-secret-change-me-in-production-32chars'
+  ) {
+    throw new Error('JWT_SECRET must be set to a secure value in production');
+  }
   const effectiveAiProvider = resolveEffectiveProvider(data);
   const googleLoginEnabled = Boolean(
     data.GOOGLE_CLIENT_ID && data.GOOGLE_CLIENT_SECRET && data.GOOGLE_REDIRECT_URI
