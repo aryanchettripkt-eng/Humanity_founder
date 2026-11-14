@@ -17,8 +17,8 @@
 - [ ] **P0.5** `.env.example` for both apps; README "Run locally" — @gemini
 
 ## Phase 1 — Data & AI core (backend)
-- [ ] **B1.1** Mongoose models per BACKEND §4 with indexes + toJSON transform — @gemini
-- [ ] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini
+- [x] **B1.1** Mongoose models per BACKEND §4 with indexes + toJSON transform — @gemini (gemini/B1.1-models-auth)
+- [x] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini (gemini/B1.1-models-auth)
 - [ ] **B1.3** Seed data: `threads.json` (Priya ~32, Daniel ~10) + `scenarios.json` per BACKEND §8 — @claude *(content writing; parallel‑safe, only touches `server/src/seed/data/`)*
 - [ ] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini
 - [ ] **B1.5** AI provider abstraction + `mock` provider — @gemini
