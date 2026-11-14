@@ -6,14 +6,23 @@
 - [ ] Product name — "Relay" is a placeholder. Keep or rename?
 - [x] AI provider for the deployed demo → **Groq** (D9). Gemini/Anthropic/mock still supported.
 - [ ] Should agents commit directly to `main` for ROADMAP/PROGRESS updates, or always via branches?
+- [ ] Real Gmail (Phase 6): which Google account owns the Cloud project, and which Gmail goes in the demo video? (G6.1)
 
 ## Open issues
-_None yet._
+- [ ] Sync events reach an assistant twice (in both `assistants:` and `user:` rooms). Harmless if FE handlers are idempotent (FRONTEND §6). Optional server fix: emit with `io.to(a).to(b)` so Socket.io dedupes. — owner: @gemini
+- [ ] Client socket isn't told when AI moves a thread *away* from `client` without a handoff. FE mitigation: `/c` refetches on focus + every 60s (FRONTEND §6). — owner: @gemini
+- [ ] Backend not yet run against a real MongoDB by Claude (sandbox can't download mongod); first full run is Aryan's local start. — owner: Aryan
 
 ## Handoffs needed
 _None yet._
 
 ---
+
+### 2026-11-15 00:40 · claude · Docs: real Gmail plan, real-vs-simulated, review follow-ups
+- Done: BACKEND §3 (Google routes, `nudges` on `/dashboard`), §4 (Google/account/source fields), §6, §7 (new socket rooms), §9, new §11 (real Gmail + Google sign-in). PRD §6.1, S10 → P1, F1b, new §11 real-vs-simulated table. FRONTEND routes/conventions, DESIGN_SYSTEM components + copy, ROADMAP Phase 6, DECISIONS D10–D12, README "What's real vs simulated", new `docs/GOOGLE_SETUP.md`.
+- Re-reviewed Gemini's fix commit `e6fae15`: all 8 findings fixed; lint clean; 18/18 tests pass. Two minor leftovers logged under Open issues.
+- Changed contracts: additive only (new routes/fields behind `REAL_GMAIL`; documented existing `nudges` and socket rooms).
+- Next: Phase 6 waits until the core frontend (Phase 2–3) is solid. Claude: B1.3 seed data, B4.5 few-shot.
 
 ### 2026-11-14 23:55 · gemini · Fix all issues from Claude's backend review
 - Done:

@@ -65,8 +65,9 @@ web/
 | Path | Page | Auth | Notes |
 |---|---|---|---|
 | `/` | redirect | – | → `/app/today` (assistant), `/c` (client), `/login` (anon) |
-| `/login`, `/signup` | Login/Signup | anon | demo buttons call `POST /api/auth/demo` |
-| `/onboarding` | Onboarding | assistant | step via `?step=welcome|connect|sync` |
+| `/login`, `/signup` | Login/Signup | anon | demo buttons call `POST /api/auth/demo`; "Continue with Google" navigates to `${API}/auth/google/start` (shown only if `/health` says `googleLogin:true`) |
+| `/auth/callback` | AuthCallback | anon | reads `#token=` (or `?error=`), stores token, clears the hash, routes by role. P1 |
+| `/onboarding` | Onboarding | assistant | step via `?step=welcome|connect|sync`; after real Gmail OAuth the server lands here with `&accountId=` or `&error=` (`not_test_user`, `access_denied`, …) |
 | `/app/today` | Today | assistant | |
 | `/app/inbox/:segment?/:threadId?` | Inbox | assistant | default segment `inbox`. Mobile: threadId present → full‑screen thread |
 | `/app/settings/accounts` | Accounts | assistant | |
@@ -109,14 +110,17 @@ Route guards: `RequireAuth role="assistant"|"client"`. Assistant without any con
 - Every component that fetches renders `<Skeleton>`, `<EmptyState>`, `<ErrorState>` branches.
 - Accessibility: interactive elements are `<button>`/`<a>`; icons‑only buttons need `aria-label` + tooltip with `KbdHint`.
 - Keyboard shortcuts registered in one place: `features/command/useShortcuts.ts`.
-- Env: `VITE_API_URL`, `VITE_SOCKET_URL`, `VITE_DEMO_MODE=true` (shows Simulate button + demo labels).
+- Env: `VITE_API_URL`, `VITE_SOCKET_URL`, `VITE_DEMO_MODE=true` (shows Simulate button + demo labels). Whether real Gmail / Google login buttons show comes from `GET /health` (`gmail`, `googleLogin`), not from a FE env var.
+- Socket events can arrive twice (assistant is in two rooms, BACKEND §7). Handlers must be idempotent: patch by id, set absolute progress values, never increment.
+- Client view (`/c`) refetches `/client/queue` on window focus and every 60s, because a thread moved away from the client by AI isn't pushed to the client socket.
 - Lint/format: ESLint (typescript-eslint, react-hooks) + Prettier (2 spaces, single quotes, semi, width 100). Run `npm run lint && npm run typecheck` before committing.
 
 ## 7. Screen composition (what each page uses)
 - **TodayPage**: `BriefCard`, `StatTile×4`, secondary counts, `ReviewStrip`, `UpcomingRail`, `ActivityFeed`, recent `ThreadRow×5`.
 - **InboxPage**: `SegmentNav` (in layout) · `ThreadList` (+ search/filter bar) · `ThreadView` (`ThreadHeader`, `MessageItem[]`, `DraftComposer`) · `AIPanel`.
 - **ClientHomePage**: greeting, count, `ClientCard[]` with AnimatePresence, all‑caught‑up `EmptyState`.
-- **OnboardingPage**: `Stepper`, `ConnectProviderCard×2`, `SimulatedOAuthModal`, `SyncProgress` (driven by `sync:progress` socket events).
+- **OnboardingPage**: `Stepper`, `ConnectProviderCard×2`, `SimulatedOAuthModal`, `SyncProgress` (driven by `sync:progress` socket events). Gmail card has two actions: primary **Use demo inbox** (simulated) and secondary **Connect real Gmail (beta)** (when enabled). Handles `?error=` from the OAuth redirect with an inline `ErrorState` + "Use demo inbox instead".
+- **SettingsAccountsPage**: list accounts with `SourceBadge` (Live / Demo), status, last synced, Sync now, Disconnect; "Connect real Gmail" button when enabled.
 
 ## 8. Testing (light, prototype‑level)
 - Vitest + Testing Library for `OwnerPill`, `OwnerPopover`, `ThreadRow`, `ClientCard`, and query‑key/optimistic logic.
