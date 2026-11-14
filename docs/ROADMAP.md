@@ -25,7 +25,7 @@
 - [x] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini (gemini/B1.5-ai-providers; includes `groq` per D9)
 - [ ] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
 - [ ] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini
-- [ ] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini
+- [x] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini (gemini/B1.9-socket-activity)
 - [ ] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini
 - [ ] **B1.11** Tests: segment filters, owner change + rule creation, classification mapping (mock) — @gemini
 

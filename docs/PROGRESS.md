@@ -15,6 +15,11 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:44 · gemini · B1.9 Socket.io server + Activity service
+- Done: `server/src/realtime/socket.js` (JWT handshake auth, `user:{id}` & `client:{id}` rooms, emit helpers for thread/counts/activity/sync/draft), `server/src/services/activity.service.js`, wired `initSocket` in `server/src/index.js`.
+- Changed contracts: none.
+- Next: `B1.8` Threads API (plus `segments.js` and classification hook) and `B1.10` Accounts & simulated sync.
+
 ### 2026-11-14 23:43 · gemini · B1.5 & B1.6 AI providers
 - Done:
   - `server/src/ai/schemas.js` (`classificationSchema`, `askSchema`), `server/src/ai/utils.js` (`AIError`, `withTimeout`, `runJSONWithRetry` with 1 JSON/schema retry).
