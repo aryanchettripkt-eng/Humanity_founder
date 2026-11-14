@@ -132,9 +132,11 @@ export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMP
       }
     }
 
+    const classifyTotal = toClassify.length || 1;
+    let classified = 0;
     emitSyncProgress(
       clientId,
-      { accountId: account.id, step: 'classifying', imported: threadRefs.length, total },
+      { accountId: account.id, step: 'classifying', imported: 0, total: classifyTotal },
       assistantId
     );
 
@@ -145,6 +147,12 @@ export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMP
           message: err?.message,
         });
       });
+      classified += 1;
+      emitSyncProgress(
+        clientId,
+        { accountId: account.id, step: 'classifying', imported: classified, total: classifyTotal },
+        assistantId
+      );
     });
 
     account.status = 'connected';
