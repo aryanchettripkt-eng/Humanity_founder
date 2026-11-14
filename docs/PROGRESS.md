@@ -18,6 +18,13 @@ _None yet._
 
 ---
 
+### 2026-11-15 · claude · B1.3 sample email data
+- Done: `server/src/seed/data/threads.json` (Priya 38: assistant 12, client 10, none 12, review 4; Daniel 10) and `scenarios.json` (6). 8 multi-message threads, 4 ownership changes with history, 17 dated items within 7 days, Waiting/Done/Archived examples, client hand-offs (handling, handed to Alex with a note, handled) and seeded Activity.
+- Changed contracts: `createThreadWithMessages` now also reads `startsInHours`/`endsInHours`, `history`, `activity`, `reclassifiedHoursAgo`, `handoff`, and `"client"` as a person placeholder (BACKEND §8). Existing fields unchanged; fallback threads still work.
+- Next: after merge, run `POST /api/demo/reset` (or `npm run seed`) on the deployed server to load it. Then B4.5.
+- Notes: validated every item against the Mongoose schemas without a DB; not yet run against Atlas.
+
+
 ### 2026-11-15 01:32 · gemini · QA & live-site fixes (Groq models, mobile UX, shortcuts, code splitting)
 - Done:
   - Fixed Groq model defaults in `server/src/config/env.js` and `.env.example` (`openai/gpt-oss-120b` / `openai/gpt-oss-20b` — `llama-3.3-70b-versatile` returned `model_not_found` on this Groq account).

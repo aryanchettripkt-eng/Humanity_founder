@@ -362,13 +362,14 @@ No client → server events besides connection (all writes go through REST).
 
 ## 8. Seed data (`npm run seed`)
 - Users: `alex@example.com` (assistant), `priya@example.com` (client of Alex), `daniel@example.com` (client of Alex). Password for all: `demo1234`.
-- Priya: ~32 threads; Daniel: ~10 threads. Mix target for Priya:
+- Priya: ~38 threads; Daniel: ~10 threads. Mix target for Priya:
   - assistant ≈ 35% (rescheduling, vendor quotes, travel booking, invoice follow‑up, event RSVP)
   - client ≈ 25% (investor term sheet, board deck approval, hiring offer decision, personal note from friend, legal signature, journalist interview request)
   - none ≈ 25% (newsletters, Stripe receipts, GitHub/Slack notifications, FYI updates, resolved threads)
   - review ≈ 10–15% (ambiguous: "Quick question" from unknown sender, cc‑heavy threads)
   - At least 6 threads with multi‑message history; at least 3 where the latest message flips ownership; 8+ with extractable dates within the next 7 days relative to seed time (generate dates relative to `now`).
 - Seed stores pre‑computed AI fields (so first load is instant) **and** can re‑run the live pipeline with `npm run seed -- --classify`.
+- `threads.json` item format (all optional unless noted; see `seed.js`): `clientKey` (`priya`|`daniel`), `subject`*, `participants`, `messages[]` (`from`, `to`, `cc`, `direction`, `hoursOffset` < 0 or `sentAt`, `bodyText`), the AI fields (`owner`, `ownerSource`, `suggestedOwner`, `confidence`, `reason`, `clientReason`, `category`, `actionRequired`, `waitingOnOthers`, `summary`, `keyPoints`), `entities[]` with `startsInHours`/`endsInHours` (relative to seed time) or `startsAt`, `history[]` and `activity[]` with `hoursOffset`, `reclassifiedHoursAgo`, `handoff` (`state`, `note`, `hoursOffset`), `unread`, `important`, `status`, `archived`. The string `"client"` in place of a person means the thread's client, so onboarding sync can reuse Priya's threads for any new client.
 - `scenarios.json`: ≥ 5 scenarios (new investor email → client; reply on existing "dinner reschedule" thread that now asks for Priya's personal choice → reclassify assistant→client; newsletter → none; ambiguous → review; meeting request → assistant + entity).
 
 ## 9. Security & config (prototype‑appropriate)

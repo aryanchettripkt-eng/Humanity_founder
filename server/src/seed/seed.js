@@ -185,7 +185,34 @@ export async function loadSeedThreads(priyaEmail = 'priya@example.com', danielEm
 }
 
 /**
+ * Resolve the "client" placeholder used in threads.json so the same seed data works for
+ * the demo personas and for any new client created during onboarding sync.
+ * @param {any} person
+ * @param {{ name: string, email: string }} client
+ */
+function resolvePerson(person, client) {
+  if (person === 'client') return { name: client.name, email: client.email };
+  return person;
+}
+
+/**
+ * Seed dates can be absolute (`startsAt`, `sentAt`) or relative to now
+ * (`startsInHours`, `hoursOffset`) so the demo always looks current.
+ * @param {any} e
+ */
+function toEntity(e) {
+  const startsAt = e.startsAt ? new Date(e.startsAt) : hoursFromNow(e.startsInHours ?? 24);
+  let endsAt;
+  if (e.endsAt) endsAt = new Date(e.endsAt);
+  else if (e.endsInHours !== undefined) endsAt = hoursFromNow(e.endsInHours);
+  const { startsInHours: _s, endsInHours: _e, ...rest } = e;
+  return { ...rest, startsAt, ...(endsAt ? { endsAt } : {}) };
+}
+
+/**
  * Create a Thread and its Messages from a seed item.
+ * Optional seed fields: `history` / `activity` (with `hoursOffset`), `reclassifiedHoursAgo`,
+ * `handoff` (with `hoursOffset`). They are ignored when `pendingAI` is true.
  * @param {{ client: any, account: any, item: any, pendingAI?: boolean }} params
  */
 export async function createThreadWithMessages({ client, account, item, pendingAI = false }) {
@@ -200,7 +227,7 @@ export async function createThreadWithMessages({ client, account, item, pendingA
     accountId: account._id,
     subject: item.subject,
     snippet: String(lastMsg?.bodyText || item.snippet || '').slice(0, 140),
-    participants: item.participants || [],
+    participants: (item.participants || []).map((p) => resolvePerson(p, client)),
     lastMessageAt,
     messageCount: msgs.length,
     lastSender: lastMsg?.direction === 'outbound' ? 'us' : 'them',
@@ -219,29 +246,60 @@ export async function createThreadWithMessages({ client, account, item, pendingA
     waitingOnOthers: item.waitingOnOthers ?? false,
     summary: pendingAI ? '' : item.summary || '',
     keyPoints: pendingAI ? [] : item.keyPoints || [],
-    entities: pendingAI
-      ? []
-      : (item.entities || []).map((e) => ({
-          ...e,
-          startsAt: new Date(e.startsAt),
-          ...(e.endsAt ? { endsAt: new Date(e.endsAt) } : {}),
-        })),
+    entities: pendingAI ? [] : (item.entities || []).map(toEntity),
     aiStatus: pendingAI ? 'pending' : 'done',
     aiModel: pendingAI ? undefined : 'seed',
+    ...(pendingAI
+      ? {}
+      : {
+          history: (item.history || []).map(({ hoursOffset, ...h }) => ({
+            ...h,
+            at: hoursFromNow(hoursOffset ?? -1),
+          })),
+          ...(item.reclassifiedHoursAgo !== undefined
+            ? { reclassifiedAt: hoursFromNow(-item.reclassifiedHoursAgo) }
+            : {}),
+          ...(item.handoff
+            ? {
+                handoff: {
+                  state: item.handoff.state,
+                  ...(item.handoff.note ? { note: item.handoff.note } : {}),
+                  at: hoursFromNow(item.handoff.hoursOffset ?? -1),
+                },
+              }
+            : {}),
+        }),
   });
 
   for (const m of msgs) {
+    const to = m.to ? m.to.map((p) => resolvePerson(p, client)) : [{ name: client.name, email: client.email }];
     await Message.create({
       threadId: thread._id,
       clientId: client._id,
-      from: m.from,
-      to: m.to || [{ name: client.name, email: client.email }],
-      cc: m.cc || [],
+      from: resolvePerson(m.from, client),
+      to,
+      cc: (m.cc || []).map((p) => resolvePerson(p, client)),
       sentAt: m.sentAt ? new Date(m.sentAt) : hoursFromNow(m.hoursOffset ?? -1),
       bodyText: m.bodyText,
       direction: m.direction || 'inbound',
       simulated: true,
     });
+  }
+
+  if (!pendingAI) {
+    for (const a of item.activity || []) {
+      const at = hoursFromNow(a.hoursOffset ?? -1);
+      const doc = new Activity({
+        clientId: client._id,
+        actor: a.actor.name === 'client' ? { type: 'client', name: client.firstName || client.name } : a.actor,
+        type: a.type,
+        threadId: thread._id,
+        payload: { subject: item.subject, ...(a.payload || {}) },
+        createdAt: at,
+        updatedAt: at,
+      });
+      await doc.save({ timestamps: false });
+    }
   }
 
   return thread;
