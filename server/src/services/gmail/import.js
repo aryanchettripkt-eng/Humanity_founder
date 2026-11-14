@@ -164,7 +164,7 @@ export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMP
     );
 
     await runWithConcurrency(toClassify, 2, async (thread) => {
-      await classifyThread(thread._id, { emit: false }).catch((err) => {
+      await classifyThread(thread._id, { fast: true, emit: false }).catch((err) => {
         logger.warn('Gmail thread classification failed', {
           threadId: String(thread._id),
           message: err?.message,

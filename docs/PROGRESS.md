@@ -18,6 +18,15 @@ _None yet._
 
 ---
 
+### 2026-11-15 03:04 · gemini · Fast Gmail classification & pending thread retry
+- Done:
+  - Gmail `import.js` and `poller.js` now call `classifyThread(..., { fast: true })` so they use `GROQ_FAST_MODEL` (`openai/gpt-oss-20b`).
+  - `server/src/ai/providers/groq.js` now passes `reasoning_effort: 'low'` for `openai/gpt-oss-*` models.
+  - Raised default `AI_TIMEOUT_MS` to `30000` in `server/src/config/env.js` and `.env.example`.
+  - `pollGmailAccount` now retries up to 5 `pending` or `failed` threads (oldest first) on each poll tick.
+- Changed contracts: none.
+- Next: merge `gemini/gmail-fast-retry` -> `main`.
+
 ### 2026-11-15 02:52 · gemini · Gmail sync concurrency lock, quota retry, early historyId
 - Done:
   - Added in-memory `activeSyncAccounts` lock (`isAccountSyncing` / `tryLockAccount` / `unlockAccount`) in `server/src/services/gmail/oauth.js` and wired it into `importGmailAccount`, `pollGmailAccount`, and `POST /accounts/:id/sync`.
