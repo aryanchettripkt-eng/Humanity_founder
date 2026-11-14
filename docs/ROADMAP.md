@@ -10,24 +10,24 @@
 ---
 
 ## Phase 0 — Repo & foundations
-- [ ] **P0.1** `git init`, root `.gitignore`, `.editorconfig`, root `package.json` with npm workspaces (`web`, `server`) and scripts `dev` (concurrently), `lint`, `test` — @gemini
-- [ ] **P0.2** Scaffold `server/` (Express, env validation, health route, error middleware, Mongo connect) — @gemini
+- [~] **P0.1** `git init`, root `.gitignore`, `.editorconfig`, root `package.json` with npm workspaces (`web`, `server`) and scripts `dev` (concurrently), `lint`, `test` — @gemini (gemini/P0.2-server-scaffold; server workspace done, `web` deferred per user)
+- [x] **P0.2** Scaffold `server/` (Express, env validation, health route, error middleware, Mongo connect) — @gemini (gemini/P0.2-server-scaffold)
 - [ ] **P0.3** Scaffold `web/` (Vite React TS, Tailwind, shadcn init, Inter, router with placeholder pages, providers) — @gemini
 - [ ] **P0.4** Design tokens in `globals.css` + `tailwind.config` exactly per DESIGN_SYSTEM §2–4; `lib/owners.ts`, `lib/segments.ts` — @gemini
 - [ ] **P0.5** `.env.example` for both apps; README "Run locally" — @gemini
 
 ## Phase 1 — Data & AI core (backend)
-- [ ] **B1.1** Mongoose models per BACKEND §4 with indexes + toJSON transform — @gemini
-- [ ] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini
+- [x] **B1.1** Mongoose models per BACKEND §4 with indexes + toJSON transform — @gemini (gemini/B1.1-models-auth)
+- [x] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini (gemini/B1.1-models-auth)
 - [ ] **B1.3** Seed data: `threads.json` (Priya ~32, Daniel ~10) + `scenarios.json` per BACKEND §8 — @claude *(content writing; parallel‑safe, only touches `server/src/seed/data/`)*
-- [ ] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini
-- [ ] **B1.5** AI provider abstraction + `mock` provider — @gemini
-- [ ] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini
+- [x] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini (gemini/B1.4-B1.11-seed-tests)
+- [x] **B1.5** AI provider abstraction + `mock` provider — @gemini (gemini/B1.5-ai-providers)
+- [x] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini (gemini/B1.5-ai-providers; includes `groq` per D9)
 - [ ] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
-- [ ] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini
-- [ ] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini
-- [ ] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini
-- [ ] **B1.11** Tests: segment filters, owner change + rule creation, classification mapping (mock) — @gemini
+- [x] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini (gemini/B1.8-threads-api)
+- [x] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini (gemini/B1.9-socket-activity)
+- [x] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini (gemini/B1.10-accounts-sync)
+- [x] **B1.11** Tests: segment filters, owner change + rule creation, classification mapping (mock) — @gemini (gemini/B1.4-B1.11-seed-tests)
 
 ## Phase 2 — Assistant experience (frontend core)
 - [ ] **F2.1** `lib/api.ts`, `queryKeys.ts`, `socket.ts`, `types/api.ts` (mirror BACKEND) — @gemini
@@ -41,22 +41,22 @@
 - [ ] **F2.9** Realtime wiring: socket events → query invalidation/patching, offline banner — @gemini
 
 ## Phase 3 — Drafts, client view, onboarding
-- [ ] **B3.1** Drafts API + draft prompt + simulated send — @gemini
+- [x] **B3.1** Drafts API + draft prompt + simulated send — @gemini (gemini/B3.1-B3.2-drafts-client-api)
 - [ ] **F3.1** `DraftComposer` (tones, instruction, regenerate, confirm send) — @gemini
-- [ ] **B3.2** Client API (`/client/*`) + Activity service + socket emits — @gemini
+- [x] **B3.2** Client API (`/client/*`) + Activity service + socket emits — @gemini (gemini/B3.1-B3.2-drafts-client-api)
 - [ ] **F3.2** Client view: `ClientLayout`, greeting, `ClientCard` actions + animations, read view, all‑caught‑up — @gemini
 - [ ] **F3.3** Onboarding: welcome, connect cards, `SimulatedOAuthModal`, `SyncProgress`, redirect + tour — @gemini
 - [ ] **F3.4** Settings → Accounts page — @gemini
 
 ## Phase 4 — Standout features (P1)
-- [ ] **B4.1** Ask AI endpoint (intent routing + LLM) — @gemini
+- [x] **B4.1** Ask AI endpoint (intent routing + LLM) — @gemini (gemini/B4-ai-demo-endpoints)
 - [ ] **F4.1** `CommandPalette` + `AskPanel` with thread chips — @gemini
-- [ ] **B4.2** Morning brief service + fallback — @gemini
-- [ ] **B4.3** Client "reply with a note" → draft (`draft:created`) — @gemini
-- [ ] **B4.4** Simulate new email endpoint + scenarios — @gemini
+- [x] **B4.2** Morning brief service + fallback — @gemini (gemini/B4-ai-demo-endpoints)
+- [x] **B4.3** Client "reply with a note" → draft (`draft:created`) — @gemini (gemini/B3.1-B3.2-drafts-client-api)
+- [x] **B4.4** Simulate new email endpoint + scenarios — @gemini (gemini/B4-ai-demo-endpoints)
 - [ ] **F4.2** Simulate button (demo mode) + new‑row highlight + Reclassified chip — @gemini
 - [ ] **B4.5** Few‑shot corrections in prompt (learns from overrides) — @claude
-- [ ] **B4.6** Follow‑up nudges (lastSender us, > 3 days) + nudge draft — @gemini
+- [x] **B4.6** Follow‑up nudges (lastSender us, > 3 days) + nudge draft — @gemini (gemini/B4-ai-demo-endpoints)
 - [ ] **F4.3** Dark mode pass — @gemini
 
 ## Phase 5 — Polish, QA, ship

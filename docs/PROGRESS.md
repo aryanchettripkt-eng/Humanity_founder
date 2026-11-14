@@ -15,6 +15,82 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:55 · gemini · Fix all issues from Claude's backend review
+- Done:
+  - Onboarding sync (`sync.service.js`): loads seed threads and runs `classifyThread` when a new client has 0 threads.
+  - Socket rooms (`realtime/socket.js` + `accounts.controller.js`): separated `assistants:{clientId}` from `client:{clientId}` (client receives sanitized payloads only); `sync:progress` & `sync:done` also emit to `user:{assistantId}`; newly created `Client` joins active assistant sockets to `assistants:{clientId}`.
+  - `/demo/reset` (`seed.js`): upserts demo users/clients by email (preserving IDs and active JWTs) and never deletes non-demo users.
+  - Classification (`classification.service.js`): `aiStatus === 'pending'` is treated as initial classification (no false `reclassifiedAt`/history); invalid `endsAt` dates are omitted instead of throwing `CastError`; removed dead `isImportant` assignment.
+  - Search (`threads.controller.js`): `q` now also searches `Message.bodyText`.
+  - Client note → draft (`client.controller.js`): wrapped draft generation in `try/catch` so handoff still succeeds if drafting fails.
+  - Updated default `ANTHROPIC_MODEL` to `claude-sonnet-4-20250514`.
+- Changed contracts: none.
+- Next: pushed to `origin/gemini/backend`; ready for `@claude` (`B1.3`, `B1.7` review + `B4.5`) or frontend (`P0.3`+).
+
+### 2026-11-14 23:49 · gemini · B4.1, B4.2, B4.4, B4.6 Phase 4 backend endpoints
+- Done:
+  - `B4.1`: `server/src/services/ask.service.js` + `ai.controller.js` + `ai.routes.js` (`POST /api/ai/ask` with intent routing, thread citation filtering, and 30/min rate limit).
+  - `B4.2`: `server/src/services/brief.service.js` + `POST /api/ai/brief/refresh` + wired into `GET /api/dashboard`.
+  - `B4.4`: `server/src/controllers/demo.controller.js` + `demo.routes.js` (`POST /api/demo/simulate-email` with fallback scenarios & reclassification, `POST /api/demo/reset`).
+  - `B4.6`: Follow-up nudges (`lastSender: 'us'`, `> 3 days`) included in `GET /api/dashboard` (`nudges`).
+- Changed contracts: `GET /api/dashboard` now also includes `nudges: ThreadListItem[]` (additive).
+- Next: `@claude` can pick up `B1.3` (seed data), `B1.7` (prompt/pipeline polish), `B4.5` (few-shot overrides). Frontend (`P0.3`+) awaits user go-ahead.
+
+### 2026-11-14 23:48 · gemini · B3.1 Drafts API + B3.2 Client/Dashboard/Activity API (+ B4.3)
+- Done:
+  - `B3.1`: `server/src/services/draft.service.js`, `drafts.controller.js`, `drafts.routes.js` (`POST /threads/:id/drafts`, `PATCH /drafts/:id`, `POST /drafts/:id/send` simulated send, `DELETE /drafts/:id`).
+  - `B3.2` + `B4.3`: `client.controller.js`, `client.routes.js` (`/client/queue`, `/client/threads/:id`, `/client/threads/:id/action` including `note` -> AI draft + `draft:created` socket), `dashboard.controller.js`, `dashboard.routes.js`, `activity.routes.js`.
+- Changed contracts: none.
+- Next: Phase 4 backend (`B4.1` Ask AI, `B4.2` Morning brief service, `B4.4` Simulate new email + `/demo/reset`, `B4.6` Follow-up nudges).
+
+### 2026-11-14 23:46 · gemini · B1.4 Seed script + B1.11 Backend tests
+- Done:
+  - `server/src/seed/seed.js`: seeds demo users (`alex`, `priya`, `daniel`), clients, email accounts, and loads `seed/data/threads.json` if present (falls back to 5 starter threads across all 4 owners until `@claude` completes `B1.3`). Supports `--classify` flag and exports `seedDatabase()` for `/demo/reset`.
+  - `server/tests/`: `segments.test.js`, `ai.test.js`, `classification.test.js`, `health.test.js` — 4 files, 17 tests passing.
+- Changed contracts: none.
+- Next: Phase 3 & 4 backend tasks (`B3.1` Drafts API, `B3.2` Client API + Dashboard, `B4.1` Ask AI, `B4.2` Morning brief, `B4.3` Client note -> draft, `B4.4` Simulate email).
+
+### 2026-11-14 23:45 · gemini · B1.10 Accounts API + simulated sync
+- Done: `server/src/services/sync.service.js`, `server/src/controllers/accounts.controller.js`, `server/src/routes/accounts.routes.js` (`/accounts`, `/accounts/connect`, `/accounts/:id/authorize`, `/accounts/:id/sync`, `DELETE /accounts/:id`).
+- Changed contracts: none.
+- Next: `B1.4` seed script (`npm run seed`, `--classify` flag) and `B1.11` tests.
+
+### 2026-11-14 23:45 · gemini · B1.8 Threads API
+- Done:
+  - `server/src/services/segments.js` (`segmentFilter` + `computeSegmentCounts` for all 12 segments).
+  - `server/src/services/classification.service.js` (`classifyThread` pipeline with Rule matching, threshold → `review`, sticky manual/client owners, history, activity & socket emits, safe fallback).
+  - `server/src/controllers/threads.controller.js` + `threads.routes.js`: list, counts, detail, patch, owner + Rule upsert, reclassify, suggestion apply/dismiss.
+- Changed contracts: none.
+- Next: `B1.10` Accounts API + simulated sync (`sync:progress`), then `B1.4` seed script and `B1.11` tests.
+- Notes/risks: `@claude` can refine `classification.service.js` prompt/few-shot in `B1.7` / `B4.5`.
+
+### 2026-11-14 23:44 · gemini · B1.9 Socket.io server + Activity service
+- Done: `server/src/realtime/socket.js` (JWT handshake auth, `user:{id}` & `client:{id}` rooms, emit helpers for thread/counts/activity/sync/draft), `server/src/services/activity.service.js`, wired `initSocket` in `server/src/index.js`.
+- Changed contracts: none.
+- Next: `B1.8` Threads API (plus `segments.js` and classification hook) and `B1.10` Accounts & simulated sync.
+
+### 2026-11-14 23:43 · gemini · B1.5 & B1.6 AI providers
+- Done:
+  - `server/src/ai/schemas.js` (`classificationSchema`, `askSchema`), `server/src/ai/utils.js` (`AIError`, `withTimeout`, `runJSONWithRetry` with 1 JSON/schema retry).
+  - `mock`, `groq` (with 429 exponential backoff + `GROQ_FAST_MODEL` support), `gemini`, and `anthropic` providers + `getProvider()`.
+- Changed contracts: none.
+- Next: `B1.9` Socket.io server, `B1.8` Threads API (plus classification service stub/hook so reclassify works cleanly while `B1.7` is `@claude`), `B1.10` Accounts & sync, `B1.4` Seed script, `B1.11` Tests.
+- Notes/risks: `B1.7` (classification prompt v1 + pipeline) is assigned to `@claude`; will build a clean `classifyThread()` service interface that `B1.8`/`B1.10` can call and `@claude` can refine or own in `B1.7`.
+
+### 2026-11-14 23:42 · gemini · B1.1 Mongoose models + B1.2 Auth
+- Done:
+  - B1.1: All 8 Mongoose models (`User`, `Client`, `EmailAccount`, `Thread`, `Message`, `Draft`, `Rule`, `Activity`) with `applyBaseTransform` (`id` string, strips `_id`/`__v`/`passwordHash`) and indexes per BACKEND §4.
+  - B1.2: `/api/auth/signup`, `/api/auth/login`, `/api/auth/demo`, `/api/auth/me`, JWT helpers, `requireAuth`, `requireRole`, `requireClientScope` middleware.
+- Changed contracts: none.
+- Next: `B1.5` & `B1.6` AI provider abstraction + `mock`, `groq`, `gemini`, `anthropic` providers.
+- Notes/risks: `npm run lint` and `npm test` (health) pass; full DB-backed auth integration tests will be added in `B1.11`.
+
+### 2026-11-14 23:40 · gemini · P0.2 server scaffold (+ P0.1 root/server workspace)
+- Done: root `.gitignore`, `.editorconfig`, root `package.json` (with `server` workspace), `server/` Express app (`helmet`, `cors`, `morgan`, zod env validation, `/health` & `/api/health`, centralized error/validation middleware, Mongo connect/disconnect, ESLint + Vitest + Supertest).
+- Changed contracts: none.
+- Next: Phase 1 backend (`B1.1` Mongoose models, `B1.2` Auth, `B1.5/B1.6` AI providers, `B1.8`–`B1.11`).
+- Notes/risks: `web` workspace omitted from root `package.json` for now because user requested backend-only work; will add `"web"` in `P0.3`.
+
 ### 2026-11-14 18:05 · claude · AI provider → Groq
 - Done: BACKEND §1/§2/§5.1 now default to Groq (`groq-sdk`, JSON mode, 429 backoff), DECISIONS D9.
 - Changed contracts: env vars `GROQ_API_KEY`, `GROQ_MODEL`, `GROQ_FAST_MODEL`; `/health` may return `groq`.
