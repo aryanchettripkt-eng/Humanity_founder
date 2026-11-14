@@ -1,5 +1,6 @@
 import { env } from '../../config/env.js';
 import { EmailAccount } from '../../models/EmailAccount.js';
+import { Thread } from '../../models/Thread.js';
 import { emitCountsChanged, emitSyncDone } from '../../realtime/socket.js';
 import { logger } from '../../utils/logger.js';
 import { classifyThread } from '../classification.service.js';
@@ -80,11 +81,30 @@ export async function pollGmailAccount(accountId) {
       const mapped = mapGmailThread(fullRes.data, account.address);
       const { thread, hasNewInbound, isNew } = await upsertMappedThread({ account, mapped });
       if (isNew || hasNewInbound) {
-        await classifyThread(thread._id, { emit: true }).catch((err) => {
+        await classifyThread(thread._id, { fast: true, emit: true }).catch((err) => {
           logger.warn('Gmail poll classification failed', { message: err?.message });
         });
         classifiedAny = true;
       }
+    }
+
+    // Retry up to 5 interrupted/failed threads (oldest first) on each poll tick
+    const pendingThreads = await Thread.find({
+      accountId: account._id,
+      aiStatus: { $in: ['pending', 'failed'] },
+    })
+      .sort({ createdAt: 1 })
+      .limit(5)
+      .select('_id');
+
+    for (const pt of pendingThreads) {
+      await classifyThread(pt._id, { fast: true, emit: true }).catch((err) => {
+        logger.warn('Gmail pending thread retry failed', {
+          threadId: String(pt._id),
+          message: err?.message,
+        });
+      });
+      classifiedAny = true;
     }
 
     if (latestHistoryId) {

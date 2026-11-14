@@ -17,7 +17,7 @@ const envSchema = z.object({
     .default('true'),
   AI_PROVIDER: z.enum(['groq', 'gemini', 'anthropic', 'mock']).default('groq'),
   AI_CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.7),
-  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(15000),
+  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
   GROQ_API_KEY: z.string().optional().default(''),
   GROQ_MODEL: z.string().default('openai/gpt-oss-120b'),
   GROQ_FAST_MODEL: z.string().default('openai/gpt-oss-20b'),

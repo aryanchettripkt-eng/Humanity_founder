@@ -45,6 +45,7 @@ export const groqProvider = {
             model,
             temperature: temp,
             response_format: { type: 'json_object' },
+            ...(model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
             messages: [
               { role: 'system', content: sys },
               { role: 'user', content: usr },
@@ -57,10 +58,12 @@ export const groqProvider = {
   },
 
   async generateText({ system, prompt, temperature = 0.5 }) {
+    const model = env.GROQ_MODEL;
     const res = await callWithBackoff(() =>
       getClient().chat.completions.create({
-        model: env.GROQ_MODEL,
+        model,
         temperature,
+        ...(model.startsWith('openai/gpt-oss-') ? { reasoning_effort: 'low' } : {}),
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: prompt },
