@@ -18,6 +18,15 @@ _None yet._
 
 ---
 
+### 2026-11-15 02:32 · gemini · Fix Groq classification schema validation
+- Done:
+  - Logged Zod validation issue paths + codes (without email content) in `server/src/ai/utils.js` `runJSONWithRetry`.
+  - Made `classificationSchema` (`server/src/ai/schemas.js`) tolerant: trimmed/lowercased enums (`category` falls back to `'general'`), coerced `confidence` (0..100 -> 0..1), `"true"`/`"false"` booleans, `keyPoints` capped via transform to first 6, `null` strings defaulted to `''` (and `summary` falls back to `snippet`/`subject`), and invalid `entities` dropped per-item.
+  - Spelled out the exact JSON structure in `buildClassificationSystemPrompt` (`server/src/services/classification.service.js`).
+  - Added Groq-style normalization unit test in `server/tests/ai.test.js` (25/25 server tests pass).
+- Changed contracts: none.
+- Next: merge `gemini/fix-classification-schema` -> `main`, wait for Render deploy, then press **Reset demo** and **Simulate email** to verify live classification (`aiStatus: 'done'`).
+
 ### 2026-11-15 02:00 · gemini · Fix all Phase 6 review findings (`c56b099` review)
 - Done:
   - Must-fix #1: replaced `sparse: true` with `partialFilterExpression: { externalId: { $exists: true } }` on `Thread` (`{accountId, externalId}`) and `Message` (`{threadId, externalId}`) so seeded/simulated threads & messages don't collide on `null`.

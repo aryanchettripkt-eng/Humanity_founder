@@ -77,5 +77,38 @@ describe('AI provider & JSON retry', () => {
     expect(calls).toBe(2);
     expect(result).toEqual({ answer: 'Fixed', threadIds: [] });
   });
+
+  it('classificationSchema normalizes Groq-style reply and drops invalid entities', () => {
+    const raw = {
+      owner: ' Assistant ',
+      confidence: 85,
+      reason: null,
+      clientReason: null,
+      category: 'Finance',
+      isImportant: 'true',
+      actionRequired: 'false',
+      waitingOnOthers: false,
+      summary: null,
+      keyPoints: ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8'],
+      entities: [
+        { type: 'DEADLINE', title: 'Invoice due', startsAt: '2026-11-20T17:00:00Z', endsAt: null, location: null },
+        { type: 'invalid_type', title: '', startsAt: '' },
+      ],
+    };
+
+    const parsed = classificationSchema.parse(raw);
+    expect(parsed.owner).toBe('assistant');
+    expect(parsed.category).toBe('finance');
+    expect(parsed.confidence).toBe(0.85);
+    expect(parsed.isImportant).toBe(true);
+    expect(parsed.actionRequired).toBe(false);
+    expect(parsed.reason).toBe('');
+    expect(parsed.clientReason).toBe('');
+    expect(parsed.summary).toBe('');
+    expect(parsed.keyPoints).toHaveLength(6);
+    expect(parsed.keyPoints).toEqual(['k1', 'k2', 'k3', 'k4', 'k5', 'k6']);
+    expect(parsed.entities).toHaveLength(1);
+    expect(parsed.entities[0].type).toBe('deadline');
+  });
 });
 
