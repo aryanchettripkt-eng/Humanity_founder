@@ -15,6 +15,15 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:45 · gemini · B1.8 Threads API
+- Done:
+  - `server/src/services/segments.js` (`segmentFilter` + `computeSegmentCounts` for all 12 segments).
+  - `server/src/services/classification.service.js` (`classifyThread` pipeline with Rule matching, threshold → `review`, sticky manual/client owners, history, activity & socket emits, safe fallback).
+  - `server/src/controllers/threads.controller.js` + `threads.routes.js`: list, counts, detail, patch, owner + Rule upsert, reclassify, suggestion apply/dismiss.
+- Changed contracts: none.
+- Next: `B1.10` Accounts API + simulated sync (`sync:progress`), then `B1.4` seed script and `B1.11` tests.
+- Notes/risks: `@claude` can refine `classification.service.js` prompt/few-shot in `B1.7` / `B4.5`.
+
 ### 2026-11-14 23:44 · gemini · B1.9 Socket.io server + Activity service
 - Done: `server/src/realtime/socket.js` (JWT handshake auth, `user:{id}` & `client:{id}` rooms, emit helpers for thread/counts/activity/sync/draft), `server/src/services/activity.service.js`, wired `initSocket` in `server/src/index.js`.
 - Changed contracts: none.
