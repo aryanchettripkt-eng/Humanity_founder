@@ -47,3 +47,4 @@ describe('segmentFilter', () => {
     expect(segmentFilter('done')).toEqual({ status: 'done', archived: false });
   });
 });
+

@@ -9,6 +9,7 @@ import {
 import { recordActivity } from '../services/activity.service.js';
 import { generateThreadDraft } from '../services/draft.service.js';
 import { notFound } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
 
 export const clientActionSchema = {
   body: z.object({
@@ -104,12 +105,19 @@ export async function postClientAction(req, res, next) {
     const json = thread.toJSON();
 
     if (action === 'note' && note) {
-      const draft = await generateThreadDraft({
-        thread,
-        tone: 'friendly',
-        sourceNote: note,
-      });
-      emitDraftCreated(thread.clientId, draft.toJSON());
+      try {
+        const draft = await generateThreadDraft({
+          thread,
+          tone: 'friendly',
+          sourceNote: note,
+        });
+        emitDraftCreated(thread.clientId, draft.toJSON());
+      } catch (draftErr) {
+        logger.warn('Failed to generate draft from client note', {
+          threadId: thread.id,
+          message: draftErr?.message,
+        });
+      }
     }
 
     await recordActivity({
@@ -131,3 +139,4 @@ export async function postClientAction(req, res, next) {
     next(err);
   }
 }
+

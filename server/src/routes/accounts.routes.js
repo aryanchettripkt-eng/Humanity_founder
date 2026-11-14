@@ -22,3 +22,4 @@ router.post('/:id/sync', syncAccount);
 router.delete('/:id', disconnectAccount);
 
 export default router;
+

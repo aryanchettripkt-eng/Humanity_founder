@@ -107,6 +107,7 @@ describe('classification.service', () => {
   });
 
   it('maps confidence < 0.70 to owner=review and keeps suggestedOwner', async () => {
+    mockThreadDoc.aiStatus = 'done';
     mockProvider.generateJSON.mockResolvedValueOnce({
       owner: 'client',
       confidence: 0.55,
@@ -188,4 +189,37 @@ describe('classification.service', () => {
     expect(res.owner).toBe('review');
     expect(res.reason).toBe('AI unavailable — please review');
   });
+
+  it('does not mark initial classification (aiStatus=pending) as reclassified', async () => {
+    mockThreadDoc.owner = 'review';
+    mockThreadDoc.aiStatus = 'pending';
+
+    mockProvider.generateJSON.mockResolvedValueOnce({
+      owner: 'client',
+      confidence: 0.91,
+      reason: 'Client decision needed.',
+      clientReason: 'Please approve.',
+      category: 'action',
+      isImportant: true,
+      actionRequired: true,
+      waitingOnOthers: false,
+      summary: 'Summary',
+      keyPoints: [],
+      entities: [
+        {
+          type: 'meeting',
+          title: 'Sync',
+          startsAt: '2026-11-15T10:00:00Z',
+          endsAt: 'not-a-valid-date',
+        },
+      ],
+    });
+
+    const res = await classifyThread('thread1', { emit: false });
+    expect(res.owner).toBe('client');
+    expect(res.history).toHaveLength(0);
+    expect(mockThreadDoc.entities).toHaveLength(1);
+    expect(mockThreadDoc.entities[0].endsAt).toBeUndefined();
+  });
 });
+

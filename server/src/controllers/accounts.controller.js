@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Client } from '../models/Client.js';
 import { EmailAccount } from '../models/EmailAccount.js';
+import { joinAssistantClientRoom } from '../realtime/socket.js';
 import { runSimulatedSync } from '../services/sync.service.js';
 import { notFound } from '../utils/errors.js';
 
@@ -60,6 +61,7 @@ export async function connectAccount(req, res, next) {
             vipSenders: [],
           },
         });
+        joinAssistantClientRoom(req.user._id, targetClient._id);
       }
     }
 
@@ -131,3 +133,4 @@ export async function disconnectAccount(req, res, next) {
     next(err);
   }
 }
+

@@ -15,6 +15,18 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:55 · gemini · Fix all issues from Claude's backend review
+- Done:
+  - Onboarding sync (`sync.service.js`): loads seed threads and runs `classifyThread` when a new client has 0 threads.
+  - Socket rooms (`realtime/socket.js` + `accounts.controller.js`): separated `assistants:{clientId}` from `client:{clientId}` (client receives sanitized payloads only); `sync:progress` & `sync:done` also emit to `user:{assistantId}`; newly created `Client` joins active assistant sockets to `assistants:{clientId}`.
+  - `/demo/reset` (`seed.js`): upserts demo users/clients by email (preserving IDs and active JWTs) and never deletes non-demo users.
+  - Classification (`classification.service.js`): `aiStatus === 'pending'` is treated as initial classification (no false `reclassifiedAt`/history); invalid `endsAt` dates are omitted instead of throwing `CastError`; removed dead `isImportant` assignment.
+  - Search (`threads.controller.js`): `q` now also searches `Message.bodyText`.
+  - Client note → draft (`client.controller.js`): wrapped draft generation in `try/catch` so handoff still succeeds if drafting fails.
+  - Updated default `ANTHROPIC_MODEL` to `claude-sonnet-4-20250514`.
+- Changed contracts: none.
+- Next: pushed to `origin/gemini/backend`; ready for `@claude` (`B1.3`, `B1.7` review + `B4.5`) or frontend (`P0.3`+).
+
 ### 2026-11-14 23:49 · gemini · B4.1, B4.2, B4.4, B4.6 Phase 4 backend endpoints
 - Done:
   - `B4.1`: `server/src/services/ask.service.js` + `ai.controller.js` + `ai.routes.js` (`POST /api/ai/ask` with intent routing, thread citation filtering, and 30/min rate limit).

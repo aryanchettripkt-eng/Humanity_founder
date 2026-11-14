@@ -17,3 +17,4 @@ export function applyBaseTransform(schema) {
   schema.set('toJSON', { virtuals: true, transform });
   schema.set('toObject', { virtuals: true, transform });
 }
+

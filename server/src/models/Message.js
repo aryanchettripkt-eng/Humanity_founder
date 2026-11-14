@@ -30,3 +30,4 @@ messageSchema.index({ threadId: 1, sentAt: 1 });
 applyBaseTransform(messageSchema);
 
 export const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
+

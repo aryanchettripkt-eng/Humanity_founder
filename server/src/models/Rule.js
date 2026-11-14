@@ -20,3 +20,4 @@ ruleSchema.index({ clientId: 1, 'match.type': 1, 'match.value': 1 }, { unique: t
 applyBaseTransform(ruleSchema);
 
 export const Rule = mongoose.models.Rule || mongoose.model('Rule', ruleSchema);
+

@@ -81,6 +81,10 @@ export async function listThreads(req, res, next) {
     if (q) {
       const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(escaped, 'i');
+      const bodyMatchedThreadIds = await Message.distinct('threadId', {
+        clientId: req.clientId,
+        bodyText: regex,
+      });
       const searchCond = {
         $or: [
           { subject: regex },
@@ -88,6 +92,7 @@ export async function listThreads(req, res, next) {
           { summary: regex },
           { 'participants.email': regex },
           { 'participants.name': regex },
+          ...(bodyMatchedThreadIds.length > 0 ? [{ _id: { $in: bodyMatchedThreadIds } }] : []),
         ],
       };
       if (query.$or) {
@@ -282,3 +287,4 @@ export async function handleSuggestion(req, res, next) {
     next(err);
   }
 }
+

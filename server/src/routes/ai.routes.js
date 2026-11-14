@@ -31,3 +31,4 @@ router.post('/ask', validate(askSchema), postAsk);
 router.post('/brief/refresh', validate(briefRefreshSchema), postBriefRefresh);
 
 export default router;
+

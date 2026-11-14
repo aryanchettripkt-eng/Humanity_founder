@@ -8,3 +8,4 @@ router.use(requireAuth, requireRole('assistant'), requireClientScope({ optional:
 router.get('/', listActivity);
 
 export default router;
+

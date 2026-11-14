@@ -173,7 +173,7 @@ function getFallbackSeedThreads(priyaEmail, danielEmail) {
   ];
 }
 
-async function loadSeedThreads(priyaEmail, danielEmail) {
+export async function loadSeedThreads(priyaEmail = 'priya@example.com', danielEmail = 'daniel@example.com') {
   try {
     const raw = await fs.readFile(THREADS_JSON_PATH, 'utf8');
     const parsed = JSON.parse(raw);
@@ -185,80 +185,165 @@ async function loadSeedThreads(priyaEmail, danielEmail) {
 }
 
 /**
- * Wipe and re-seed the database with demo users, clients, accounts, and threads.
+ * Create a Thread and its Messages from a seed item.
+ * @param {{ client: any, account: any, item: any, pendingAI?: boolean }} params
+ */
+export async function createThreadWithMessages({ client, account, item, pendingAI = false }) {
+  const msgs = item.messages || [];
+  const lastMsg = msgs[msgs.length - 1];
+  const lastMessageAt = lastMsg?.sentAt
+    ? new Date(lastMsg.sentAt)
+    : hoursFromNow(lastMsg?.hoursOffset ?? -1);
+
+  const thread = await Thread.create({
+    clientId: client._id,
+    accountId: account._id,
+    subject: item.subject,
+    snippet: String(lastMsg?.bodyText || item.snippet || '').slice(0, 140),
+    participants: item.participants || [],
+    lastMessageAt,
+    messageCount: msgs.length,
+    lastSender: lastMsg?.direction === 'outbound' ? 'us' : 'them',
+    unread: item.unread ?? true,
+    important: item.important ?? false,
+    archived: item.archived ?? false,
+    status: item.status || 'open',
+    owner: pendingAI ? 'review' : item.owner || 'review',
+    ownerSource: item.ownerSource || 'ai',
+    suggestedOwner: pendingAI ? undefined : item.suggestedOwner,
+    confidence: pendingAI ? 0 : item.confidence ?? 0.5,
+    reason: pendingAI ? '' : item.reason || '',
+    clientReason: pendingAI ? undefined : item.clientReason,
+    category: item.category || 'general',
+    actionRequired: item.actionRequired ?? false,
+    waitingOnOthers: item.waitingOnOthers ?? false,
+    summary: pendingAI ? '' : item.summary || '',
+    keyPoints: pendingAI ? [] : item.keyPoints || [],
+    entities: pendingAI
+      ? []
+      : (item.entities || []).map((e) => ({
+          ...e,
+          startsAt: new Date(e.startsAt),
+          ...(e.endsAt ? { endsAt: new Date(e.endsAt) } : {}),
+        })),
+    aiStatus: pendingAI ? 'pending' : 'done',
+    aiModel: pendingAI ? undefined : 'seed',
+  });
+
+  for (const m of msgs) {
+    await Message.create({
+      threadId: thread._id,
+      clientId: client._id,
+      from: m.from,
+      to: m.to || [{ name: client.name, email: client.email }],
+      cc: m.cc || [],
+      sentAt: m.sentAt ? new Date(m.sentAt) : hoursFromNow(m.hoursOffset ?? -1),
+      bodyText: m.bodyText,
+      direction: m.direction || 'inbound',
+      simulated: true,
+    });
+  }
+
+  return thread;
+}
+
+/**
+ * Reset and re-seed only the demo personas and their data (preserves user IDs & non-demo users).
  * @param {{ classify?: boolean }} [opts]
  */
 export async function seedDatabase(opts = {}) {
   const { classify = false } = opts;
 
-  await Promise.all([
-    User.deleteMany({}),
-    Client.deleteMany({}),
-    EmailAccount.deleteMany({}),
-    Thread.deleteMany({}),
-    Message.deleteMany({}),
-    Draft.deleteMany({}),
-    Rule.deleteMany({}),
-    Activity.deleteMany({}),
-  ]);
-
   const passwordHash = await bcrypt.hash('demo1234', 10);
 
-  const alex = await User.create({
-    name: 'Alex Morgan',
-    email: 'alex@example.com',
-    passwordHash,
-    role: 'assistant',
-    onboarding: { completed: true, tourSeen: false },
-  });
-
-  const priyaClient = await Client.create({
-    name: 'Priya Raman',
-    firstName: 'Priya',
-    email: 'priya@example.com',
-    title: 'Founder, Raman Studio',
-    assistantId: alex._id,
-    profile: {
-      delegation:
-        'Alex handles scheduling, vendors, travel, and routine follow-ups. Priya handles investors, hiring decisions, legal sign-off, and personal notes.',
-      vipSenders: ['james@sequoiacap.example.com'],
+  const alex = await User.findOneAndUpdate(
+    { email: 'alex@example.com' },
+    {
+      $set: {
+        name: 'Alex Morgan',
+        passwordHash,
+        role: 'assistant',
+        onboarding: { completed: true, tourSeen: false },
+      },
     },
-  });
+    { upsert: true, new: true }
+  );
 
-  const danielClient = await Client.create({
-    name: 'Daniel Okafor',
-    firstName: 'Daniel',
-    email: 'daniel@example.com',
-    title: 'Partner, Okafor Ventures',
-    assistantId: alex._id,
-    profile: {
-      delegation:
-        'Alex handles travel, calendar, and receipts. Daniel handles LP updates and deal memos.',
-      vipSenders: [],
+  const priyaClient = await Client.findOneAndUpdate(
+    { assistantId: alex._id, email: 'priya@example.com' },
+    {
+      $set: {
+        name: 'Priya Raman',
+        firstName: 'Priya',
+        title: 'Founder, Raman Studio',
+        profile: {
+          delegation:
+            'Alex handles scheduling, vendors, travel, and routine follow-ups. Priya handles investors, hiring decisions, legal sign-off, and personal notes.',
+          vipSenders: ['james@sequoiacap.example.com'],
+        },
+      },
     },
-  });
+    { upsert: true, new: true }
+  );
 
-  const priyaUser = await User.create({
-    name: 'Priya Raman',
-    email: 'priya@example.com',
-    passwordHash,
-    role: 'client',
-    clientId: priyaClient._id,
-    onboarding: { completed: true, tourSeen: true },
-  });
+  const danielClient = await Client.findOneAndUpdate(
+    { assistantId: alex._id, email: 'daniel@example.com' },
+    {
+      $set: {
+        name: 'Daniel Okafor',
+        firstName: 'Daniel',
+        title: 'Partner, Okafor Ventures',
+        profile: {
+          delegation:
+            'Alex handles travel, calendar, and receipts. Daniel handles LP updates and deal memos.',
+          vipSenders: [],
+        },
+      },
+    },
+    { upsert: true, new: true }
+  );
 
-  const danielUser = await User.create({
-    name: 'Daniel Okafor',
-    email: 'daniel@example.com',
-    passwordHash,
-    role: 'client',
-    clientId: danielClient._id,
-    onboarding: { completed: true, tourSeen: true },
-  });
+  const priyaUser = await User.findOneAndUpdate(
+    { email: 'priya@example.com' },
+    {
+      $set: {
+        name: 'Priya Raman',
+        passwordHash,
+        role: 'client',
+        clientId: priyaClient._id,
+        onboarding: { completed: true, tourSeen: true },
+      },
+    },
+    { upsert: true, new: true }
+  );
+
+  const danielUser = await User.findOneAndUpdate(
+    { email: 'daniel@example.com' },
+    {
+      $set: {
+        name: 'Daniel Okafor',
+        passwordHash,
+        role: 'client',
+        clientId: danielClient._id,
+        onboarding: { completed: true, tourSeen: true },
+      },
+    },
+    { upsert: true, new: true }
+  );
 
   priyaClient.userId = priyaUser._id;
   danielClient.userId = danielUser._id;
   await Promise.all([priyaClient.save(), danielClient.save()]);
+
+  const demoClientIds = [priyaClient._id, danielClient._id];
+  await Promise.all([
+    EmailAccount.deleteMany({ clientId: { $in: demoClientIds } }),
+    Thread.deleteMany({ clientId: { $in: demoClientIds } }),
+    Message.deleteMany({ clientId: { $in: demoClientIds } }),
+    Draft.deleteMany({ clientId: { $in: demoClientIds } }),
+    Rule.deleteMany({ clientId: { $in: demoClientIds } }),
+    Activity.deleteMany({ clientId: { $in: demoClientIds } }),
+  ]);
 
   const priyaAccount = await EmailAccount.create({
     clientId: priyaClient._id,
@@ -290,59 +375,12 @@ export async function seedDatabase(opts = {}) {
 
   for (const item of seedThreads) {
     const target = clientMap[item.clientKey || 'priya'] || clientMap.priya;
-    const msgs = item.messages || [];
-    const lastMsg = msgs[msgs.length - 1];
-    const lastMessageAt = lastMsg?.sentAt
-      ? new Date(lastMsg.sentAt)
-      : hoursFromNow(lastMsg?.hoursOffset ?? -1);
-
-    const thread = await Thread.create({
-      clientId: target.client._id,
-      accountId: target.account._id,
-      subject: item.subject,
-      snippet: String(lastMsg?.bodyText || item.snippet || '').slice(0, 140),
-      participants: item.participants || [],
-      lastMessageAt,
-      messageCount: msgs.length,
-      lastSender: lastMsg?.direction === 'outbound' ? 'us' : 'them',
-      unread: item.unread ?? true,
-      important: item.important ?? false,
-      archived: item.archived ?? false,
-      status: item.status || 'open',
-      owner: item.owner || 'review',
-      ownerSource: item.ownerSource || 'ai',
-      suggestedOwner: item.suggestedOwner,
-      confidence: item.confidence ?? 0.5,
-      reason: item.reason || '',
-      clientReason: item.clientReason,
-      category: item.category || 'general',
-      actionRequired: item.actionRequired ?? false,
-      waitingOnOthers: item.waitingOnOthers ?? false,
-      summary: item.summary || '',
-      keyPoints: item.keyPoints || [],
-      entities: (item.entities || []).map((e) => ({
-        ...e,
-        startsAt: new Date(e.startsAt),
-        ...(e.endsAt ? { endsAt: new Date(e.endsAt) } : {}),
-      })),
-      aiStatus: 'done',
-      aiModel: 'seed',
+    const thread = await createThreadWithMessages({
+      client: target.client,
+      account: target.account,
+      item,
+      pendingAI: classify,
     });
-
-    for (const m of msgs) {
-      await Message.create({
-        threadId: thread._id,
-        clientId: target.client._id,
-        from: m.from,
-        to: m.to || [{ name: target.client.name, email: target.client.email }],
-        cc: m.cc || [],
-        sentAt: m.sentAt ? new Date(m.sentAt) : hoursFromNow(m.hoursOffset ?? -1),
-        bodyText: m.bodyText,
-        direction: m.direction || 'inbound',
-        simulated: true,
-      });
-    }
-
     createdThreadIds.push(thread._id);
   }
 
@@ -375,3 +413,4 @@ if (isMain) {
       process.exit(1);
     });
 }
+

@@ -24,7 +24,7 @@ const envSchema = z.object({
   GEMINI_API_KEY: z.string().optional().default(''),
   GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
   ANTHROPIC_API_KEY: z.string().optional().default(''),
-  ANTHROPIC_MODEL: z.string().default('claude-3-5-sonnet-latest'),
+  ANTHROPIC_MODEL: z.string().default('claude-sonnet-4-20250514'),
 });
 
 /**

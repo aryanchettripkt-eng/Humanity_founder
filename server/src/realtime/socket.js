@@ -52,7 +52,7 @@ export function initSocket(httpServer) {
       if (user.role === 'assistant') {
         const clients = await Client.find({ assistantId: user._id }).select('_id');
         for (const c of clients) {
-          socket.join(`client:${String(c._id)}`);
+          socket.join(`assistants:${String(c._id)}`);
         }
       } else if (user.role === 'client' && user.clientId) {
         socket.join(`client:${String(user.clientId)}`);
@@ -70,7 +70,22 @@ export function getIO() {
   return io;
 }
 
-export function emitToClient(clientId, event, payload) {
+/**
+ * Join an assistant's active sockets to a newly created client room.
+ * @param {string | import('mongoose').Types.ObjectId} assistantId
+ * @param {string | import('mongoose').Types.ObjectId} clientId
+ */
+export function joinAssistantClientRoom(assistantId, clientId) {
+  if (!io || !assistantId || !clientId) return;
+  io.in(`user:${String(assistantId)}`).socketsJoin(`assistants:${String(clientId)}`);
+}
+
+export function emitToAssistants(clientId, event, payload) {
+  if (!io || !clientId) return;
+  io.to(`assistants:${String(clientId)}`).emit(event, payload);
+}
+
+export function emitToClientUser(clientId, event, payload) {
   if (!io || !clientId) return;
   io.to(`client:${String(clientId)}`).emit(event, payload);
 }
@@ -80,23 +95,45 @@ export function emitToUser(userId, event, payload) {
   io.to(`user:${String(userId)}`).emit(event, payload);
 }
 
-export const emitThreadCreated = (clientId, thread) =>
-  emitToClient(clientId, 'thread:created', thread);
+function sanitizeThreadForClient(thread) {
+  if (!thread) return thread;
+  const copy = { ...thread };
+  delete copy.history;
+  delete copy.reason;
+  delete copy.suggestedOwner;
+  return copy;
+}
 
-export const emitThreadUpdated = (clientId, thread) =>
-  emitToClient(clientId, 'thread:updated', thread);
+export const emitThreadCreated = (clientId, thread) => {
+  emitToAssistants(clientId, 'thread:created', thread);
+  if (thread?.owner === 'client') {
+    emitToClientUser(clientId, 'thread:created', sanitizeThreadForClient(thread));
+  }
+};
+
+export const emitThreadUpdated = (clientId, thread) => {
+  emitToAssistants(clientId, 'thread:updated', thread);
+  if (thread?.owner === 'client' || (thread?.handoff?.state && thread.handoff.state !== 'none')) {
+    emitToClientUser(clientId, 'thread:updated', sanitizeThreadForClient(thread));
+  }
+};
 
 export const emitCountsChanged = (clientId) =>
-  emitToClient(clientId, 'counts:changed', { clientId: String(clientId) });
+  emitToAssistants(clientId, 'counts:changed', { clientId: String(clientId) });
 
 export const emitActivityNew = (clientId, activity) =>
-  emitToClient(clientId, 'activity:new', activity);
+  emitToAssistants(clientId, 'activity:new', activity);
 
-export const emitSyncProgress = (clientId, progress) =>
-  emitToClient(clientId, 'sync:progress', progress);
+export const emitSyncProgress = (clientId, progress, assistantId) => {
+  emitToAssistants(clientId, 'sync:progress', progress);
+  if (assistantId) emitToUser(assistantId, 'sync:progress', progress);
+};
 
-export const emitSyncDone = (clientId, account) =>
-  emitToClient(clientId, 'sync:done', account);
+export const emitSyncDone = (clientId, account, assistantId) => {
+  emitToAssistants(clientId, 'sync:done', account);
+  if (assistantId) emitToUser(assistantId, 'sync:done', account);
+};
 
 export const emitDraftCreated = (clientId, draft) =>
-  emitToClient(clientId, 'draft:created', draft);
+  emitToAssistants(clientId, 'draft:created', draft);
+

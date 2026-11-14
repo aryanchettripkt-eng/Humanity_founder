@@ -104,6 +104,7 @@ export async function classifyThread(threadId, opts = {}) {
   const assistant = client?.assistantId ? await User.findById(client.assistantId) : null;
 
   const prevOwner = thread.owner;
+  const isFirstClassification = thread.aiStatus === 'pending';
   const isSticky = thread.ownerSource === 'manual' || thread.ownerSource === 'client';
   const matchedRule = await findMatchingRule(thread.clientId, messages);
 
@@ -142,21 +143,25 @@ export async function classifyThread(threadId, opts = {}) {
     thread.aiStatus = 'done';
     thread.aiModel = provider.name;
     thread.category = aiResult.category;
-    thread.isImportant = undefined;
     thread.important = aiResult.isImportant;
     thread.actionRequired = aiResult.actionRequired;
     thread.waitingOnOthers = aiResult.waitingOnOthers;
     thread.summary = aiResult.summary;
     thread.keyPoints = aiResult.keyPoints;
     thread.entities = (aiResult.entities || [])
-      .map((e) => ({
-        type: e.type,
-        title: e.title,
-        startsAt: new Date(e.startsAt),
-        ...(e.endsAt ? { endsAt: new Date(e.endsAt) } : {}),
-        ...(e.location ? { location: e.location } : {}),
-      }))
-      .filter((e) => !Number.isNaN(e.startsAt.getTime()));
+      .map((e) => {
+        const startsAt = new Date(e.startsAt);
+        if (Number.isNaN(startsAt.getTime())) return null;
+        const endsAt = e.endsAt ? new Date(e.endsAt) : null;
+        return {
+          type: e.type,
+          title: e.title,
+          startsAt,
+          ...(endsAt && !Number.isNaN(endsAt.getTime()) ? { endsAt } : {}),
+          ...(e.location ? { location: e.location } : {}),
+        };
+      })
+      .filter(Boolean);
 
     if (matchedRule) {
       matchedRule.hits += 1;
@@ -193,7 +198,9 @@ export async function classifyThread(threadId, opts = {}) {
     thread.reason = `Rule: emails from ${matchedRule.match.value} go to ${matchedRule.owner}`;
   }
 
-  if (thread.owner !== prevOwner) {
+  const ownerChanged = !isFirstClassification && thread.owner !== prevOwner;
+
+  if (ownerChanged) {
     thread.history.push({
       at: new Date(),
       from: prevOwner,
@@ -207,7 +214,7 @@ export async function classifyThread(threadId, opts = {}) {
   await thread.save();
   const json = thread.toJSON();
 
-  if (thread.owner !== prevOwner && emit) {
+  if (ownerChanged && emit) {
     await recordActivity({
       clientId: thread.clientId,
       actor: { type: 'ai', name: 'Relay AI' },
@@ -224,3 +231,4 @@ export async function classifyThread(threadId, opts = {}) {
 
   return json;
 }
+

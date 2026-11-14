@@ -34,3 +34,4 @@ activitySchema.index({ clientId: 1, createdAt: -1 });
 applyBaseTransform(activitySchema);
 
 export const Activity = mongoose.models.Activity || mongoose.model('Activity', activitySchema);
+

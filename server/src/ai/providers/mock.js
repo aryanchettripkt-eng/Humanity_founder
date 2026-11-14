@@ -118,3 +118,4 @@ export const mockProvider = {
     return 'Thanks for the note! I’ll take care of this and circle back soon.';
   },
 };
+

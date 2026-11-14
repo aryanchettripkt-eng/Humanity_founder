@@ -23,3 +23,4 @@ export async function recordActivity({ clientId, actor, type, threadId, payload 
   emitActivityNew(clientId, json);
   return json;
 }
+

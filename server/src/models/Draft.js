@@ -28,3 +28,4 @@ const draftSchema = new mongoose.Schema(
 applyBaseTransform(draftSchema);
 
 export const Draft = mongoose.models.Draft || mongoose.model('Draft', draftSchema);
+

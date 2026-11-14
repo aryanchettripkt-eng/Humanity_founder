@@ -78,3 +78,4 @@ describe('AI provider & JSON retry', () => {
     expect(result).toEqual({ answer: 'Fixed', threadIds: [] });
   });
 });
+
