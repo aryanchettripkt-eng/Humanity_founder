@@ -61,7 +61,7 @@
 
 ## Phase 5 — Polish, QA, ship
 - [ ] **Q5.1** UX review pass against DESIGN_SYSTEM §10 at 375/768/1440, file issues in PROGRESS.md — @claude
-- [ ] **Q5.2** Fix list from Q5.1 — @gemini
+- [x] **Q5.2** Fix list from Q5.1 — @gemini (gemini/Q5.2-ux-fixes)
 - [ ] **Q5.3** Acceptance criteria run (PRD §8), all boxes ticked — @claude
 - [x] **Q5.4** Deploy: Atlas, Render, Vercel; seed prod; verify sockets over HTTPS — @gemini (Aryan provides accounts/keys)
 - [x] **Q5.5** README: overview, demo logins, what's simulated, architecture diagram, AI provider notes — @claude

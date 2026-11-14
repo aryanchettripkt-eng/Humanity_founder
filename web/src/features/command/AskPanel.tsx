@@ -96,20 +96,25 @@ export function AskPanel() {
             <p className="leading-relaxed text-foreground">{askMutation.data.answer}</p>
             {askMutation.data.threadIds.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-1">
-                {askMutation.data.threadIds.map((id, idx) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => {
-                      setAskOpen(false);
-                      navigate(`/app/inbox/inbox/${id}`);
-                    }}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5"
-                  >
-                    <span>Thread #{idx + 1}</span>
-                    <ArrowUpRight className="h-3 w-3" />
-                  </button>
-                ))}
+                {askMutation.data.threadIds.map((id, idx) => {
+                  const cited = askMutation.data.threads?.find((t) => t.id === id);
+                  const label = cited?.subject || `Thread #${idx + 1}`;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      title={label}
+                      onClick={() => {
+                        setAskOpen(false);
+                        navigate(`/app/inbox/inbox/${id}`);
+                      }}
+                      className="inline-flex max-w-full items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5"
+                    >
+                      <span className="max-w-[220px] truncate">{label}</span>
+                      <ArrowUpRight className="h-3 w-3 shrink-0" />
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

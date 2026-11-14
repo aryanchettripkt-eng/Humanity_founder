@@ -16,7 +16,7 @@ import {
   useStartGmail,
   useSyncAccount,
 } from '@/features/accounts/api';
-import { useHealth } from '@/features/auth/api';
+import { useHealth, useMe } from '@/features/auth/api';
 import { ConnectProviderCard } from '@/features/accounts/components/ConnectProviderCard';
 import { SimulatedOAuthModal } from '@/features/accounts/components/SimulatedOAuthModal';
 import { ApiError } from '@/lib/api';
@@ -26,7 +26,12 @@ import { useUiStore } from '@/stores/ui';
 export function SettingsAccountsPage() {
   const activeClientId = useUiStore((s) => s.activeClientId) || undefined;
   const { data: health } = useHealth();
+  const { data: me } = useMe();
   const { data: accounts, isLoading, isError, refetch } = useAccounts(activeClientId);
+  const activeClient = me?.clients?.find((c) => c.id === activeClientId) || me?.clients?.[0];
+  const hasDemoGmail = Boolean(
+    accounts?.some((a) => a.provider === 'gmail' && a.simulated && a.status !== 'disconnected')
+  );
   const connectMutation = useConnectAccount();
   const authorizeMutation = useAuthorizeAccount();
   const startGmailMutation = useStartGmail();
@@ -84,9 +89,11 @@ export function SettingsAccountsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-6">
       <div>
-        <h1 className="text-lg font-semibold text-foreground">Connected accounts</h1>
+        <h1 className="text-lg font-semibold text-foreground">
+          {activeClient ? `${activeClient.firstName}'s accounts` : 'Connected accounts'}
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Manage simulated email connections for your clients.
+          Manage email connections for {activeClient ? activeClient.name : 'your clients'}.
         </p>
       </div>
 
@@ -156,6 +163,7 @@ export function SettingsAccountsPage() {
         <h2 className="text-sm font-semibold text-foreground">Add a connection</h2>
         <ConnectProviderCard
           provider="gmail"
+          demoAvailable={!hasDemoGmail}
           realAvailable={Boolean(health?.gmail)}
           realLoading={startGmailMutation.isPending}
           onConnect={() => handleConnect('gmail')}
