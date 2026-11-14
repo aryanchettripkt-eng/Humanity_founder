@@ -15,6 +15,14 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:43 · gemini · B1.5 & B1.6 AI providers
+- Done:
+  - `server/src/ai/schemas.js` (`classificationSchema`, `askSchema`), `server/src/ai/utils.js` (`AIError`, `withTimeout`, `runJSONWithRetry` with 1 JSON/schema retry).
+  - `mock`, `groq` (with 429 exponential backoff + `GROQ_FAST_MODEL` support), `gemini`, and `anthropic` providers + `getProvider()`.
+- Changed contracts: none.
+- Next: `B1.9` Socket.io server, `B1.8` Threads API (plus classification service stub/hook so reclassify works cleanly while `B1.7` is `@claude`), `B1.10` Accounts & sync, `B1.4` Seed script, `B1.11` Tests.
+- Notes/risks: `B1.7` (classification prompt v1 + pipeline) is assigned to `@claude`; will build a clean `classifyThread()` service interface that `B1.8`/`B1.10` can call and `@claude` can refine or own in `B1.7`.
+
 ### 2026-11-14 23:42 · gemini · B1.1 Mongoose models + B1.2 Auth
 - Done:
   - B1.1: All 8 Mongoose models (`User`, `Client`, `EmailAccount`, `Thread`, `Message`, `Draft`, `Rule`, `Activity`) with `applyBaseTransform` (`id` string, strips `_id`/`__v`/`passwordHash`) and indexes per BACKEND §4.

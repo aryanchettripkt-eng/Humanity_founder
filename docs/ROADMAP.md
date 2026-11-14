@@ -21,8 +21,8 @@
 - [x] **B1.2** Auth: signup/login/demo/me, JWT middleware, role guards — @gemini (gemini/B1.1-models-auth)
 - [ ] **B1.3** Seed data: `threads.json` (Priya ~32, Daniel ~10) + `scenarios.json` per BACKEND §8 — @claude *(content writing; parallel‑safe, only touches `server/src/seed/data/`)*
 - [ ] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini
-- [ ] **B1.5** AI provider abstraction + `mock` provider — @gemini
-- [ ] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini
+- [x] **B1.5** AI provider abstraction + `mock` provider — @gemini (gemini/B1.5-ai-providers)
+- [x] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini (gemini/B1.5-ai-providers; includes `groq` per D9)
 - [ ] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
 - [ ] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini
 - [ ] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini
