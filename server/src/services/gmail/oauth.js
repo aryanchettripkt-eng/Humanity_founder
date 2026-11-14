@@ -1,6 +1,57 @@
 import { google } from 'googleapis';
 import { env } from '../../config/env.js';
 
+const activeSyncAccounts = new Set();
+
+export function isAccountSyncing(accountId) {
+  return activeSyncAccounts.has(String(accountId));
+}
+
+export function tryLockAccount(accountId) {
+  const id = String(accountId);
+  if (activeSyncAccounts.has(id)) return false;
+  activeSyncAccounts.add(id);
+  return true;
+}
+
+export function unlockAccount(accountId) {
+  activeSyncAccounts.delete(String(accountId));
+}
+
+export function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isGmailRateLimitError(err) {
+  const status = err?.code || err?.status || err?.response?.status;
+  const msg = String(err?.message || '');
+  const reason = err?.errors?.[0]?.reason || err?.response?.data?.error?.errors?.[0]?.reason || '';
+  if (status === 429) return true;
+  if (status === 403 && (reason.includes('rateLimitExceeded') || reason.includes('userRateLimitExceeded'))) {
+    return true;
+  }
+  return msg.includes('Quota exceeded') || msg.includes('rateLimitExceeded');
+}
+
+/**
+ * Call a Gmail API request with exponential backoff (1s, 2s, 4s; max 4 tries) on rate/quota errors.
+ */
+export async function callGmailWithRetry(fn, { baseDelayMs = 1000, maxAttempts = 4 } = {}) {
+  let delay = baseDelayMs;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt < maxAttempts - 1 && isGmailRateLimitError(err)) {
+        await sleep(delay);
+        delay *= 2;
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 export const LOGIN_SCOPES = ['openid', 'email', 'profile'];
 export const GMAIL_SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',

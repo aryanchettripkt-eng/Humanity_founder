@@ -12,7 +12,13 @@ import { recordActivity } from '../activity.service.js';
 import { classifyThread } from '../classification.service.js';
 import { decryptToken } from './crypto.js';
 import { mapGmailThread } from './mapper.js';
-import { createAuthedGmailClient } from './oauth.js';
+import {
+  callGmailWithRetry,
+  createAuthedGmailClient,
+  sleep,
+  tryLockAccount,
+  unlockAccount,
+} from './oauth.js';
 
 /**
  * Idempotently upsert a mapped Gmail thread and its messages by `externalId`.
@@ -81,8 +87,16 @@ async function runWithConcurrency(items, concurrency, fn) {
  * Initial import (or limited re-import) for a real Gmail EmailAccount.
  */
 export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMPORT_LIMIT } = {}) {
+  if (!tryLockAccount(accountId)) {
+    logger.info('Gmail import skipped; sync already running', { accountId: String(accountId) });
+    return;
+  }
+
   const account = await EmailAccount.findById(accountId);
-  if (!account || account.simulated || !account.google?.refreshTokenEnc) return;
+  if (!account || account.simulated || !account.google?.refreshTokenEnc) {
+    unlockAccount(accountId);
+    return;
+  }
 
   const clientId = account.clientId;
   const assistantId = account.assistantId;
@@ -97,14 +111,20 @@ export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMP
     const refreshToken = decryptToken(account.google.refreshTokenEnc);
     const gmail = await createAuthedGmailClient(refreshToken);
 
-    const profileRes = await gmail.users.getProfile({ userId: 'me' });
+    const profileRes = await callGmailWithRetry(() => gmail.users.getProfile({ userId: 'me' }));
     const historyId = profileRes.data?.historyId ? String(profileRes.data.historyId) : undefined;
+    if (historyId) {
+      account.google.historyId = historyId;
+      await account.save();
+    }
 
-    const listRes = await gmail.users.threads.list({
-      userId: 'me',
-      labelIds: ['INBOX'],
-      maxResults,
-    });
+    const listRes = await callGmailWithRetry(() =>
+      gmail.users.threads.list({
+        userId: 'me',
+        labelIds: ['INBOX'],
+        maxResults,
+      })
+    );
     const threadRefs = listRes.data?.threads || [];
     const total = threadRefs.length || 1;
 
@@ -112,11 +132,14 @@ export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMP
     for (let i = 0; i < threadRefs.length; i += 1) {
       const ref = threadRefs[i];
       if (!ref?.id) continue;
-      const fullRes = await gmail.users.threads.get({
-        userId: 'me',
-        id: ref.id,
-        format: 'full',
-      });
+      if (i > 0) await sleep(100);
+      const fullRes = await callGmailWithRetry(() =>
+        gmail.users.threads.get({
+          userId: 'me',
+          id: ref.id,
+          format: 'full',
+        })
+      );
       const mapped = mapGmailThread(fullRes.data, account.address);
       const { thread, hasNewInbound, isNew } = await upsertMappedThread({ account, mapped });
       if (isNew || hasNewInbound || thread.aiStatus === 'pending') {
@@ -189,6 +212,8 @@ export async function importGmailAccount(accountId, { maxResults = env.GMAIL_IMP
       { accountId: String(accountId), step: 'error', imported: 0, total: 1, error: msg },
       assistantId
     );
+  } finally {
+    unlockAccount(accountId);
   }
 }
 

@@ -38,7 +38,7 @@ const envSchema = z.object({
     .default('http://localhost:4000/api/oauth/google/callback'),
   WEB_URL: z.string().optional().default('http://localhost:5173'),
   TOKEN_ENC_KEY: z.string().optional().default(''),
-  GMAIL_IMPORT_LIMIT: z.coerce.number().int().positive().max(200).default(50),
+  GMAIL_IMPORT_LIMIT: z.coerce.number().int().positive().max(200).default(20),
   GMAIL_POLL_SECONDS: z.coerce.number().int().positive().default(60),
 });
 
