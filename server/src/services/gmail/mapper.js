@@ -1,5 +1,20 @@
 const MAX_BODY_CHARS = 20_000;
 
+/**
+ * Strip common quoted reply chains (`On ... wrote:`, `-----Original Message-----`)
+ * so AI prompts stay focused on the new message content.
+ */
+export function trimQuotedReplies(text = '') {
+  const lines = String(text || '').split(/\r?\n/);
+  const cutIdx = lines.findIndex(
+    (line) =>
+      /^On .+ wrote:\s*$/i.test(line.trim()) ||
+      /^-{2,}\s*Original Message\s*-{2,}\s*$/i.test(line.trim())
+  );
+  const kept = cutIdx >= 0 ? lines.slice(0, cutIdx) : lines;
+  return kept.join('\n').trim() || String(text || '').trim();
+}
+
 /** Decode Gmail base64url string to UTF-8 text. */
 export function decodeBase64Url(data = '') {
   if (!data) return '';

@@ -28,19 +28,28 @@ export async function pollGmailAccount(accountId) {
     const refreshToken = decryptToken(account.google.refreshTokenEnc);
     const gmail = await createAuthedGmailClient(refreshToken);
 
-    const historyRes = await gmail.users.history.list({
-      userId: 'me',
-      startHistoryId: account.google.historyId,
-      historyTypes: ['messageAdded'],
-    });
-
-    const historyItems = historyRes.data?.history || [];
     const changedThreadIds = new Set();
-    for (const h of historyItems) {
-      for (const added of h.messagesAdded || []) {
-        if (added.message?.threadId) changedThreadIds.add(added.message.threadId);
+    let pageToken;
+    let latestHistoryId;
+    do {
+      const historyRes = await gmail.users.history.list({
+        userId: 'me',
+        startHistoryId: account.google.historyId,
+        historyTypes: ['messageAdded'],
+        ...(pageToken ? { pageToken } : {}),
+      });
+
+      const historyItems = historyRes.data?.history || [];
+      for (const h of historyItems) {
+        for (const added of h.messagesAdded || []) {
+          if (added.message?.threadId) changedThreadIds.add(added.message.threadId);
+        }
       }
-    }
+      if (historyRes.data?.historyId) {
+        latestHistoryId = String(historyRes.data.historyId);
+      }
+      pageToken = historyRes.data?.nextPageToken || undefined;
+    } while (pageToken);
 
     let classifiedAny = false;
     for (const gmailThreadId of changedThreadIds) {
@@ -59,8 +68,8 @@ export async function pollGmailAccount(accountId) {
       }
     }
 
-    if (historyRes.data?.historyId) {
-      account.google.historyId = String(historyRes.data.historyId);
+    if (latestHistoryId) {
+      account.google.historyId = latestHistoryId;
     }
     account.google.lastPolledAt = new Date();
     account.lastSyncedAt = new Date();
@@ -93,6 +102,10 @@ export async function pollGmailAccount(accountId) {
     }
 
     logger.warn('Gmail poll error', { accountId: account.id, message: msg });
+    account.status = 'connected';
+    account.error = msg;
+    await account.save();
+    emitSyncDone(account.clientId, account.toJSON(), account.assistantId);
   }
 }
 

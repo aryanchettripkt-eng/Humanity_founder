@@ -95,7 +95,10 @@ const threadSchema = new mongoose.Schema(
 
 threadSchema.index({ clientId: 1, owner: 1, archived: 1, status: 1, lastMessageAt: -1 });
 threadSchema.index({ clientId: 1, archived: 1, status: 1, lastMessageAt: -1 });
-threadSchema.index({ accountId: 1, externalId: 1 }, { unique: true, sparse: true });
+threadSchema.index(
+  { accountId: 1, externalId: 1 },
+  { unique: true, partialFilterExpression: { externalId: { $exists: true } } }
+);
 threadSchema.index({
   subject: 'text',
   snippet: 'text',

@@ -18,6 +18,14 @@ _None yet._
 
 ---
 
+### 2026-11-15 02:00 · gemini · Fix all Phase 6 review findings (`c56b099` review)
+- Done:
+  - Must-fix #1: replaced `sparse: true` with `partialFilterExpression: { externalId: { $exists: true } }` on `Thread` (`{accountId, externalId}`) and `Message` (`{threadId, externalId}`) so seeded/simulated threads & messages don't collide on `null`.
+  - Should-fix #2–#5: `pollGmailAccount` now resets `status: 'connected'` + emits `sync:done` on generic errors; Google login requires `verified_email === true` before matching by email; `login` returns `401 INVALID_CREDENTIALS` when `passwordHash` is missing; `OnboardingPage` polls `GET /accounts` while on `step === 'sync'`.
+  - Minor: improved default client naming, added `nextPageToken` loop in `history.list`, added `trimQuotedReplies` for AI prompts, added `returnTo: 'settings'` so connecting from Settings returns to `/app/settings/accounts` without re-triggering the tour, and added dedupe + quote-trimming unit tests in `server/tests/gmail.test.js`.
+- Changed contracts: none.
+- Next: merge `gemini/G6-real-gmail` -> `main` (and drop any old `accountId_1_externalId_1` / `threadId_1_externalId_1` indexes if built on Atlas).
+
 ### 2026-11-15 01:48 · gemini · Phase 6 (G6.2–G6.7): Real Gmail + Sign in with Google
 - Done:
   - Backend (`server/`): added `googleapis`, Google/Gmail env flags (`REAL_GMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `WEB_URL`, `TOKEN_ENC_KEY`, `GMAIL_IMPORT_LIMIT`, `GMAIL_POLL_SECONDS`) and `/health` flags (`gmail`, `googleLogin`).

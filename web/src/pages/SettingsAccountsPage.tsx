@@ -139,7 +139,10 @@ export function SettingsAccountsPage() {
           onConnect={() => handleConnect('gmail')}
           onConnectReal={async () => {
             try {
-              const res = await startGmailMutation.mutateAsync({ clientId: activeClientId });
+              const res = await startGmailMutation.mutateAsync({
+                clientId: activeClientId,
+                returnTo: 'settings',
+              });
               window.location.href = res.authUrl;
             } catch (err) {
               toast.error(err instanceof ApiError ? err.message : 'Could not start Gmail OAuth');

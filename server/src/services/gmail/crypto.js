@@ -43,9 +43,9 @@ export function decryptToken(payload, rawKey = env.TOKEN_ENC_KEY) {
 }
 
 /** Sign a short-lived (10 min) OAuth state JWT. */
-export function signOAuthState({ purpose, userId, clientId }, secret = env.JWT_SECRET) {
+export function signOAuthState({ purpose, userId, clientId, returnTo }, secret = env.JWT_SECRET) {
   const nonce = crypto.randomBytes(12).toString('hex');
-  return jwt.sign({ purpose, userId, clientId, nonce }, secret, { expiresIn: '10m' });
+  return jwt.sign({ purpose, userId, clientId, returnTo, nonce }, secret, { expiresIn: '10m' });
 }
 
 /** Verify and decode an OAuth state JWT. */

@@ -59,7 +59,7 @@ export async function login(req, res, next) {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user) {
+    if (!user || !user.passwordHash) {
       return next(unauthorized('Invalid email or password', 'INVALID_CREDENTIALS'));
     }
 

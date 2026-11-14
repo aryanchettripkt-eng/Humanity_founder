@@ -1,12 +1,15 @@
 import crypto from 'node:crypto';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { Message } from '../src/models/Message.js';
+import { Thread } from '../src/models/Thread.js';
 import {
   decryptToken,
   encryptToken,
   signOAuthState,
   verifyOAuthState,
 } from '../src/services/gmail/crypto.js';
-import { mapGmailThread } from '../src/services/gmail/mapper.js';
+import { upsertMappedThread } from '../src/services/gmail/import.js';
+import { mapGmailThread, trimQuotedReplies } from '../src/services/gmail/mapper.js';
 
 function b64url(str) {
   return Buffer.from(str, 'utf8').toString('base64url');
@@ -125,6 +128,79 @@ describe('gmail crypto & OAuth state (G6.7)', () => {
     expect(decoded.clientId).toBe('c1');
     expect(typeof decoded.nonce).toBe('string');
     expect(() => verifyOAuthState(`${state}tamper`, jwtSecret)).toThrow();
+  });
+});
+
+describe('quoted reply trimming & idempotent upsert dedupe (G6.7)', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('trims On ... wrote: quoted chains for AI prompts', () => {
+    const body = 'Sounds good, let us do 3pm.\n\nOn Mon, Nov 10, 2026 Bob wrote:\n> Earlier text';
+    expect(trimQuotedReplies(body)).toBe('Sounds good, let us do 3pm.');
+  });
+
+  it('upserts Thread and Message by externalId without duplicating on re-import', async () => {
+    const fakeAccount = { _id: 'acc1', clientId: 'client1', address: 'priya@acme.com' };
+    const fakeThread = { _id: 'thr1', aiStatus: 'done' };
+
+    const findOneSpy = vi
+      .spyOn(Thread, 'findOne')
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(fakeThread);
+    const createSpy = vi.spyOn(Thread, 'create').mockResolvedValue(fakeThread);
+    const updateThreadSpy = vi.spyOn(Thread, 'findByIdAndUpdate').mockResolvedValue(fakeThread);
+    const updateMsgSpy = vi
+      .spyOn(Message, 'updateOne')
+      .mockResolvedValueOnce({ upsertedCount: 1 })
+      .mockResolvedValueOnce({ upsertedCount: 0 });
+
+    const mapped = {
+      threadData: {
+        source: 'gmail',
+        externalId: 'g_t_1',
+        subject: 'Hello',
+        snippet: 'Hi',
+        participants: [{ name: 'Bob', email: 'bob@vc.com' }],
+        lastMessageAt: new Date(),
+        messageCount: 1,
+        lastSender: 'them',
+        unread: true,
+        important: false,
+        archived: false,
+        status: 'open',
+      },
+      messagesData: [
+        {
+          externalId: 'g_m_1',
+          from: { name: 'Bob', email: 'bob@vc.com' },
+          to: [{ name: 'Priya', email: 'priya@acme.com' }],
+          cc: [],
+          sentAt: new Date(),
+          bodyText: 'Hi',
+          direction: 'inbound',
+          simulated: false,
+        },
+      ],
+    };
+
+    const first = await upsertMappedThread({ account: fakeAccount, mapped });
+    const second = await upsertMappedThread({ account: fakeAccount, mapped });
+
+    expect(first.isNew).toBe(true);
+    expect(first.hasNewInbound).toBe(true);
+    expect(second.isNew).toBe(false);
+    expect(second.hasNewInbound).toBe(false);
+    expect(findOneSpy).toHaveBeenCalledTimes(2);
+    expect(createSpy).toHaveBeenCalledTimes(1);
+    expect(updateThreadSpy).toHaveBeenCalledTimes(1);
+    expect(updateMsgSpy).toHaveBeenCalledTimes(2);
+    expect(updateMsgSpy).toHaveBeenCalledWith(
+      { threadId: 'thr1', externalId: 'g_m_1' },
+      expect.objectContaining({ $setOnInsert: expect.any(Object) }),
+      { upsert: true }
+    );
   });
 });
 

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, CheckCircle2, Inbox, Sparkles, Users } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
@@ -28,13 +28,15 @@ export function OnboardingPage() {
   const queryClient = useQueryClient();
 
   const step = (searchParams.get('step') as Step) || 'welcome';
+  const accountIdParam = searchParams.get('accountId');
   const oauthError = searchParams.get('error');
   const [modalProvider, setModalProvider] = useState<'gmail' | 'outlook' | null>(null);
   const [pendingAccountId, setPendingAccountId] = useState<string | null>(null);
   const [progress, setProgress] = useState<SyncProgressEvent | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   const { data: health } = useHealth();
-  const { data: accounts } = useAccounts();
+  const { data: accounts } = useAccounts(undefined, true, step === 'sync' ? 2000 : false);
   const connectMutation = useConnectAccount();
   const authorizeMutation = useAuthorizeAccount();
   const startGmailMutation = useStartGmail();
@@ -57,6 +59,20 @@ export function OnboardingPage() {
 
   useSocketEvent<SyncProgressEvent>('sync:progress', handleProgress);
   useSocketEvent<EmailAccount>('sync:done', handleDone);
+
+  // Fallback polling completion in case redirect happened after socket sync:done fired
+  useEffect(() => {
+    if (step !== 'sync' || !accounts?.length) return;
+    const target = accountIdParam
+      ? accounts.find((a) => a.id === accountIdParam)
+      : accounts.find((a) => a.status === 'connected' || a.status === 'error');
+    if (!target) return;
+    if (target.status === 'connected' && progress?.step !== 'done') {
+      handleDone(target);
+    } else if (target.status === 'error' && !syncError) {
+      setSyncError(target.error || 'Sync failed');
+    }
+  }, [step, accounts, accountIdParam, progress?.step, syncError, handleDone]);
 
   const goStep = (next: Step) => {
     setSearchParams({ step: next });
@@ -213,6 +229,19 @@ export function OnboardingPage() {
             <h1 className="text-lg font-semibold text-foreground">Syncing your inbox</h1>
           </div>
           <SyncProgress progress={progress} />
+          {syncError && (
+            <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-foreground">
+              <p className="font-medium">{syncError}</p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-2 h-7 text-xs"
+                onClick={() => goStep('connect')}
+              >
+                Back to connections
+              </Button>
+            </div>
+          )}
           {progress?.step === 'done' && (
             <Button className="w-full" onClick={() => navigate('/app/today?tour=1')}>
               Open Today

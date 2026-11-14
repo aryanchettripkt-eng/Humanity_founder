@@ -14,6 +14,7 @@ import { logger } from '../utils/logger.js';
 export const startGmailSchema = {
   body: z.object({
     clientId: z.string().optional(),
+    returnTo: z.enum(['onboarding', 'settings']).optional(),
   }),
 };
 
@@ -30,9 +31,11 @@ async function resolveOrCreateClient(assistantId, assistantName, assistantEmail,
   const existing = await Client.findOne({ assistantId }).sort({ createdAt: 1 });
   if (existing) return existing;
 
+  const cleanName = String(assistantName || '').trim() || assistantEmail.split('@')[0] || 'Executive';
+  const firstName = cleanName.split(/\s+/)[0] || cleanName;
   const created = await Client.create({
-    name: `${assistantName}'s Client`,
-    firstName: 'Client',
+    name: cleanName,
+    firstName,
     email: assistantEmail,
     title: 'Executive',
     assistantId,
@@ -69,6 +72,7 @@ export async function startGmailConnect(req, res, next) {
       purpose: 'gmail',
       userId: req.user.id,
       clientId: targetClient.id,
+      returnTo: req.body?.returnTo || 'onboarding',
     });
     const authUrl = buildGoogleAuthUrl({ purpose: 'gmail', state });
     res.json({ data: { authUrl } });
@@ -90,8 +94,13 @@ export async function handleGoogleCallback(req, res) {
     return res.redirect(302, `${base}/login?error=state_invalid`);
   }
 
+  const fromSettings = parsedState.returnTo === 'settings';
   const errorTarget =
-    parsedState.purpose === 'gmail' ? `${base}/onboarding?step=connect` : `${base}/auth/callback`;
+    parsedState.purpose === 'gmail'
+      ? fromSettings
+        ? `${base}/app/settings/accounts`
+        : `${base}/onboarding?step=connect`
+      : `${base}/auth/callback`;
 
   if (oauthError) {
     const mappedCode =
@@ -118,20 +127,21 @@ export async function handleGoogleCallback(req, res) {
 
     if (parsedState.purpose === 'login') {
       let user = await User.findOne({ googleId: userInfo.id });
-      if (!user) {
+      if (!user && userInfo.verified_email === true) {
         user = await User.findOne({ email });
         if (user) {
           user.googleId = userInfo.id;
           await user.save();
-        } else {
-          user = await User.create({
-            name: userInfo.name || email.split('@')[0],
-            email,
-            googleId: userInfo.id,
-            role: 'assistant',
-            onboarding: { completed: false, tourSeen: false },
-          });
         }
+      }
+      if (!user) {
+        user = await User.create({
+          name: userInfo.name || email.split('@')[0],
+          email,
+          googleId: userInfo.id,
+          role: 'assistant',
+          onboarding: { completed: false, tourSeen: false },
+        });
       }
       const token = signToken(user);
       return res.redirect(302, `${base}/auth/callback#token=${encodeURIComponent(token)}`);
@@ -198,6 +208,12 @@ export async function handleGoogleCallback(req, res) {
     }
 
     void importGmailAccount(account._id);
+    if (fromSettings) {
+      return res.redirect(
+        302,
+        `${base}/app/settings/accounts?syncing=${encodeURIComponent(account.id)}`
+      );
+    }
     return res.redirect(
       302,
       `${base}/onboarding?step=sync&accountId=${encodeURIComponent(account.id)}`

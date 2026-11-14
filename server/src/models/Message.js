@@ -27,7 +27,10 @@ const messageSchema = new mongoose.Schema(
 );
 
 messageSchema.index({ threadId: 1, sentAt: 1 });
-messageSchema.index({ threadId: 1, externalId: 1 }, { unique: true, sparse: true });
+messageSchema.index(
+  { threadId: 1, externalId: 1 },
+  { unique: true, partialFilterExpression: { externalId: { $exists: true } } }
+);
 
 applyBaseTransform(messageSchema);
 
