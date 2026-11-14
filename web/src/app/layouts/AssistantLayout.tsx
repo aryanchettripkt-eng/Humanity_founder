@@ -15,6 +15,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { toast } from 'sonner';
 import { KbdHint } from '@/components/common/KbdHint';
 import { OfflineBanner } from '@/components/common/OfflineBanner';
+import { GuidedTour } from '@/components/common/GuidedTour';
 import { Button } from '@/components/ui/button';
 import { useAccounts } from '@/features/accounts/api';
 import { AccountStatusBadge } from '@/features/accounts/components/AccountStatusBadge';
@@ -327,6 +328,7 @@ export function AssistantLayout() {
 
       <CommandPalette />
       <AskPanel />
+      <GuidedTour />
     </div>
   );
 }

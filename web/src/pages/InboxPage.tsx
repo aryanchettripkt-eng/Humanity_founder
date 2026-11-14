@@ -4,7 +4,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AIPanel } from '@/features/ai/components/AIPanel';
+import { AIPanel, MobileAISummary } from '@/features/ai/components/AIPanel';
 import { DraftComposer } from '@/features/composer/components/DraftComposer';
 import {
   useChangeOwner,
@@ -139,12 +139,26 @@ export function InboxPage() {
         } else if (e.key === 'r') {
           e.preventDefault();
           setComposerOpen(true);
+        } else if (e.key === 'o') {
+          e.preventDefault();
+          const cycle: Record<string, 'assistant' | 'client' | 'none'> = {
+            assistant: 'client',
+            client: 'none',
+            none: 'assistant',
+            review: 'assistant',
+          };
+          const nextOwner = cycle[detail.owner] ?? 'assistant';
+          changeOwner.mutate({
+            id: detail.id,
+            owner: nextOwner,
+            previousOwner: detail.owner,
+          });
         }
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [threads, focusedIndex, detail, segment, searchParams, navigate, patchThread]);
+  }, [threads, focusedIndex, detail, segment, searchParams, navigate, patchThread, changeOwner]);
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -283,6 +297,12 @@ export function InboxPage() {
             />
 
             <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
+              <MobileAISummary
+                thread={detail}
+                reclassifying={reclassify.isPending}
+                onReclassify={() => reclassify.mutate(detail.id)}
+              />
+
               {detail.handoff?.state && detail.handoff.state !== 'none' && (
                 <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
                   <Crown className="mt-0.5 h-4 w-4 shrink-0" />

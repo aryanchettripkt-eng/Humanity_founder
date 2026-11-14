@@ -45,7 +45,7 @@ export function OnboardingPage() {
       queryClient.invalidateQueries({ queryKey: ['threads'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Inbox synced');
-      setTimeout(() => navigate('/app/today', { replace: true }), 500);
+      setTimeout(() => navigate('/app/today?tour=1', { replace: true }), 500);
     },
     [navigate, queryClient]
   );
@@ -149,7 +149,9 @@ export function OnboardingPage() {
           <div>
             <h1 className="text-lg font-semibold text-foreground">Connect a client inbox</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Choose an email provider to sync and classify conversations.
+              Choose an email provider to sync and classify conversations.{' '}
+              <span className="font-medium text-foreground">Simulated in prototype</span> — loads
+              sample threads safely without external OAuth.
             </p>
           </div>
           <div className="space-y-3">
@@ -177,7 +179,7 @@ export function OnboardingPage() {
           </div>
           <SyncProgress progress={progress} />
           {progress?.step === 'done' && (
-            <Button className="w-full" onClick={() => navigate('/app/today')}>
+            <Button className="w-full" onClick={() => navigate('/app/today?tour=1')}>
               Open Today
             </Button>
           )}

@@ -1,18 +1,48 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AssistantLayout } from '@/app/layouts/AssistantLayout';
 import { ClientLayout } from '@/app/layouts/ClientLayout';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useMe } from '@/features/auth/api';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { getAuthToken } from '@/lib/api';
-import { ClientHomePage } from '@/pages/ClientHomePage';
-import { ClientThreadPage } from '@/pages/ClientThreadPage';
-import { InboxPage } from '@/pages/InboxPage';
-import { LoginPage } from '@/pages/LoginPage';
-import { NotFoundPage } from '@/pages/NotFoundPage';
-import { OnboardingPage } from '@/pages/OnboardingPage';
-import { SettingsAccountsPage } from '@/pages/SettingsAccountsPage';
-import { SignupPage } from '@/pages/SignupPage';
-import { TodayPage } from '@/pages/TodayPage';
+
+const ClientHomePage = lazy(() =>
+  import('@/pages/ClientHomePage').then((m) => ({ default: m.ClientHomePage }))
+);
+const ClientThreadPage = lazy(() =>
+  import('@/pages/ClientThreadPage').then((m) => ({ default: m.ClientThreadPage }))
+);
+const InboxPage = lazy(() =>
+  import('@/pages/InboxPage').then((m) => ({ default: m.InboxPage }))
+);
+const LoginPage = lazy(() =>
+  import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage }))
+);
+const NotFoundPage = lazy(() =>
+  import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
+);
+const OnboardingPage = lazy(() =>
+  import('@/pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage }))
+);
+const SettingsAccountsPage = lazy(() =>
+  import('@/pages/SettingsAccountsPage').then((m) => ({ default: m.SettingsAccountsPage }))
+);
+const SignupPage = lazy(() =>
+  import('@/pages/SignupPage').then((m) => ({ default: m.SignupPage }))
+);
+const TodayPage = lazy(() =>
+  import('@/pages/TodayPage').then((m) => ({ default: m.TodayPage }))
+);
+
+function RouteFallback() {
+  return (
+    <div className="space-y-4 p-6">
+      <Skeleton className="h-7 w-48" />
+      <Skeleton className="h-32 w-full rounded-xl" />
+    </div>
+  );
+}
 
 function RootRedirect() {
   const token = getAuthToken();
@@ -27,7 +57,8 @@ function RootRedirect() {
 export function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
@@ -68,7 +99,8 @@ export function AppRouter() {
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

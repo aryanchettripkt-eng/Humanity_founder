@@ -95,7 +95,7 @@ export function emitToUser(userId, event, payload) {
   io.to(`user:${String(userId)}`).emit(event, payload);
 }
 
-function sanitizeThreadForClient(thread) {
+export function sanitizeThreadForClient(thread) {
   if (!thread) return thread;
   const copy = { ...thread };
   delete copy.history;
@@ -124,15 +124,20 @@ export const emitCountsChanged = (clientId) =>
 export const emitActivityNew = (clientId, activity) =>
   emitToAssistants(clientId, 'activity:new', activity);
 
-export const emitSyncProgress = (clientId, progress, assistantId) => {
-  emitToAssistants(clientId, 'sync:progress', progress);
-  if (assistantId) emitToUser(assistantId, 'sync:progress', progress);
-};
+function emitSyncEvent(clientId, assistantId, event, payload) {
+  if (!io) return;
+  let target = clientId ? io.to(`assistants:${String(clientId)}`) : null;
+  if (assistantId) {
+    target = target ? target.to(`user:${String(assistantId)}`) : io.to(`user:${String(assistantId)}`);
+  }
+  if (target) target.emit(event, payload);
+}
 
-export const emitSyncDone = (clientId, account, assistantId) => {
-  emitToAssistants(clientId, 'sync:done', account);
-  if (assistantId) emitToUser(assistantId, 'sync:done', account);
-};
+export const emitSyncProgress = (clientId, progress, assistantId) =>
+  emitSyncEvent(clientId, assistantId, 'sync:progress', progress);
+
+export const emitSyncDone = (clientId, account, assistantId) =>
+  emitSyncEvent(clientId, assistantId, 'sync:done', account);
 
 export const emitDraftCreated = (clientId, draft) =>
   emitToAssistants(clientId, 'draft:created', draft);
