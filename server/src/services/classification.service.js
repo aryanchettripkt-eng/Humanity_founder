@@ -11,7 +11,7 @@ import { logger } from '../utils/logger.js';
 import { recordActivity } from './activity.service.js';
 import { trimQuotedReplies } from './gmail/mapper.js';
 
-export const PROMPT_VERSION = 'v2';
+export const PROMPT_VERSION = 'v3';
 
 const MAX_CORRECTIONS = 5;
 
@@ -54,6 +54,7 @@ function buildClassificationSystemPrompt({ todayLabel, nextDaysLabel, timezone }
     '- confidence reflects how clearly the evidence supports the owner (0.9+ explicit, 0.7–0.9 strong signals, <0.7 ambiguous).',
     '- reason: one sentence that cites the evidence.',
     `- Extract every concrete date/time/deadline as ISO-8601 with timezone offset (e.g. +05:30) in timezone ${timezone}. Today is ${todayLabel}. Next 7 days: ${nextDaysLabel}.`,
+    '- Resolve words like "Friday", "tomorrow" or "next week" from the date of the message that says them (shown in the client\'s timezone next to each message), using the day list above. "By Friday" means the first Friday on or after that message. Before answering, check that the weekday of every date you output matches the weekday named in the email. A time with no date is on the day it refers to; omit dates you cannot pin down.',
     '- Output ONLY valid JSON matching this exact shape: {"owner":"assistant|client|none","confidence":0.0-1.0,"reason":"...","clientReason":"... or null","category":"meeting|action|update|newsletter|finance|legal|personal|general","isImportant":bool,"actionRequired":bool,"waitingOnOthers":bool,"summary":"...","keyPoints":["max 6"],"entities":[{"type":"meeting|deadline|date","title":"...","startsAt":"ISO-8601","endsAt":"ISO-8601 or null","location":"... or null"}]}.',
   ].join('\n');
 }
@@ -104,7 +105,37 @@ async function loadRecentCorrections(clientId, excludeThreadId) {
   }
 }
 
-function buildClassificationUserPrompt({ client, assistant, messages, corrections = [] }) {
+/**
+ * A message timestamp in the client's timezone with its weekday, e.g. "Sun 2026-11-15 03:33",
+ * so relative words ("by Friday") are resolved from the client's local date, not UTC.
+ * @param {Date | string} date
+ * @param {string} [tz]
+ */
+export function formatLocalStamp(date, tz = 'UTC') {
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return 'unknown time';
+  try {
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        hourCycle: 'h23',
+        weekday: 'short',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+        .formatToParts(d)
+        .map((x) => [x.type, x.value])
+    );
+    return `${p.weekday} ${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`;
+  } catch {
+    return d.toISOString();
+  }
+}
+
+function buildClassificationUserPrompt({ client, assistant, messages, corrections = [], timezone }) {
   const recent = messages.slice(-12);
   const older = messages.slice(0, Math.max(0, messages.length - 12));
 
@@ -132,7 +163,7 @@ function buildClassificationUserPrompt({ client, assistant, messages, correction
     const toList = (m.to || []).map((r) => r.email).join(', ');
     const ccList = (m.cc || []).map((r) => r.email).join(', ');
     lines.push(
-      `--- [${m.direction}] ${m.from?.name || ''} <${m.from?.email || ''}> · ${new Date(m.sentAt).toISOString()}`,
+      `--- [${m.direction}] ${m.from?.name || ''} <${m.from?.email || ''}> · ${formatLocalStamp(m.sentAt, timezone)}`,
       `To: ${toList}  Cc: ${ccList}`,
       trimQuotedReplies(String(m.bodyText || '')).slice(0, 2000)
     );
@@ -206,7 +237,7 @@ export async function classifyThread(threadId, opts = {}) {
         nextDaysLabel,
         timezone: tz,
       }),
-      prompt: buildClassificationUserPrompt({ client, assistant, messages, corrections }),
+      prompt: buildClassificationUserPrompt({ client, assistant, messages, corrections, timezone: tz }),
       schema: classificationSchema,
       fast,
     });

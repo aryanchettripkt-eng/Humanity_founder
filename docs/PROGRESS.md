@@ -25,7 +25,8 @@ _None yet._
 
 ### 2026-11-15 03:50 · claude · B4.5 few-shot corrections, B1.7 reviewed
 - Done: classification prompt now includes up to 5 recent threads whose owner was set by the assistant (manual change) or the client (hand-off) as few-shot examples (`formatCorrections` / `loadRecentCorrections` in `classification.service.js`). Loading them never blocks classification. B1.7 (pipeline written by Gemini) reviewed across the Phase 6 and audit passes and marked done.
-- Changed contracts: `PROMPT_VERSION` v1 → v2 (user prompt gains a "Recent corrections" block). No API or model changes.
+- Also (v3): message times in the prompt are now shown in the client's timezone with the weekday (`formatLocalStamp`), plus a rule to resolve "by Friday" from the message's own date. Seen live: a Sat 22:03 UTC email (Sunday morning in IST) saying "Friday 5 PM" was saved as Sun Nov 22.
+- Changed contracts: `PROMPT_VERSION` v1 → v3 (user prompt gains a "Recent corrections" block and local message times). No API or model changes.
 - Next: Q5.5 README, then Q5.1/Q5.3 QA pass on the live site.
 
 
