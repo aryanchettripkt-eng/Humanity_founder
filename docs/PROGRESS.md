@@ -15,6 +15,13 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:48 · gemini · B3.1 Drafts API + B3.2 Client/Dashboard/Activity API (+ B4.3)
+- Done:
+  - `B3.1`: `server/src/services/draft.service.js`, `drafts.controller.js`, `drafts.routes.js` (`POST /threads/:id/drafts`, `PATCH /drafts/:id`, `POST /drafts/:id/send` simulated send, `DELETE /drafts/:id`).
+  - `B3.2` + `B4.3`: `client.controller.js`, `client.routes.js` (`/client/queue`, `/client/threads/:id`, `/client/threads/:id/action` including `note` -> AI draft + `draft:created` socket), `dashboard.controller.js`, `dashboard.routes.js`, `activity.routes.js`.
+- Changed contracts: none.
+- Next: Phase 4 backend (`B4.1` Ask AI, `B4.2` Morning brief service, `B4.4` Simulate new email + `/demo/reset`, `B4.6` Follow-up nudges).
+
 ### 2026-11-14 23:46 · gemini · B1.4 Seed script + B1.11 Backend tests
 - Done:
   - `server/src/seed/seed.js`: seeds demo users (`alex`, `priya`, `daniel`), clients, email accounts, and loads `seed/data/threads.json` if present (falls back to 5 starter threads across all 4 owners until `@claude` completes `B1.3`). Supports `--classify` flag and exports `seedDatabase()` for `/demo/reset`.

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { createDraftSchema, createThreadDraft } from '../controllers/drafts.controller.js';
 import {
   getThreadCounts,
   getThreadDetail,
@@ -26,5 +27,6 @@ router.patch('/:id', validate(patchThreadSchema), patchThread);
 router.patch('/:id/owner', validate(patchOwnerSchema), patchThreadOwner);
 router.post('/:id/reclassify', reclassifyThread);
 router.post('/:id/suggestion', validate(suggestionSchema), handleSuggestion);
+router.post('/:id/drafts', validate(createDraftSchema), createThreadDraft);
 
 export default router;

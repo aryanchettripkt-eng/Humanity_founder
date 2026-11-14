@@ -41,9 +41,9 @@
 - [ ] **F2.9** Realtime wiring: socket events → query invalidation/patching, offline banner — @gemini
 
 ## Phase 3 — Drafts, client view, onboarding
-- [ ] **B3.1** Drafts API + draft prompt + simulated send — @gemini
+- [x] **B3.1** Drafts API + draft prompt + simulated send — @gemini (gemini/B3.1-B3.2-drafts-client-api)
 - [ ] **F3.1** `DraftComposer` (tones, instruction, regenerate, confirm send) — @gemini
-- [ ] **B3.2** Client API (`/client/*`) + Activity service + socket emits — @gemini
+- [x] **B3.2** Client API (`/client/*`) + Activity service + socket emits — @gemini (gemini/B3.1-B3.2-drafts-client-api)
 - [ ] **F3.2** Client view: `ClientLayout`, greeting, `ClientCard` actions + animations, read view, all‑caught‑up — @gemini
 - [ ] **F3.3** Onboarding: welcome, connect cards, `SimulatedOAuthModal`, `SyncProgress`, redirect + tour — @gemini
 - [ ] **F3.4** Settings → Accounts page — @gemini
@@ -52,7 +52,7 @@
 - [ ] **B4.1** Ask AI endpoint (intent routing + LLM) — @gemini
 - [ ] **F4.1** `CommandPalette` + `AskPanel` with thread chips — @gemini
 - [ ] **B4.2** Morning brief service + fallback — @gemini
-- [ ] **B4.3** Client "reply with a note" → draft (`draft:created`) — @gemini
+- [x] **B4.3** Client "reply with a note" → draft (`draft:created`) — @gemini (gemini/B3.1-B3.2-drafts-client-api)
 - [ ] **B4.4** Simulate new email endpoint + scenarios — @gemini
 - [ ] **F4.2** Simulate button (demo mode) + new‑row highlight + Reclassified chip — @gemini
 - [ ] **B4.5** Few‑shot corrections in prompt (learns from overrides) — @claude
