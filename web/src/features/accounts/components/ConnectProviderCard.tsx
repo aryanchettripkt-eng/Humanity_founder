@@ -18,8 +18,8 @@ export function ConnectProviderCard({
   const isGmail = provider === 'gmail';
   const title = isGmail ? 'Google Gmail' : 'Microsoft Outlook';
   const subtitle = isGmail
-    ? 'Read-only inbox & thread sync for Google Workspace'
-    : 'Read-only inbox & calendar sync for Microsoft 365';
+    ? 'Sample inbox & thread sync (simulated in prototype)'
+    : 'Simulated Outlook inbox & calendar preview';
 
   return (
     <Card className="flex items-center justify-between gap-4 p-4">
@@ -28,7 +28,14 @@ export function ConnectProviderCard({
           <Mail className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+            {!connectedAddress && (
+              <span className="rounded-full border border-border bg-surface px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                Simulated
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
             {connectedAddress ? `Connected as ${connectedAddress}` : subtitle}
           </p>

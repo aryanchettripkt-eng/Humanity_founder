@@ -9,6 +9,8 @@ export function useClientQueue() {
     queryKey: qk.client.queue(),
     queryFn: () => apiFetch<ThreadListItem[]>('/client/queue'),
     staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
   });
 }
 

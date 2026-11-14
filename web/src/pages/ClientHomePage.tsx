@@ -110,24 +110,24 @@ export function ClientHomePage() {
                       </span>
                     )}
 
-                    <div className="flex flex-wrap gap-2 pt-1">
+                    <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
                       {isHandling ? (
                         <Button
                           size="lg"
-                          className="min-h-[44px] flex-1"
+                          className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
                           disabled={actionMutation.isPending}
                           onClick={() =>
                             actionMutation.mutate({ threadId: t.id, action: 'handled' })
                           }
                         >
-                          <CheckCircle2 className="h-4 w-4" />
+                          <CheckCircle2 className="h-4 w-4 shrink-0" />
                           Mark handled
                         </Button>
                       ) : (
                         <Button
                           size="lg"
                           variant="outline"
-                          className="min-h-[44px] flex-1"
+                          className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
                           disabled={actionMutation.isPending}
                           onClick={() =>
                             actionMutation.mutate({ threadId: t.id, action: 'handling' })
@@ -140,20 +140,20 @@ export function ClientHomePage() {
                       <Button
                         size="lg"
                         variant="secondary"
-                        className="min-h-[44px] flex-1"
+                        className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
                         disabled={actionMutation.isPending}
                         onClick={() =>
                           actionMutation.mutate({ threadId: t.id, action: 'handoff' })
                         }
                       >
-                        <UserRoundCheck className="h-4 w-4" />
+                        <UserRoundCheck className="h-4 w-4 shrink-0" />
                         Assistant take over
                       </Button>
 
                       <Button
                         size="lg"
                         variant="ghost"
-                        className="min-h-[44px]"
+                        className="min-h-[44px] w-full whitespace-nowrap sm:w-auto"
                         onClick={() => {
                           setNoteOpenId(noteOpenId === t.id ? null : t.id);
                           setNoteText('');

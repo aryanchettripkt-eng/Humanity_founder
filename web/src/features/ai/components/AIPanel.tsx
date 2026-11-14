@@ -30,7 +30,7 @@ export function AIPanel({
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span>AI Insights</span>
         </div>
-        {thread.aiModel && (
+        {thread.aiModel && thread.aiModel !== 'seed' && (
           <span className="rounded border border-border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground">
             {thread.aiModel}
           </span>
@@ -172,4 +172,61 @@ export function AIPanel({
     </aside>
   );
 }
+
+/** Collapsible AI Insights summary shown above messages on mobile / tablet (< xl). */
+export function MobileAISummary({
+  thread,
+  reclassifying = false,
+  onReclassify,
+}: Pick<AIPanelProps, 'thread' | 'reclassifying' | 'onReclassify'>) {
+  const ownerMeta = OWNER_META[thread.owner] ?? OWNER_META.review;
+  return (
+    <details className="xl:hidden rounded-xl border border-border bg-surface p-3 text-xs" open>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 font-medium text-foreground">
+        <span className="inline-flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          <span>AI Insights · Why {ownerMeta.label}</span>
+        </span>
+        <ConfidenceMeter value={thread.confidence} />
+      </summary>
+      <div className="mt-2.5 space-y-2 border-t border-border pt-2.5 text-xs">
+        <p className="leading-relaxed text-foreground">
+          {thread.reason || 'No classification reason recorded yet.'}
+        </p>
+        {(thread.summary || thread.snippet) && (
+          <p className="leading-relaxed text-muted-foreground">
+            <strong className="font-medium text-foreground">Summary: </strong>
+            {thread.summary || thread.snippet}
+          </p>
+        )}
+        {thread.entities?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-0.5">
+            {thread.entities.map((ent, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-0.5 text-[11px] text-foreground"
+              >
+                <CalendarPlus className="h-3 w-3 text-primary" />
+                {ent.title}: {formatUpcomingDate(ent.startsAt)}
+              </span>
+            ))}
+          </div>
+        )}
+        {thread.aiStatus === 'failed' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs"
+            disabled={reclassifying}
+            onClick={onReclassify}
+          >
+            <RefreshCw className="h-3 w-3" />
+            Retry AI
+          </Button>
+        )}
+      </div>
+    </details>
+  );
+}
+
 

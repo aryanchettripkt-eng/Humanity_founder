@@ -18,6 +18,14 @@ _None yet._
 
 ---
 
+### 2026-11-15 01:32 · gemini · QA & live-site fixes (Groq models, mobile UX, shortcuts, code splitting)
+- Done:
+  - Fixed Groq model defaults in `server/src/config/env.js` and `.env.example` (`openai/gpt-oss-120b` / `openai/gpt-oss-20b` — `llama-3.3-70b-versatile` returned `model_not_found` on this Groq account).
+  - Fixed singular/plural in `brief.service.js` (`1 thread needs you`), sanitized `reason`/`history` in `client.controller.js` REST responses, and deduped `sync:progress`/`sync:done` via `io.to(...).to(...)` in `socket.js`.
+  - Frontend: added collapsible `MobileAISummary` above thread messages (`< xl`), fixed mobile client card button wrapping + 60s queue refetch, fixed `"Draft with AI"` button wrapping, updated Onboarding Outlook copy + `"Simulated"` badge, hid `"seed"` model pill, added `o` owner-cycle shortcut, added post-onboarding `GuidedTour` (`?tour=1`), and added route-level `React.lazy` code splitting in `router.tsx`.
+- Changed contracts: none.
+- Next: merge `gemini/q5-qa-fixes` -> `main`, remove/update `GROQ_MODEL` & `GROQ_FAST_MODEL` on Render, then `@claude` `B1.3` full seed data + `B4.5` few-shot + `Q5.1`/`Q5.3`.
+
 ### 2026-11-15 00:40 · claude · Docs: real Gmail plan, real-vs-simulated, review follow-ups
 - Done: BACKEND §3 (Google routes, `nudges` on `/dashboard`), §4 (Google/account/source fields), §6, §7 (new socket rooms), §9, new §11 (real Gmail + Google sign-in). PRD §6.1, S10 → P1, F1b, new §11 real-vs-simulated table. FRONTEND routes/conventions, DESIGN_SYSTEM components + copy, ROADMAP Phase 6, DECISIONS D10–D12, README "What's real vs simulated", new `docs/GOOGLE_SETUP.md`.
 - Re-reviewed Gemini's fix commit `e6fae15`: all 8 findings fixed; lint clean; 18/18 tests pass. Two minor leftovers logged under Open issues.

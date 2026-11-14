@@ -5,6 +5,7 @@ import {
   emitCountsChanged,
   emitDraftCreated,
   emitThreadUpdated,
+  sanitizeThreadForClient,
 } from '../realtime/socket.js';
 import { recordActivity } from '../services/activity.service.js';
 import { generateThreadDraft } from '../services/draft.service.js';
@@ -27,7 +28,7 @@ export async function getClientQueue(req, res, next) {
       'handoff.state': { $ne: 'handled' },
     }).sort({ important: -1, lastMessageAt: -1 });
 
-    res.json({ data: threads.map((t) => t.toJSON()) });
+    res.json({ data: threads.map((t) => sanitizeThreadForClient(t.toJSON())) });
   } catch (err) {
     next(err);
   }
@@ -42,8 +43,7 @@ export async function getClientThreadDetail(req, res, next) {
     if (!thread) return next(notFound('Thread not found'));
 
     const messages = await Message.find({ threadId: thread._id }).sort({ sentAt: 1 });
-    const json = thread.toJSON();
-    delete json.history;
+    const json = sanitizeThreadForClient(thread.toJSON());
 
     res.json({
       data: {

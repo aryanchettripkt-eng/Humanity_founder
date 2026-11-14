@@ -58,11 +58,11 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
 
   if (!draft && !autoOpen && !createDraft.isPending) {
     return (
-      <div className="flex items-center justify-between rounded-xl border border-border bg-card p-3">
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
         <span className="text-xs text-muted-foreground">
           Need to reply? Generate an AI draft and review before sending.
         </span>
-        <Button size="sm" onClick={handleGenerate}>
+        <Button size="sm" className="shrink-0 whitespace-nowrap" onClick={handleGenerate}>
           <Sparkles className="h-3.5 w-3.5" />
           Draft with AI
         </Button>

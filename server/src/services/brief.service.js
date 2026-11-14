@@ -16,7 +16,12 @@ export async function generateMorningBrief({ clientId, counts, upcoming = [], us
   const client = await Client.findById(clientId);
   const clientName = client?.firstName || 'your client';
   const nextUp = upcoming[0]?.title ? ` Next up: ${upcoming[0].title}.` : '';
-  const fallbackText = `${counts.assistant ?? 0} threads need you, ${counts.client ?? 0} need ${clientName}, ${counts.review ?? 0} to review.${nextUp}`;
+  const assistantCount = counts.assistant ?? 0;
+  const clientCount = counts.client ?? 0;
+  const reviewCount = counts.review ?? 0;
+  const assistantPhrase = `${assistantCount} ${assistantCount === 1 ? 'thread needs' : 'threads need'} you`;
+  const clientPhrase = `${clientCount} ${clientCount === 1 ? 'needs' : 'need'} ${clientName}`;
+  const fallbackText = `${assistantPhrase}, ${clientPhrase}, ${reviewCount} to review.${nextUp}`;
 
   if (!useAI) {
     return {
