@@ -35,6 +35,8 @@ const threadSchema = new mongoose.Schema(
   {
     clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
     accountId: { type: mongoose.Schema.Types.ObjectId, ref: 'EmailAccount', required: true },
+    source: { type: String, enum: ['seed', 'simulated', 'gmail'], default: 'seed' },
+    externalId: { type: String },
     subject: { type: String, required: true, trim: true },
     snippet: { type: String, default: '' },
     participants: { type: [participantSchema], default: [] },
@@ -93,6 +95,10 @@ const threadSchema = new mongoose.Schema(
 
 threadSchema.index({ clientId: 1, owner: 1, archived: 1, status: 1, lastMessageAt: -1 });
 threadSchema.index({ clientId: 1, archived: 1, status: 1, lastMessageAt: -1 });
+threadSchema.index(
+  { accountId: 1, externalId: 1 },
+  { unique: true, partialFilterExpression: { externalId: { $exists: true } } }
+);
 threadSchema.index({
   subject: 'text',
   snippet: 'text',

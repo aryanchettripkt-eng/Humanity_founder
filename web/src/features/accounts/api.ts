@@ -3,13 +3,18 @@ import { apiFetch } from '@/lib/api';
 import { qk } from '@/lib/queryKeys';
 import type { EmailAccount } from '@/types/api';
 
-export function useAccounts(clientId?: string, enabled = true) {
+export function useAccounts(
+  clientId?: string,
+  enabled = true,
+  refetchInterval: number | false = false
+) {
   const qs = clientId ? `?clientId=${encodeURIComponent(clientId)}` : '';
   return useQuery({
     queryKey: qk.accounts.all(clientId),
     queryFn: () => apiFetch<EmailAccount[]>(`/accounts${qs}`),
     enabled,
     staleTime: 30_000,
+    refetchInterval,
   });
 }
 
@@ -17,6 +22,16 @@ export function useConnectAccount() {
   return useMutation({
     mutationFn: (body: { provider: 'gmail' | 'outlook'; clientId?: string }) =>
       apiFetch<{ accountId: string; consentUrl: null; simulated: true }>('/accounts/connect', {
+        method: 'POST',
+        body,
+      }),
+  });
+}
+
+export function useStartGmail() {
+  return useMutation({
+    mutationFn: (body: { clientId?: string; returnTo?: 'onboarding' | 'settings' } = {}) =>
+      apiFetch<{ authUrl: string }>('/accounts/gmail/start', {
         method: 'POST',
         body,
       }),

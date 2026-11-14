@@ -7,6 +7,9 @@ import { useMe } from '@/features/auth/api';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { getAuthToken } from '@/lib/api';
 
+const AuthCallbackPage = lazy(() =>
+  import('@/pages/AuthCallbackPage').then((m) => ({ default: m.AuthCallbackPage }))
+);
 const ClientHomePage = lazy(() =>
   import('@/pages/ClientHomePage').then((m) => ({ default: m.ClientHomePage }))
 );
@@ -62,6 +65,7 @@ export function AppRouter() {
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         <Route
           path="/onboarding"

@@ -70,12 +70,12 @@
 ## Phase 6 — Real Gmail + Sign in with Google (P1, start only after Phase 2–3 frontend is solid)
 > Spec: BACKEND §11, PRD §6.1 / F1b, DESIGN_SYSTEM §7 copy. Demo inbox must keep working with `REAL_GMAIL=false`.
 - [ ] **G6.1** Google Cloud project, Gmail API, consent screen, test users, OAuth client, `.env` values — **Aryan** (follow `docs/GOOGLE_SETUP.md`)
-- [ ] **G6.2** OAuth plumbing: `/accounts/gmail/start`, `/auth/google/start`, `/oauth/google/callback`, signed `state`, token encryption (`TOKEN_ENC_KEY`), `/health` flags, env validation — @gemini
-- [ ] **G6.3** Gmail import: mapper (MIME → Thread/Message), upsert by `externalId`, classify with concurrency 2, `sync:progress` — @gemini
-- [ ] **G6.4** Poller: `history.list` every `GMAIL_POLL_SECONDS`, Sync now, `invalid_grant` → reconnect state, disconnect revokes token — @gemini
-- [ ] **G6.5** Sign in with Google: find/create user, `/auth/callback` token hand-off — @gemini
-- [ ] **G6.6** Frontend: `GoogleButton`, Gmail card dual actions, OAuth error states, `SourceBadge`, Settings → Accounts, "Open in Gmail" link — @gemini
-- [ ] **G6.7** Tests: mapper fixtures, state verification, dedupe (mock Google client) — @gemini
+- [x] **G6.2** OAuth plumbing: `/accounts/gmail/start`, `/auth/google/start`, `/oauth/google/callback`, signed `state`, token encryption (`TOKEN_ENC_KEY`), `/health` flags, env validation — @gemini (gemini/G6-real-gmail)
+- [x] **G6.3** Gmail import: mapper (MIME → Thread/Message), upsert by `externalId`, classify with concurrency 2, `sync:progress` — @gemini (gemini/G6-real-gmail)
+- [x] **G6.4** Poller: `history.list` every `GMAIL_POLL_SECONDS`, Sync now, `invalid_grant` → reconnect state, disconnect revokes token — @gemini (gemini/G6-real-gmail)
+- [x] **G6.5** Sign in with Google: find/create user, `/auth/callback` token hand-off — @gemini (gemini/G6-real-gmail)
+- [x] **G6.6** Frontend: `GoogleButton`, Gmail card dual actions, OAuth error states, `SourceBadge`, Settings → Accounts, "Open in Gmail" link — @gemini (gemini/G6-real-gmail)
+- [x] **G6.7** Tests: mapper fixtures, state verification, dedupe (mock Google client) — @gemini (gemini/G6-real-gmail)
 - [ ] **G6.8** Review G6.2–G6.7 against spec + update README "What's real" + video script segment — @claude
 
 ## Backlog (P2, do not start without Aryan's OK)

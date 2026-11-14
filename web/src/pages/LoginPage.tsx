@@ -7,9 +7,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
+import { GoogleButton } from '@/components/common/GoogleButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { demoLoginApi, loginApi } from '@/features/auth/api';
+import { demoLoginApi, getGoogleLoginUrl, loginApi, useHealth } from '@/features/auth/api';
 import { ApiError } from '@/lib/api';
 
 const schema = z.object({
@@ -23,6 +24,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [demoLoading, setDemoLoading] = useState<'assistant' | 'client' | null>(null);
+  const { data: health } = useHealth();
 
   const {
     register,
@@ -88,6 +90,15 @@ export function LoginPage() {
             <span>{demoLoading === 'client' ? 'Signing in…' : 'Client (Priya)'}</span>
           </Button>
         </div>
+        {health?.googleLogin && (
+          <div className="mt-2">
+            <GoogleButton
+              onClick={() => {
+                window.location.href = getGoogleLoginUrl();
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <div className="relative mb-6">

@@ -9,6 +9,7 @@ import { User } from '../models/User.js';
 import { emitCountsChanged, emitThreadUpdated } from '../realtime/socket.js';
 import { logger } from '../utils/logger.js';
 import { recordActivity } from './activity.service.js';
+import { trimQuotedReplies } from './gmail/mapper.js';
 
 export const PROMPT_VERSION = 'v1';
 
@@ -51,7 +52,7 @@ function buildClassificationUserPrompt({ client, assistant, messages }) {
     lines.push(
       `--- [${m.direction}] ${m.from?.name || ''} <${m.from?.email || ''}> · ${new Date(m.sentAt).toISOString()}`,
       `To: ${toList}  Cc: ${ccList}`,
-      String(m.bodyText || '').slice(0, 2000)
+      trimQuotedReplies(String(m.bodyText || '')).slice(0, 2000)
     );
   }
 

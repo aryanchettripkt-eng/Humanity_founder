@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { env } from '../config/env.js';
+import { handleGoogleCallback } from '../controllers/google.controller.js';
 import accountsRoutes from './accounts.routes.js';
 import activityRoutes from './activity.routes.js';
 import aiRoutes from './ai.routes.js';
@@ -17,11 +18,14 @@ export function healthHandler(_req, res) {
     data: {
       ok: true,
       ai: env.effectiveAiProvider,
+      gmail: env.realGmailEnabled,
+      googleLogin: env.googleLoginEnabled,
     },
   });
 }
 
 router.get('/health', healthHandler);
+router.get('/oauth/google/callback', handleGoogleCallback);
 router.use('/auth', authRoutes);
 router.use('/accounts', accountsRoutes);
 router.use('/threads', threadsRoutes);

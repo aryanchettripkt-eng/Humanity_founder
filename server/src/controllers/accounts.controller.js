@@ -1,9 +1,15 @@
 import { z } from 'zod';
 import { Client } from '../models/Client.js';
 import { EmailAccount } from '../models/EmailAccount.js';
+import { Message } from '../models/Message.js';
+import { Thread } from '../models/Thread.js';
 import { joinAssistantClientRoom } from '../realtime/socket.js';
+import { decryptToken } from '../services/gmail/crypto.js';
+import { revokeGoogleToken } from '../services/gmail/oauth.js';
+import { pollGmailAccount } from '../services/gmail/poller.js';
 import { runSimulatedSync } from '../services/sync.service.js';
 import { notFound } from '../utils/errors.js';
+import { logger } from '../utils/logger.js';
 
 export const connectAccountSchema = {
   body: z.object({
@@ -116,7 +122,11 @@ export async function syncAccount(req, res, next) {
     account.status = 'syncing';
     await account.save();
 
-    void runSimulatedSync(account._id);
+    if (account.simulated) {
+      void runSimulatedSync(account._id);
+    } else {
+      void pollGmailAccount(account._id);
+    }
     res.json({ data: { started: true } });
   } catch (err) {
     next(err);
@@ -126,8 +136,29 @@ export async function syncAccount(req, res, next) {
 export async function disconnectAccount(req, res, next) {
   try {
     const account = await findOwnedAccount(req.params.id, req.user._id);
+
+    if (!account.simulated && account.google?.refreshTokenEnc) {
+      try {
+        const refreshToken = decryptToken(account.google.refreshTokenEnc);
+        await revokeGoogleToken(refreshToken);
+      } catch (err) {
+        logger.warn('Failed to revoke Google token on disconnect', { message: err?.message });
+      }
+      account.google = undefined;
+    }
+
     account.status = 'disconnected';
     await account.save();
+
+    if (req.query.removeMail === 'true') {
+      const threads = await Thread.find({ accountId: account._id }).select('_id');
+      const threadIds = threads.map((t) => t._id);
+      if (threadIds.length > 0) {
+        await Message.deleteMany({ threadId: { $in: threadIds } });
+        await Thread.deleteMany({ _id: { $in: threadIds } });
+      }
+    }
+
     res.json({ data: { ok: true } });
   } catch (err) {
     next(err);

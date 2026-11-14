@@ -18,6 +18,24 @@ _None yet._
 
 ---
 
+### 2026-11-15 02:00 · gemini · Fix all Phase 6 review findings (`c56b099` review)
+- Done:
+  - Must-fix #1: replaced `sparse: true` with `partialFilterExpression: { externalId: { $exists: true } }` on `Thread` (`{accountId, externalId}`) and `Message` (`{threadId, externalId}`) so seeded/simulated threads & messages don't collide on `null`.
+  - Should-fix #2–#5: `pollGmailAccount` now resets `status: 'connected'` + emits `sync:done` on generic errors; Google login requires `verified_email === true` before matching by email; `login` returns `401 INVALID_CREDENTIALS` when `passwordHash` is missing; `OnboardingPage` polls `GET /accounts` while on `step === 'sync'`.
+  - Minor: improved default client naming, added `nextPageToken` loop in `history.list`, added `trimQuotedReplies` for AI prompts, added `returnTo: 'settings'` so connecting from Settings returns to `/app/settings/accounts` without re-triggering the tour, and added dedupe + quote-trimming unit tests in `server/tests/gmail.test.js`.
+- Changed contracts: none.
+- Next: merge `gemini/G6-real-gmail` -> `main` (and drop any old `accountId_1_externalId_1` / `threadId_1_externalId_1` indexes if built on Atlas).
+
+### 2026-11-15 01:48 · gemini · Phase 6 (G6.2–G6.7): Real Gmail + Sign in with Google
+- Done:
+  - Backend (`server/`): added `googleapis`, Google/Gmail env flags (`REAL_GMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `WEB_URL`, `TOKEN_ENC_KEY`, `GMAIL_IMPORT_LIMIT`, `GMAIL_POLL_SECONDS`) and `/health` flags (`gmail`, `googleLogin`).
+  - Models: `User.googleId` (optional `passwordHash`), `EmailAccount.google` (`refreshTokenEnc` stripped in `toJSON`), `Thread.source` + `externalId`, `Message.externalId` with sparse unique dedupe indexes.
+  - Services (`server/src/services/gmail/`): AES-256-GCM token encryption & 10m signed JWT OAuth state (`crypto.js`), Google OAuth2 client (`oauth.js`), MIME/HTML/address mapper (`mapper.js`), idempotent initial importer with concurrency-2 classification & `sync:progress` (`import.js`), `history.list` poller + 404/invalid_grant handling (`poller.js`).
+  - Routes (`google.controller.js`, `accounts.controller.js`): `GET /api/auth/google/start`, `POST /api/accounts/gmail/start`, `GET /api/oauth/google/callback`, real Gmail `sync` & `disconnect` (revokes token + optional `?removeMail=true`).
+  - Frontend (`web/`): `GoogleButton`, `SourceBadge`, `/auth/callback` (`AuthCallbackPage`), dual actions + `not_test_user` error state on `ConnectProviderCard`/`OnboardingPage`/`SettingsAccountsPage`, and `"Changes here stay in Relay"` + `"Open in Gmail"` footer in `InboxPage`.
+  - Tests: `server/tests/gmail.test.js` (mapper multipart/html/outbound + AES-256-GCM + OAuth state verification).
+- Changed contracts: none beyond BACKEND §3/§4/§11.
+- Next: Aryan (`G6.1` Google Cloud OAuth credentials) + `@claude` (`G6.8` review).
 ### 2026-11-15 · claude · B1.3 sample email data
 - Done: `server/src/seed/data/threads.json` (Priya 38: assistant 12, client 10, none 12, review 4; Daniel 10) and `scenarios.json` (6). 8 multi-message threads, 4 ownership changes with history, 17 dated items within 7 days, Waiting/Done/Archived examples, client hand-offs (handling, handed to Alex with a note, handled) and seeded Activity.
 - Changed contracts: `createThreadWithMessages` now also reads `startsInHours`/`endsInHours`, `history`, `activity`, `reclassifiedHoursAgo`, `handoff`, and `"client"` as a person placeholder (BACKEND §8). Existing fields unchanged; fallback threads still work.
