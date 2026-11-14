@@ -37,6 +37,11 @@ _None yet._
 - Changed contracts: none.
 - Next: Q5.1/Q5.3 QA pass on the live site.
 
+### 2026-11-15 03:50 · claude · B4.5 few-shot corrections, B1.7 reviewed
+- Done: classification prompt now includes up to 5 recent threads whose owner was set by the assistant (manual change) or the client (hand-off) as few-shot examples (`formatCorrections` / `loadRecentCorrections` in `classification.service.js`). Loading them never blocks classification. B1.7 (pipeline written by Gemini) reviewed across the Phase 6 and audit passes and marked done.
+- Changed contracts: `PROMPT_VERSION` v1 → v2 (user prompt gains a "Recent corrections" block). No API or model changes.
+- Next: Q5.5 README, then Q5.1/Q5.3 QA pass on the live site.
+
 
 ### 2026-11-15 03:20 · gemini · Audit fixes (1–10)
 - Done:
