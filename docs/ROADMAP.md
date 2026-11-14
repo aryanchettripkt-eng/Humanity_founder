@@ -23,7 +23,7 @@
 - [x] **B1.4** Seed script (`npm run seed`, `--classify` flag) — @gemini (gemini/B1.4-B1.11-seed-tests)
 - [x] **B1.5** AI provider abstraction + `mock` provider — @gemini (gemini/B1.5-ai-providers)
 - [x] **B1.6** `gemini` and `anthropic` providers with JSON validation + retry + timeout — @gemini (gemini/B1.5-ai-providers; includes `groq` per D9)
-- [ ] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
+- [x] **B1.7** Classification prompt v1 + zod schema + pipeline (rules, threshold, sticky owners, history) — @claude *(review by @gemini)*
 - [x] **B1.8** Threads API: list (segments, search, filters, pagination), counts, detail, patch, owner, reclassify, suggestion — @gemini (gemini/B1.8-threads-api)
 - [x] **B1.9** Socket.io server with JWT auth, rooms, emit helpers — @gemini (gemini/B1.9-socket-activity)
 - [x] **B1.10** Accounts API + simulated sync with `sync:progress` — @gemini (gemini/B1.10-accounts-sync)
@@ -55,7 +55,7 @@
 - [x] **B4.3** Client "reply with a note" → draft (`draft:created`) — @gemini (gemini/B3.1-B3.2-drafts-client-api)
 - [x] **B4.4** Simulate new email endpoint + scenarios — @gemini (gemini/B4-ai-demo-endpoints)
 - [x] **F4.2** Simulate button (demo mode) + new‑row highlight + Reclassified chip — @gemini (gemini/frontend)
-- [ ] **B4.5** Few‑shot corrections in prompt (learns from overrides) — @claude
+- [x] **B4.5** Few‑shot corrections in prompt (learns from overrides) — @claude
 - [x] **B4.6** Follow‑up nudges (lastSender us, > 3 days) + nudge draft — @gemini (gemini/B4-ai-demo-endpoints)
 - [x] **F4.3** Dark mode pass — @gemini (gemini/frontend)
 
