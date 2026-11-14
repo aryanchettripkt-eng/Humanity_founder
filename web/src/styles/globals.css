@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --surface: 0 0% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --border: 240 5.9% 90%;
+    --foreground: 240 5.9% 10%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --primary: 243.4 75.4% 58.6%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 238.7 83.5% 66.7%;
+    --success: 142.1 76.2% 36.3%;
+    --warning: 32.1 94.6% 43.7%;
+    --destructive: 0 72.2% 50.6%;
+    --radius: 10px;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --surface: 240 5.9% 10%;
+    --card: 240 5.9% 10%;
+    --card-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --foreground: 0 0% 98%;
+    --muted-foreground: 240 5% 64.9%;
+    --primary: 234.5 89.5% 73.9%;
+    --primary-foreground: 240 10% 3.9%;
+    --ring: 234.5 89.5% 73.9%;
+    --success: 142.1 70.6% 45.3%;
+    --warning: 43.3 96.4% 56.3%;
+    --destructive: 0 90.6% 70.8%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

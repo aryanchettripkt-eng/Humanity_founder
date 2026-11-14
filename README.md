@@ -17,7 +17,23 @@ Prototype for the *AI Full‑Stack Engineer Intern* assignment. Personal assista
 | [docs/DECISIONS.md](./docs/DECISIONS.md) | Decision log |
 
 ## Run locally
-_To be written in P0.5._
+
+```bash
+# 1. Install all workspace dependencies
+npm install
+
+# 2. Configure environment variables
+cp server/.env.example server/.env   # set MONGODB_URI (and optional GROQ_API_KEY)
+cp web/.env.example web/.env         # defaults to http://localhost:4000
+
+# 3. Seed demo data (alex@example.com, priya@example.com, daniel@example.com / demo1234)
+npm run seed
+
+# 4. Start both server (port 4000) and web (port 5173)
+npm run dev
+```
+
+Open http://localhost:5173 and click **Assistant (Alex)** or **Client (Priya)** on `/login`.
 
 ## What's simulated
 _To be completed in Q5.5_ — Gmail/Outlook OAuth and sync, sending email, calendar add. AI runs live when a key is set, otherwise a deterministic mock.

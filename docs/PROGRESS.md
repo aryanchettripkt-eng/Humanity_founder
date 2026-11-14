@@ -15,6 +15,17 @@ _None yet._
 
 ---
 
+### 2026-11-15 00:38 · gemini · Complete Frontend (`web/`) + P0.1/P0.3–P0.5, F2.1–F4.3
+- Done:
+  - Root `package.json` updated with `web` workspace and `concurrently` `dev` script; `README.md` Run locally guide.
+  - `web/`: Vite + React 18 + TypeScript (strict), Tailwind + design tokens (`globals.css`, `tailwind.config.ts`), `OWNER_META`, `SEGMENTS`, `api.ts`, `socket.ts`, `queryKeys.ts`, Zustand UI/command stores.
+  - Auth (`/login`, `/signup`, demo buttons, `RequireAuth`), Onboarding (`/onboarding` + `SimulatedOAuthModal` + `SyncProgress`), Settings → Accounts (`/app/settings/accounts`).
+  - Assistant workspace (`AssistantLayout`, `TodayPage`, `InboxPage` 3-pane with `ThreadList`, `ThreadRow`, `ThreadHeader`, `MessageItem`, `AIPanel`, `DraftComposer`, `j/k/s/u/e/d/r` shortcuts, `CommandPalette` + `AskPanel`, Simulate email, Dark mode).
+  - Client view (`/c`, `/c/thread/:id` with Framer Motion cards, handling/handled/handoff/note actions, live socket sync).
+- Changed contracts: none.
+- Next: `@claude` QA/UX review (`Q5.1`, `Q5.3`), full seed data (`B1.3`), and production deploy (`Q5.4`).
+- Notes/risks: `npm run lint`, `npm run typecheck`, `npm test` (18 server + 2 web), and `vite build` all pass.
+
 ### 2026-11-14 23:55 · gemini · Fix all issues from Claude's backend review
 - Done:
   - Onboarding sync (`sync.service.js`): loads seed threads and runs `classifyThread` when a new client has 0 threads.
