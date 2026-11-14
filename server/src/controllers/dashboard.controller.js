@@ -1,6 +1,6 @@
 import { Activity } from '../models/Activity.js';
-import { Client } from '../models/Client.js';
 import { Thread } from '../models/Thread.js';
+import { generateMorningBrief } from '../services/brief.service.js';
 import { computeSegmentCounts, SEGMENT_IDS } from '../services/segments.js';
 
 export async function getDashboard(req, res, next) {
@@ -18,6 +18,7 @@ export async function getDashboard(req, res, next) {
           upcoming: [],
           review: [],
           recent: [],
+          nudges: [],
           activity: [],
         },
       });
@@ -25,11 +26,11 @@ export async function getDashboard(req, res, next) {
 
     const now = new Date();
     const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 3600 * 1000);
+    const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 3600 * 1000);
 
-    const [counts, client, reviewThreads, recentThreads, datedThreads, activities] =
+    const [counts, reviewThreads, recentThreads, datedThreads, nudgeThreads, activities] =
       await Promise.all([
         computeSegmentCounts(req.clientId),
-        Client.findById(req.clientId),
         Thread.find({
           clientId: req.clientId,
           owner: 'review',
@@ -46,6 +47,15 @@ export async function getDashboard(req, res, next) {
           archived: false,
           'entities.startsAt': { $gte: now, $lte: sevenDaysLater },
         }).select('subject entities'),
+        Thread.find({
+          clientId: req.clientId,
+          lastSender: 'us',
+          status: 'open',
+          archived: false,
+          lastMessageAt: { $lte: threeDaysAgo },
+        })
+          .sort({ lastMessageAt: 1 })
+          .limit(5),
         Activity.find({ clientId: req.clientId }).sort({ createdAt: -1 }).limit(15),
       ]);
 
@@ -67,21 +77,21 @@ export async function getDashboard(req, res, next) {
     }
     upcoming.sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
 
-    const clientName = client?.firstName || 'your client';
-    const nextUp = upcoming[0]?.title ? ` Next up: ${upcoming[0].title}.` : '';
-    const briefText = `${counts.assistant} threads need you, ${counts.client} need ${clientName}, ${counts.review} to review.${nextUp}`;
+    const brief = await generateMorningBrief({
+      clientId: req.clientId,
+      counts,
+      upcoming,
+      useAI: false,
+    });
 
     res.json({
       data: {
         counts,
-        brief: {
-          text: briefText,
-          generatedAt: now.toISOString(),
-          fallback: true,
-        },
+        brief,
         upcoming: upcoming.slice(0, 10),
         review: reviewThreads.map((t) => t.toJSON()),
         recent: recentThreads.map((t) => t.toJSON()),
+        nudges: nudgeThreads.map((t) => t.toJSON()),
         activity: activities.map((a) => a.toJSON()),
       },
     });

@@ -49,14 +49,14 @@
 - [ ] **F3.4** Settings → Accounts page — @gemini
 
 ## Phase 4 — Standout features (P1)
-- [ ] **B4.1** Ask AI endpoint (intent routing + LLM) — @gemini
+- [x] **B4.1** Ask AI endpoint (intent routing + LLM) — @gemini (gemini/B4-ai-demo-endpoints)
 - [ ] **F4.1** `CommandPalette` + `AskPanel` with thread chips — @gemini
-- [ ] **B4.2** Morning brief service + fallback — @gemini
+- [x] **B4.2** Morning brief service + fallback — @gemini (gemini/B4-ai-demo-endpoints)
 - [x] **B4.3** Client "reply with a note" → draft (`draft:created`) — @gemini (gemini/B3.1-B3.2-drafts-client-api)
-- [ ] **B4.4** Simulate new email endpoint + scenarios — @gemini
+- [x] **B4.4** Simulate new email endpoint + scenarios — @gemini (gemini/B4-ai-demo-endpoints)
 - [ ] **F4.2** Simulate button (demo mode) + new‑row highlight + Reclassified chip — @gemini
 - [ ] **B4.5** Few‑shot corrections in prompt (learns from overrides) — @claude
-- [ ] **B4.6** Follow‑up nudges (lastSender us, > 3 days) + nudge draft — @gemini
+- [x] **B4.6** Follow‑up nudges (lastSender us, > 3 days) + nudge draft — @gemini (gemini/B4-ai-demo-endpoints)
 - [ ] **F4.3** Dark mode pass — @gemini
 
 ## Phase 5 — Polish, QA, ship

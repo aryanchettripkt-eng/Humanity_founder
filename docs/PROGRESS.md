@@ -15,6 +15,15 @@ _None yet._
 
 ---
 
+### 2026-11-14 23:49 · gemini · B4.1, B4.2, B4.4, B4.6 Phase 4 backend endpoints
+- Done:
+  - `B4.1`: `server/src/services/ask.service.js` + `ai.controller.js` + `ai.routes.js` (`POST /api/ai/ask` with intent routing, thread citation filtering, and 30/min rate limit).
+  - `B4.2`: `server/src/services/brief.service.js` + `POST /api/ai/brief/refresh` + wired into `GET /api/dashboard`.
+  - `B4.4`: `server/src/controllers/demo.controller.js` + `demo.routes.js` (`POST /api/demo/simulate-email` with fallback scenarios & reclassification, `POST /api/demo/reset`).
+  - `B4.6`: Follow-up nudges (`lastSender: 'us'`, `> 3 days`) included in `GET /api/dashboard` (`nudges`).
+- Changed contracts: `GET /api/dashboard` now also includes `nudges: ThreadListItem[]` (additive).
+- Next: `@claude` can pick up `B1.3` (seed data), `B1.7` (prompt/pipeline polish), `B4.5` (few-shot overrides). Frontend (`P0.3`+) awaits user go-ahead.
+
 ### 2026-11-14 23:48 · gemini · B3.1 Drafts API + B3.2 Client/Dashboard/Activity API (+ B4.3)
 - Done:
   - `B3.1`: `server/src/services/draft.service.js`, `drafts.controller.js`, `drafts.routes.js` (`POST /threads/:id/drafts`, `PATCH /drafts/:id`, `POST /drafts/:id/send` simulated send, `DELETE /drafts/:id`).
