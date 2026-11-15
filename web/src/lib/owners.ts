@@ -23,6 +23,7 @@ export interface OwnerMetaItem {
   icon: LucideIcon;
   pillClass: string;
   dotClass: string;
+  chartColor: string;
   shortcut: string;
 }
 
@@ -36,6 +37,7 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
     pillClass:
       'text-grove-forest bg-grove-forest/10 border-grove-forest/25 dark:text-emerald-300 dark:bg-grove-forest/20 dark:border-grove-forest/40',
     dotClass: 'bg-grove-forest',
+    chartColor: 'var(--chart-assistant)',
     shortcut: '1',
   },
   client: {
@@ -47,6 +49,7 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
     pillClass:
       'text-grove-clay bg-grove-clay/10 border-grove-clay/25 dark:text-stone-300 dark:bg-grove-clay/20 dark:border-grove-clay/40',
     dotClass: 'bg-grove-clay',
+    chartColor: 'var(--chart-client)',
     shortcut: '2',
   },
   none: {
@@ -58,6 +61,7 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
     pillClass:
       'text-foreground bg-grove-linen border-border dark:text-stone-200 dark:bg-grove-linen/60 dark:border-border',
     dotClass: 'bg-muted-foreground',
+    chartColor: 'var(--chart-none)',
     shortcut: '3',
   },
   review: {
@@ -69,6 +73,7 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
     pillClass:
       'text-grove-terracotta bg-grove-terracotta/10 border-dashed border-grove-terracotta/40 dark:text-orange-300 dark:bg-grove-terracotta/20 dark:border-grove-terracotta/50',
     dotClass: 'bg-grove-terracotta',
+    chartColor: 'hsl(var(--grove-terracotta))',
     shortcut: '4',
   },
 };

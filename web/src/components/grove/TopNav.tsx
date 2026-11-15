@@ -80,7 +80,7 @@ export function TopNav({
           to={logoHref}
           className="inline-flex min-h-[44px] items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--cta-bg)] text-[var(--cta-fg)] shadow-sm">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--logo-bg)] text-[var(--logo-fg)] shadow-sm">
             <MailCheck className="h-4 w-4" aria-hidden="true" />
           </span>
           <span className="font-display text-base font-semibold tracking-tight text-[var(--hero-fg)]">
@@ -107,7 +107,7 @@ export function TopNav({
                   type="button"
                   aria-haspopup="menu"
                   aria-expanded={clientOpen}
-                  className="inline-flex h-11 items-center gap-2 rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] pl-2 pr-3.5 text-xs font-semibold text-[var(--hero-fg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)]"
+                  className="glass inline-flex h-11 items-center gap-2 rounded-full pl-2 pr-3.5 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)]"
                 >
                   <Avatar name={activeClient.name} initials={activeClient.initials} size="sm" />
                   <span>{clientFirstName}</span>
@@ -146,7 +146,7 @@ export function TopNav({
               type="button"
               onClick={onOpenSearch}
               aria-label="Search or ask AI (Command K)"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] text-[var(--hero-fg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)]"
+              className="glass flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)]"
             >
               <Search className="h-4 w-4" />
             </button>
@@ -155,7 +155,7 @@ export function TopNav({
           <Link
             to={settingsHref}
             aria-label="Settings"
-            className="hidden h-11 w-11 items-center justify-center rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] text-[var(--hero-fg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)] sm:flex"
+            className="glass hidden h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] sm:flex"
           >
             <Settings className="h-4 w-4" />
           </Link>
@@ -167,7 +167,7 @@ export function TopNav({
                 aria-label="User menu"
                 aria-haspopup="menu"
                 aria-expanded={userOpen}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)]"
+                className="glass flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)]"
               >
                 <Avatar name={userName} initials={userInitials} size="sm" />
               </button>

@@ -78,15 +78,23 @@ export function AssistantLayout() {
           size="short"
           nav={<AssistantTopNav />}
           left={
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--hero-fg)]">
-              {pageTitle}
-            </h1>
+            <div className="inline-block rounded-2xl bg-[radial-gradient(ellipse_at_25%_50%,rgba(0,0,0,0.28)_0%,transparent_75%)] px-1 py-0.5">
+              <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--hero-fg)]">
+                {pageTitle}
+              </h1>
+            </div>
           }
         />
       ) : null}
 
       <main className="flex min-h-0 flex-1 flex-col pb-20 md:pb-0">
-        <Outlet />
+        {!isToday ? (
+          <div className="working-panel flex min-h-0 flex-1 flex-col overflow-hidden">
+            <Outlet />
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
 
       <BottomTabBar onOpenAsk={() => openAsk('')} />

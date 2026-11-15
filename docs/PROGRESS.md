@@ -27,6 +27,17 @@ _None yet._
 
 ---
 
+### 2026-11-15 23:12 · gemini · G9.1c glass hero over full-bleed background
+- Done: Updated `gemini/G9.1c-themes` to match the full-bleed background + smoky glass hero + floating working panel composition:
+  - Placed `web/public/bg/app-bg.webp` (`cover`, `center`, `fixed`, `#1A1B19` fallback, `20%` dark overlay in `.dark` via `--canvas-overlay`).
+  - Removed the outer card from `AppFrame` and made `HeroBand` fully transparent with `padding-inline: clamp(16px, 8.5vw, 160px)`, white hero text, and a soft radial black scrim behind greeting/summary/title for AA contrast.
+  - Switched `.glass` and tokens to smoky glass (`bg-black/25`, `backdrop-blur-xl`, `1px white/20` border, `20px` radius, white text) across `TopNav`, `GlassTabs`, date chip, `StackedBars`, `GlassStat`, and `GlassList`; logo circle is `#B7E36A` with `#1E1F1C` icon.
+  - Wired `StackedBars` to `OWNER_META.*.chartColor` (`#7FA14A`, `#A07E66`, `#8A8C86` at `85%`).
+  - Added `.working-panel` (`#F6F6F3` light / `rgba(21,22,20,0.94)` dark, `32px` radius, `clamp(0px, 6.4vw, 120px)` side gap, `40px` padding, full-width `24px` top radius on phones) wrapping `TodayPage` and non-Today pages (`Inbox`, `Settings`) in `AssistantLayout`.
+  - Updated `FilterBar` filter circle to outlined white/card with hairline border, `ThreadCard` (`#FFFFFF` / `#1D1E1B`, no shadow, `#4E7A1A` / `#8CC63F` CTA), and docs (`DESIGN_SYSTEM.md` §6, `FRONTEND.md` §7).
+- Changed contracts: none.
+- Next: Push to `gemini/G9.1c-themes` and update PR #25 title to `feat(grove): G9.1c glass hero over full-bleed background`.
+
 ### 2026-11-15 21:08 · gemini · G9.1c themes and canvas
 - Done: Implemented DESIGN_V2 §1.0 (D21) light and dark themes + canvas backgrounds on `gemini/G9.1c-themes`:
   - Added `web/public/bg/grove-light.webp` and `web/public/bg/grove-dark.webp`.

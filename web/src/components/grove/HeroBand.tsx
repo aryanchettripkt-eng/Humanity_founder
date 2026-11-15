@@ -33,7 +33,7 @@ export function HeroBand({
         className
       )}
     >
-      <div className="relative z-10 flex h-full flex-col justify-between gap-6 px-4 pb-6 pt-4 sm:px-6 md:px-8">
+      <div className="relative z-10 flex h-full flex-col justify-between gap-6 px-[clamp(16px,8.5vw,160px)] pb-7 pt-4">
         {nav ? <div>{nav}</div> : null}
 
         {(left || right) ? (

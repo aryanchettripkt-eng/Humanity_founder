@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GlassCard } from '@/components/grove/GlassCard';
 import type { GroveBarDayModel } from '@/components/grove/models';
-import { getOwnerShortLabel } from '@/lib/owners';
+import { getOwnerShortLabel, OWNER_META } from '@/lib/owners';
 import type { Owner } from '@/types/api';
 
 export type StackedBarsProps = {
@@ -43,7 +43,10 @@ export function StackedBars({
             onClick={() => onSelectOwner?.('assistant')}
             className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-[var(--glass-fg)]"
           >
-            <span className="h-2 w-2 rounded-full bg-[var(--chart-assistant)] ring-1 ring-[var(--glass-border)]" />
+            <span
+              className="h-2 w-2 rounded-full ring-1 ring-[var(--glass-border)]"
+              style={{ backgroundColor: OWNER_META.assistant.chartColor }}
+            />
             {assistantLabel}
           </button>
           <button
@@ -51,7 +54,10 @@ export function StackedBars({
             onClick={() => onSelectOwner?.('client')}
             className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-[var(--glass-fg)]"
           >
-            <span className="h-2 w-2 rounded-full bg-[var(--chart-client)] ring-1 ring-[var(--glass-border)]" />
+            <span
+              className="h-2 w-2 rounded-full ring-1 ring-[var(--glass-border)]"
+              style={{ backgroundColor: OWNER_META.client.chartColor }}
+            />
             {clientLabel}
           </button>
           <button
@@ -59,7 +65,10 @@ export function StackedBars({
             onClick={() => onSelectOwner?.('none')}
             className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-[var(--glass-fg)]"
           >
-            <span className="h-2 w-2 rounded-full bg-[var(--chart-none)] ring-1 ring-[var(--glass-border)]" />
+            <span
+              className="h-2 w-2 rounded-full ring-1 ring-[var(--glass-border)]"
+              style={{ backgroundColor: OWNER_META.none.chartColor }}
+            />
             {noneLabel}
           </button>
         </div>
@@ -119,7 +128,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hNone - 1.5)}
                     rx={5}
-                    fill="var(--chart-none)"
+                    fill={OWNER_META.none.chartColor}
                     onClick={() => onSelectOwner?.('none')}
                   />
                 ) : null}
@@ -130,7 +139,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hClient - 1.5)}
                     rx={5}
-                    fill="var(--chart-client)"
+                    fill={OWNER_META.client.chartColor}
                     onClick={() => onSelectOwner?.('client')}
                   />
                 ) : null}
@@ -141,7 +150,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hAssistant)}
                     rx={5}
-                    fill="var(--chart-assistant)"
+                    fill={OWNER_META.assistant.chartColor}
                     onClick={() => onSelectOwner?.('assistant')}
                   />
                 ) : null}

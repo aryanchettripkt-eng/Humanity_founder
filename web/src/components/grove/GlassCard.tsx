@@ -46,7 +46,7 @@ export function GlassCard({
                 <Link
                   to={actionHref}
                   aria-label={actionLabel}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--nav-circle-bg)] text-[var(--glass-fg)] transition-colors hover:bg-[var(--glass-hover)]"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/10 text-[var(--glass-fg)] transition-colors hover:bg-white/20"
                 >
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
@@ -55,7 +55,7 @@ export function GlassCard({
                   type="button"
                   onClick={onAction}
                   aria-label={actionLabel}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--nav-circle-bg)] text-[var(--glass-fg)] transition-colors hover:bg-[var(--glass-hover)]"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/10 text-[var(--glass-fg)] transition-colors hover:bg-white/20"
                 >
                   <ArrowUpRight className="h-4 w-4" />
                 </button>
