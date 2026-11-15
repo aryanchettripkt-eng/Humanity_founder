@@ -5,6 +5,7 @@ export type ScheduleSlot = {
   time: string;
   title: string;
   avatars: string[];
+  attendeesLabel: string;
 };
 
 export type HeroStat = {
@@ -48,11 +49,30 @@ export type SampleTask = {
 
 export const SCHEDULE_DATE = 'Thu, Nov 15';
 export const SCHEDULE_NOW_TIME = '1:45 pm';
+export const SCHEDULE_NOW_PERCENT = 54;
 
 export const SCHEDULE_SLOTS: ScheduleSlot[] = [
-  { id: 'slot-1', time: '9:30', title: '9:30 Board prep · Priya', avatars: ['PR', 'AM'] },
-  { id: 'slot-2', time: '2:00 pm', title: '2:00 pm Investor call', avatars: ['MC', 'PR'] },
-  { id: 'slot-3', time: '4:30', title: '4:30 Contract review', avatars: ['DO'] },
+  {
+    id: 'slot-1',
+    time: '9:30',
+    title: 'Board prep',
+    avatars: ['PR', 'AM'],
+    attendeesLabel: 'Priya Raman, Alex Morgan',
+  },
+  {
+    id: 'slot-2',
+    time: '2:00 pm',
+    title: 'Investor call',
+    avatars: ['MC', 'PR'],
+    attendeesLabel: 'Maya Chen, Priya Raman',
+  },
+  {
+    id: 'slot-3',
+    time: '4:30',
+    title: 'Contract review',
+    avatars: ['DO'],
+    attendeesLabel: 'Daniel Okafor',
+  },
 ];
 
 export const HERO_STATS: HeroStat[] = [
@@ -224,7 +244,23 @@ export const SAMPLE_TASKS: SampleTask[] = [
     subtitle: 'Q1 offsite budget approval',
     statusLabel: "Sent to Priya's view",
     actionKind: 'handoff',
-    tags: ['waiting', 'urgent', 'done'],
+    tags: ['waiting', 'urgent'],
   },
 ];
+
+export const THREAD_EMPTY_COPY: Record<'all' | Owner, string> = {
+  all: 'Inbox is clear.',
+  assistant: 'Nothing on your plate. Nice.',
+  client: 'Nothing waiting on Priya.',
+  none: 'No FYI or newsletter threads right now.',
+  review: 'AI is confident about everything right now.',
+};
+
+export const TASK_EMPTY_COPY: Record<TaskFilterId, string> = {
+  all: 'Nothing scheduled for today.',
+  urgent: 'No urgent tasks right now.',
+  'due-today': 'Nothing due today.',
+  waiting: 'Nothing waiting on Priya.',
+  done: 'Nothing marked done yet.',
+};
 

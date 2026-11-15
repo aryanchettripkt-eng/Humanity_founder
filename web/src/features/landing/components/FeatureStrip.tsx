@@ -36,14 +36,16 @@ export function FeatureStrip() {
           return (
             <div
               key={feature.id}
-              className="flex items-start gap-3 rounded-[24px] border border-zinc-200/80 bg-white p-4"
+              className="flex items-start gap-3 rounded-[24px] border border-landing-line bg-landing-card p-4"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-landing-ink">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-landing-surface text-landing-ink">
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-landing-ink">{feature.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-zinc-600">{feature.description}</p>
+                <p className="mt-1 text-xs leading-relaxed text-landing-muted">
+                  {feature.description}
+                </p>
               </div>
             </div>
           );
@@ -52,4 +54,3 @@ export function FeatureStrip() {
     </section>
   );
 }
-

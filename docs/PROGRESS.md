@@ -27,6 +27,19 @@ _None yet._
 
 ---
 
+### 2026-11-15 17:47 · gemini · L7.1 landing page audit fixes (P1 + P2 + a11y)
+- Done:
+  - P1 #1 (`StatWithDelta`): absolute top-right delta badge on the number wrapper; stacked label under number below `sm` so 320/375/390 stats never overlap.
+  - P1 #2 (`ReplyCard`, `TaskCard`): `w-full flex-1` on `<article>` to fill grid cells; fixed two-row footer pinned with `mt-auto` on `ReplyCard`.
+  - P1 #3 (`LandingPage`): removes `.dark` from `<html>` on mount and restores on unmount so `OWNER_META` pills and portalled tooltips always render light.
+  - P1 #4: removed fake header bell, task-card bell, and status dropdown chevron; made decorative search/sliders non-interactive `<span>`s; labelled real demo triggers with `"Opens the live demo"` tooltips.
+  - P1 #5 (`SummaryPanel`): `/c` preview only renders when `owner === 'client'`; shows owner-specific preview for `assistant`, `none`, and `review` with per-thread timelines.
+  - P1 #6: dynamic filtered counts via `SectionHeader`, fixed `task-3` tags (`waiting`, `urgent`), added `THREAD_EMPTY_COPY` / `TASK_EMPTY_COPY` empty states.
+  - P1 #7 (`LandingTopBar`): `<section aria-label>`, bold time + short title in `flex-1` slots (no truncation at 1440), absolute `54%` `"now"` needle.
+  - P2 + a11y + refactors: added `--landing-card`, `--landing-card-soft`, `--landing-line`, `--landing-muted`, `--landing-ink-surface`, `--landing-ink-line`, `--landing-ink-muted`, `--landing-delta-down-foreground`, and `shadow-landing`; replaced raw palette classes; extracted `useDemoLogin()` (`features/auth/useDemoLogin.ts`) and `SectionHeader`; added scroll-spy on anchor rail, `82%` mobile carousel peek, `44px` tap targets, `12px` minimum text, `aria-live="polite"`, and 6 tests in `LandingPage.test.tsx`.
+- Changed contracts: none.
+- Next: push `gemini/L7.1-landing-page` and open PR after visual verification.
+
 ### 2026-11-15 17:30 · gemini · L7.1 Public landing page
 - Done:
   - Added `.theme-landing` HSL tokens in `web/src/styles/globals.css` and mapped `landing.*` colors in `web/tailwind.config.ts` (app indigo palette untouched).

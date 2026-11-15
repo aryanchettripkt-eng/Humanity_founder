@@ -46,9 +46,16 @@ const config: Config = {
         landing: {
           canvas: 'hsl(var(--landing-canvas))',
           surface: 'hsl(var(--landing-surface))',
+          card: 'hsl(var(--landing-card))',
+          'card-soft': 'hsl(var(--landing-card-soft))',
+          line: 'hsl(var(--landing-line))',
+          muted: 'hsl(var(--landing-muted))',
           ink: {
             DEFAULT: 'hsl(var(--landing-ink))',
             foreground: 'hsl(var(--landing-ink-foreground))',
+            surface: 'hsl(var(--landing-ink-surface))',
+            line: 'hsl(var(--landing-ink-line))',
+            muted: 'hsl(var(--landing-ink-muted))',
           },
           accent: {
             DEFAULT: 'hsl(var(--landing-accent))',
@@ -56,9 +63,15 @@ const config: Config = {
           },
           delta: {
             up: 'hsl(var(--landing-delta-up))',
-            down: 'hsl(var(--landing-delta-down))',
+            down: {
+              DEFAULT: 'hsl(var(--landing-delta-down))',
+              foreground: 'hsl(var(--landing-delta-down-foreground))',
+            },
           },
         },
+      },
+      boxShadow: {
+        landing: '0 24px 80px -24px hsl(var(--landing-ink) / 0.14)',
       },
     },
   },

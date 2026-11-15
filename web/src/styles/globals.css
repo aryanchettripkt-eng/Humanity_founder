@@ -37,14 +37,22 @@
   }
 
   .theme-landing {
-    --landing-canvas: 240 5.9% 90%;
-    --landing-surface: 0 0% 98%;
+    --landing-canvas: 240 5.9% 88%;
+    --landing-surface: 240 6% 92%;
+    --landing-card: 0 0% 100%;
+    --landing-card-soft: 0 0% 97%;
+    --landing-line: 240 5.9% 84%;
+    --landing-muted: 240 4.5% 36%;
     --landing-ink: 240 4% 5%;
     --landing-ink-foreground: 0 0% 98%;
+    --landing-ink-surface: 240 4% 12%;
+    --landing-ink-line: 240 4% 20%;
+    --landing-ink-muted: 240 5% 65%;
     --landing-accent: 80 85% 69%;
     --landing-accent-foreground: 240 4% 5%;
     --landing-delta-up: 80 85% 69%;
     --landing-delta-down: 351 95% 86%;
+    --landing-delta-down-foreground: 345 85% 20%;
     --background: 0 0% 100%;
     --surface: 240 4.8% 95.9%;
     --card: 0 0% 100%;
