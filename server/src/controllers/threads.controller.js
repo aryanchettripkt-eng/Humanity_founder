@@ -6,13 +6,20 @@ import { Thread } from '../models/Thread.js';
 import { emitCountsChanged, emitThreadUpdated } from '../realtime/socket.js';
 import { recordActivity } from '../services/activity.service.js';
 import { classifyThread } from '../services/classification.service.js';
-import { computeSegmentCounts, SEGMENT_IDS, segmentFilter } from '../services/segments.js';
+import {
+  computeSegmentCounts,
+  HANDOFF_STATES,
+  handoffFilter,
+  SEGMENT_IDS,
+  segmentFilter,
+} from '../services/segments.js';
 import { badRequest, notFound } from '../utils/errors.js';
 
 export const listThreadsSchema = {
   query: z.object({
     clientId: z.string().optional(),
     segment: z.enum(SEGMENT_IDS).optional().default('inbox'),
+    handoff: z.enum(HANDOFF_STATES).optional(),
     q: z.string().trim().optional(),
     filters: z.string().optional(),
     account: z.string().optional(),
@@ -61,10 +68,11 @@ export async function listThreads(req, res, next) {
       return res.json({ data: [], meta: { total: 0, page: 1, pageSize: req.query.pageSize } });
     }
 
-    const { segment, q, filters, account, page, pageSize } = req.query;
+    const { segment, handoff, q, filters, account, page, pageSize } = req.query;
     const query = {
       clientId: req.clientId,
       ...segmentFilter(segment),
+      ...handoffFilter(handoff),
     };
 
     if (account) {

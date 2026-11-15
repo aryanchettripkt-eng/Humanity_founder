@@ -13,6 +13,7 @@ export const qk = {
       filters?: string;
       account?: string;
       clientId?: string;
+      handoff?: string;
     }) => ['threads', 'list', params] as const,
     counts: (clientId?: string) => ['threads', 'counts', { clientId: clientId ?? null }] as const,
     detail: (id: string) => ['threads', 'detail', id] as const,

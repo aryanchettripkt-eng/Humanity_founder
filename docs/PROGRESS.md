@@ -28,6 +28,17 @@ _None yet._
 
 ---
 
+### 2026-11-16 04:15 · claude · G9.3b client's desk in the Inbox
+- Done (Aryan asked me to build it instead of handing it to Gemini): the client view's features now live in the Inbox.
+- **"{Client}'s desk" strip** above the Inbox columns: 4 chips (Waiting on {client}, {Client}'s on it, Handed back to you, Handled by {client} · 7d) that open the matching segment with `?handoff=` (clicking the active chip clears it), the latest client note (opens its thread), "See what {client} sees" (`/c?preview=1`) and a collapse toggle remembered in `relay-ui` (`clientDeskCollapsed`; collapsed by default under 768). One row from 1600px, two rows below that, short chip labels on phones. Hidden on phones while a thread is open.
+- **Rows:** handoff chip after the owner pill ({Client}'s on it / Handed back / Handled by {client}).
+- **Reading pane:** the old "Client status" line is now a glass card with the crown, "{Client} is handling this / handed this back to you / marked this handled", the time, the note, and "Open draft" when a draft was made from the note.
+- **AI insights:** "WHY {CLIENT}" (the `clientReason` the client sees) above Summary for client-owned threads.
+- **Server:** `GET /threads` takes `handoff` (zod enum), filtering on `handoff.state`; `handoffFilter` in `services/segments.js` + tests. BACKEND.md updated.
+- **Data:** waiting = `/threads/counts`.client; on it, handed back = `meta.total` of the filtered list; handled 7d = done + handled with `handoff.at` in the last 7 days; note = newest `client_note`/`client_handoff` with a note from `/activity`. The layout now also invalidates `activity` on `activity:new`.
+- Checked: lint, typecheck, tests (server 38, web 37). No page scroll at 1903, 1440, 1024 and 390, light and dark, expanded and collapsed. Screenshots in project files `reviews/shots-inbox-client-desk/`.
+- Open issue: at 900px tall with a draft open, the docked composer leaves little room for messages; the expanded desk makes that tighter. Collapsing the desk helps; the composer height is worth a look.
+
 ### 2026-11-16 04:30 · claude · G9.3c Statistics and About pages
 - Done (assigned by Aryan in chat): the Client view tab is gone. The top nav is now Today, Inbox, Statistics, About, Ask AI. The phone tab bar is Today, Inbox, Stats, About, Ask. The `/c` routes still work for client logins and `/c?preview=1` (G9.3b puts the preview link in the Inbox header).
 - `/app/stats`: hero with a 7 / 30 day range, 4 KPI tiles (emails sorted, kept as the AI sorted, corrected by you, needed your call), an emails-per-day stacked bar chart by owner with legend, hover tooltip and a table view, "Who it's for", categories, AI confidence, the client's side (on it, handed back, handled) and recent activity. Built from the latest 100 threads in each of the inbox, done and archived segments; when there are more, the page says "Based on the latest N of M emails". Live updates on `thread:*` and `activity:new`.

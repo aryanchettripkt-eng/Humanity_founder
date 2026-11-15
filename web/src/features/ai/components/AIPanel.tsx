@@ -2,6 +2,7 @@ import { AlertTriangle, CalendarPlus, History, RefreshCw, Sparkles, X } from 'lu
 import { useState } from 'react';
 import { ConfidenceMeter } from '@/components/common/ConfidenceMeter';
 import { OwnerPill } from '@/components/common/OwnerPill';
+import { useActiveClient } from '@/features/client-desk/useActiveClient';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatRelativeTime, formatUpcomingDate } from '@/lib/format';
@@ -27,6 +28,7 @@ export function AIPanel({
   onClose,
   className,
 }: AIPanelProps) {
+  const { firstName } = useActiveClient();
   const ownerMeta = OWNER_META[thread.owner] ?? OWNER_META.review;
   const suggestedMeta = thread.suggestedOwner ? OWNER_META[thread.suggestedOwner] : null;
 
@@ -160,6 +162,17 @@ export function AIPanel({
           </div>
         ) : null}
       </section>
+
+      {/* Why {client}: the reason the client sees in their queue */}
+      {thread.owner === 'client' && thread.clientReason ? (
+        <section className="space-y-2">
+          <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
+            Why {firstName}
+          </h3>
+          <p className="text-[15px] leading-relaxed text-[var(--fg)]">{thread.clientReason}</p>
+          <p className="text-xs text-[var(--fg-subtle)]">This is what {firstName} sees.</p>
+        </section>
+      ) : null}
 
       {/* Summary */}
       <section className="space-y-2">

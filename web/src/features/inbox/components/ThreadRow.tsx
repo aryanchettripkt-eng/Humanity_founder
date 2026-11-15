@@ -1,6 +1,7 @@
 import { CalendarDays, Star } from 'lucide-react';
 import { OwnerPill } from '@/components/common/OwnerPill';
 import { OwnerPopover } from '@/components/common/OwnerPopover';
+import { HandoffChip } from '@/features/client-desk/components/HandoffChip';
 import { formatRelativeTime, isWithin24Hours } from '@/lib/format';
 import { CATEGORY_ICONS } from '@/lib/owners';
 import { cn } from '@/lib/utils';
@@ -133,6 +134,8 @@ export function ThreadRow({
             />
           </span>
         </OwnerPopover>
+
+        <HandoffChip state={thread.handoff?.state} />
 
         {hasDate ? (
           <span className="inline-flex items-center gap-1 rounded-full border border-[var(--pane-border)] bg-[var(--card-glass-bg)] px-2 py-0.5 text-[11px] font-medium text-[var(--fg-muted)]">

@@ -53,6 +53,7 @@ export function AssistantLayout() {
   const onActivityNew = useCallback(
     (act: ActivityItem) => {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['activity'] });
       if (act.actor.type === 'client') {
         toast.info(`${act.actor.name}: ${act.type.replace(/_/g, ' ')}`);
       }

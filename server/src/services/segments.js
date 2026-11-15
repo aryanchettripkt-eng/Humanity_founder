@@ -51,6 +51,17 @@ export function segmentFilter(segment = 'inbox') {
   }
 }
 
+export const HANDOFF_STATES = ['client_handling', 'handed_to_assistant', 'handled'];
+
+/**
+ * Extra filter for the client's handoff state (G9.3b). Combines with any segment.
+ * @param {string} [handoff]
+ * @returns {Record<string, unknown>}
+ */
+export function handoffFilter(handoff) {
+  return handoff && HANDOFF_STATES.includes(handoff) ? { 'handoff.state': handoff } : {};
+}
+
 /**
  * Compute counts for every segment scoped to a client.
  * @param {string | import('mongoose').Types.ObjectId} clientId

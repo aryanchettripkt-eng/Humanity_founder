@@ -1,4 +1,4 @@
-import { ChevronUp, Crown, ExternalLink, Inbox } from 'lucide-react';
+import { ChevronUp, ExternalLink, Inbox } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -7,6 +7,8 @@ import { SourceBadge } from '@/components/common/SourceBadge';
 import { InboxRail } from '@/components/grove/InboxRail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIPanel, MobileAISummary } from '@/features/ai/components/AIPanel';
+import { ClientDesk } from '@/features/client-desk/components/ClientDesk';
+import { HandoffCard } from '@/features/client-desk/components/HandoffCard';
 import { DraftComposer } from '@/features/composer/components/DraftComposer';
 import {
   useChangeOwner,
@@ -22,6 +24,7 @@ import { MessageItem } from '@/features/thread/components/MessageItem';
 import { ThreadHeader } from '@/features/thread/components/ThreadHeader';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
+import type { DeskFilter } from '@/features/client-desk/mappers';
 import type { SegmentId } from '@/types/api';
 
 export function InboxPage() {
@@ -34,6 +37,7 @@ export function InboxPage() {
 
   const q = searchParams.get('q') || '';
   const filtersParam = searchParams.get('f') || '';
+  const handoffParam = searchParams.get('handoff');
   const activeFilters = useMemo(
     () => (filtersParam ? filtersParam.split(',').filter(Boolean) : []),
     [filtersParam]
@@ -55,6 +59,7 @@ export function InboxPage() {
     q: q || undefined,
     filters: filtersParam || undefined,
     clientId: activeClientId || undefined,
+    handoff: handoffParam || undefined,
   });
 
   const threads = useMemo(() => listData?.data ?? [], [listData?.data]);
@@ -186,8 +191,26 @@ export function InboxPage() {
       navigate('/app/today');
       return;
     }
-    const qs = searchParams.toString();
+    const next = new URLSearchParams(searchParams);
+    next.delete('handoff');
+    const qs = next.toString();
     navigate(`/app/inbox/${seg}${qs ? `?${qs}` : ''}`);
+  };
+
+  // A desk chip opens its segment with the handoff filter; clicking the active chip clears it.
+  const selectDeskFilter = (f: DeskFilter, active: boolean) => {
+    const next = new URLSearchParams(searchParams);
+    if (active || !f.handoff) next.delete('handoff');
+    else next.set('handoff', f.handoff);
+    const qs = next.toString();
+    navigate(`/app/inbox/${f.segment}${qs ? `?${qs}` : ''}`);
+  };
+
+  const openDraft = () => {
+    setComposerOpen(true);
+    const el = document.getElementById('inbox-composer');
+    el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    el?.querySelector<HTMLTextAreaElement>('textarea')?.focus();
   };
 
   const selectThread = (id: string) => {
@@ -200,6 +223,14 @@ export function InboxPage() {
   const visibleMessages = collapsedCount > 0 ? messages.slice(-2) : messages;
 
   return (
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden md:gap-4">
+    <ClientDesk
+      segment={segment}
+      handoff={handoffParam}
+      onFilter={selectDeskFilter}
+      onOpenThread={(id) => navigate(`/app/inbox/inbox/${id}`)}
+      className={cn(threadId && 'hidden lg:flex')}
+    />
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:gap-4">
       {/* Segment rail: horizontal chips on mobile (<768 when list visible), vertical 72px rail on >=768 */}
       <div className={cn('shrink-0 md:min-h-0', threadId ? 'hidden md:flex' : 'flex')}>
@@ -338,17 +369,7 @@ export function InboxPage() {
                 onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
               />
 
-              {detail.handoff?.state && detail.handoff.state !== 'none' ? (
-                <div className="glass-card flex items-start gap-2.5 rounded-[20px] p-3.5 text-xs text-[var(--fg)]">
-                  <Crown className="mt-0.5 h-4 w-4 shrink-0 text-[var(--grove-lime)]" />
-                  <div>
-                    <p className="font-medium capitalize">
-                      Client status: {detail.handoff.state.replace(/_/g, ' ')}
-                    </p>
-                    {detail.handoff.note ? <p className="mt-0.5">“{detail.handoff.note}”</p> : null}
-                  </div>
-                </div>
-              ) : null}
+              <HandoffCard thread={detail} onOpenDraft={openDraft} />
 
               {collapsedCount > 0 ? (
                 <button
@@ -389,7 +410,7 @@ export function InboxPage() {
             </div>
 
             {/* Docked DraftComposer at bottom of reading column */}
-            <div className="shrink-0 border-t border-[var(--glass-divider)] p-4 sm:px-6">
+            <div id="inbox-composer" className="shrink-0 border-t border-[var(--glass-divider)] p-4 sm:px-6">
               <DraftComposer
                 threadId={detail.id}
                 draft={detail.draft}
@@ -425,6 +446,7 @@ export function InboxPage() {
           />
         </div>
       ) : null}
+    </div>
     </div>
   );
 }

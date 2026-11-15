@@ -11,6 +11,7 @@ export function useThreads(params: {
   filters?: string;
   account?: string;
   clientId?: string;
+  handoff?: string;
 }) {
   const sp = new URLSearchParams();
   if (params.clientId) sp.set('clientId', params.clientId);
@@ -18,6 +19,7 @@ export function useThreads(params: {
   if (params.q) sp.set('q', params.q);
   if (params.filters) sp.set('filters', params.filters);
   if (params.account) sp.set('account', params.account);
+  if (params.handoff) sp.set('handoff', params.handoff);
 
   return useQuery({
     queryKey: qk.threads.list(params),

@@ -16,6 +16,9 @@ interface UiState {
   newThreadIds: string[];
   lastSeenCounts: Record<string, SeenClientCounts>;
   lastSeenActivityAt: string | null;
+  /** Inbox client's desk strip. null = not chosen yet (collapsed on phones, open elsewhere). */
+  clientDeskCollapsed: boolean | null;
+  setClientDeskCollapsed: (v: boolean) => void;
   toggleSidebar: () => void;
   setSidebarCollapsed: (v: boolean) => void;
   toggleAiPanel: () => void;
@@ -40,6 +43,8 @@ export const useUiStore = create<UiState>()(
       newThreadIds: [],
       lastSeenCounts: {},
       lastSeenActivityAt: null,
+      clientDeskCollapsed: null,
+      setClientDeskCollapsed: (v) => set({ clientDeskCollapsed: v }),
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
       toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
@@ -77,6 +82,7 @@ export const useUiStore = create<UiState>()(
         activeClientUserId: s.activeClientUserId,
         lastSeenCounts: s.lastSeenCounts,
         lastSeenActivityAt: s.lastSeenActivityAt,
+        clientDeskCollapsed: s.clientDeskCollapsed,
       }),
     }
   )
