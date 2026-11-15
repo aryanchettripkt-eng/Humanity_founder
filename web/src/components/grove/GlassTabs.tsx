@@ -1,4 +1,7 @@
+import { m } from 'framer-motion';
+import { useId } from 'react';
 import { Link } from 'react-router-dom';
+import { EASE_EMPH, vtName } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export type GlassTabItem<T extends string = string> = {
@@ -13,6 +16,13 @@ export type GlassTabsProps<T extends string = string> = {
   activeId: T;
   onChange?: (id: T) => void;
   ariaLabel?: string;
+  /**
+   * Page nav only. Each page renders its own nav, so the active pill can't animate
+   * within one instance; instead the pill and labels are named for the page view
+   * transition and the pill glides to the new tab (motion.css). Without it the
+   * pill slides in place with Motion.
+   */
+  viewTransitionScope?: string;
   className?: string;
 };
 
@@ -21,8 +31,11 @@ export function GlassTabs<T extends string = string>({
   activeId,
   onChange,
   ariaLabel = 'Primary navigation',
+  viewTransitionScope,
   className,
 }: GlassTabsProps<T>) {
+  const pillId = useId();
+  const scope = viewTransitionScope;
   return (
     <nav
       aria-label={ariaLabel}
@@ -34,15 +47,36 @@ export function GlassTabs<T extends string = string>({
       {items.map((item) => {
         const isActive = item.id === activeId;
         const itemClass = cn(
-          'inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-base whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'relative isolate inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-base whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           isActive
-            ? 'bg-[var(--nav-active-bg)] text-[var(--nav-active-fg)] shadow-sm font-semibold'
+            ? 'text-[var(--nav-active-fg)] font-semibold'
             : 'font-medium text-[var(--fg)] hover:bg-[var(--glass-hover)]'
         );
 
         const content = (
           <>
-            <span>{item.label}</span>
+            {isActive ? (
+              // Its own layer so the active pill can slide between tabs.
+              scope ? (
+                <span
+                  aria-hidden="true"
+                  {...vtName(`${scope}-pill`)}
+                  className="absolute inset-0 -z-10 rounded-full bg-[var(--nav-active-bg)] shadow-sm"
+                />
+              ) : (
+                <m.span
+                  aria-hidden="true"
+                  layoutId={pillId}
+                  transition={{ duration: 0.38, ease: EASE_EMPH }}
+                  className="absolute inset-0 -z-10 rounded-full bg-[var(--nav-active-bg)] shadow-sm"
+                />
+              )
+            ) : null}
+            {scope ? (
+              <span {...vtName(`${scope}-label-${item.id}`)}>{item.label}</span>
+            ) : (
+              <span>{item.label}</span>
+            )}
             {item.badge !== undefined && item.badge > 0 ? (
               <span
                 className={cn(

@@ -1,0 +1,355 @@
+/*
+ * Motion layer (DESIGN_SYSTEM §5). One place for every animation in the app:
+ *   - first load intro (html.intro, set in index.html, cleared in lib/intro.ts)
+ *   - page transitions (View Transitions API, html[data-vt='page'])
+ *   - theme switch (View Transitions API, html[data-vt='theme'])
+ *   - enter reveals ([data-reveal], [data-stagger])
+ *   - popovers, dialogs, tooltips (Radix data-state)
+ *   - hover and press feedback
+ * Everything here is switched off by prefers-reduced-motion at the bottom of this file.
+ */
+
+:root {
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-emph: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --dur-fast: 150ms;
+  --dur-base: 200ms;
+  --dur-page: 250ms;
+  --dur-reveal: 480ms;
+  --dur-theme: 560ms;
+  --lift-shadow: 0 10px 28px -14px rgba(20, 21, 18, 0.28);
+  color-scheme: light;
+}
+
+.dark {
+  --lift-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.7);
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- keyframes */
+
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes motion-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes motion-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+@keyframes motion-pop-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+    translate: var(--pop-x, 0) var(--pop-y, 0);
+  }
+}
+
+@keyframes motion-pop-out {
+  to {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+@keyframes motion-frame-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+    scale: 0.988;
+  }
+}
+
+@keyframes motion-canvas-in {
+  from {
+    opacity: 0;
+    scale: 1.04;
+  }
+}
+
+@keyframes motion-drawer-in {
+  from {
+    opacity: 0;
+    translate: 24px 0;
+  }
+}
+
+@keyframes motion-theme-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+}
+
+/* ------------------------------------------------------------ first load */
+
+/* The canvas image settles in while the frame floats up. Plays once per page load. */
+.intro [data-canvas] {
+  animation: motion-canvas-in 1200ms var(--ease-emph) both;
+}
+
+.intro [data-canvas-overlay] {
+  animation: motion-fade-in 900ms var(--ease-out) both;
+}
+
+.intro .floating-frame {
+  animation: motion-frame-in 760ms var(--ease-emph) 120ms both;
+}
+
+/* ---------------------------------------------------------------- reveals */
+
+/*
+ * [data-reveal] fades up when it mounts. Set --reveal-i (0, 1, 2…) to stagger.
+ * [data-stagger] does the same for each direct child, in order.
+ * `backwards` fill so nothing keeps a transform after the animation ends.
+ */
+[data-reveal],
+[data-stagger] > * {
+  animation: motion-rise-in var(--dur-reveal) var(--ease-emph) backwards;
+  animation-delay: calc(var(--reveal-i, 0) * 60ms);
+}
+
+[data-reveal='fade'] {
+  animation-name: motion-fade-in;
+  animation-duration: 260ms;
+}
+
+[data-stagger] > :nth-child(2) { --reveal-i: 1; }
+[data-stagger] > :nth-child(3) { --reveal-i: 2; }
+[data-stagger] > :nth-child(4) { --reveal-i: 3; }
+[data-stagger] > :nth-child(5) { --reveal-i: 4; }
+[data-stagger] > :nth-child(6) { --reveal-i: 5; }
+[data-stagger] > :nth-child(7) { --reveal-i: 6; }
+[data-stagger] > :nth-child(n + 8) { --reveal-i: 7; }
+
+/* On first load, wait for the frame to arrive before the content rises. */
+.intro [data-reveal],
+.intro [data-stagger] > * {
+  animation-delay: calc(360ms + var(--reveal-i, 0) * 70ms);
+}
+
+/* ------------------------------------------------------- page transitions */
+
+/*
+ * Only during a page switch (names come from lib/motion.ts vtName()):
+ *   - the page underneath crossfades,
+ *   - the top nav and phone tab bar hold still (their new state shows at once),
+ *   - the active nav pill glides to its new tab, under the tab labels, which
+ *     crossfade their colour.
+ */
+:root[data-vt='page'] [data-vt] {
+  view-transition-name: var(--vt-name);
+}
+
+:root[data-vt='page']::view-transition-old(root) {
+  animation: motion-fade-out 140ms var(--ease-in) both;
+}
+
+:root[data-vt='page']::view-transition-new(root) {
+  animation: motion-fade-in var(--dur-page) var(--ease-out) 60ms both;
+}
+
+:root[data-vt='page']::view-transition-old(app-nav),
+:root[data-vt='page']::view-transition-old(tab-bar),
+:root[data-vt='page']::view-transition-old(nav-pill) {
+  display: none;
+}
+
+:root[data-vt='page']::view-transition-new(app-nav),
+:root[data-vt='page']::view-transition-new(tab-bar),
+:root[data-vt='page']::view-transition-new(nav-pill) {
+  animation: none;
+}
+
+:root[data-vt='page']::view-transition-new(nav-pill) {
+  height: 100%;
+}
+
+:root[data-vt='page']::view-transition-group(nav-pill) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-emph);
+}
+
+:root[data-vt='page']::view-transition-group(app-nav),
+:root[data-vt='page']::view-transition-group(tab-bar) {
+  animation-duration: var(--dur-page);
+  animation-timing-function: var(--ease-out);
+}
+
+/* ------------------------------------------------------------ theme switch */
+
+/* A circle of the new theme grows from the toggle the user pressed. */
+:root[data-vt='theme']::view-transition-old(root) {
+  animation: none;
+}
+
+:root[data-vt='theme']::view-transition-new(root) {
+  animation: motion-theme-reveal var(--dur-theme) var(--ease-emph) both;
+}
+
+/* Colour transitions would start from the old theme inside the new snapshot. */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
+/* ------------------------------------------- popovers, dialogs, tooltips */
+
+.motion-popover {
+  transform-origin: var(
+    --radix-popover-content-transform-origin,
+    var(--radix-tooltip-content-transform-origin, center)
+  );
+}
+
+.motion-popover[data-side='bottom'] { --pop-y: -4px; }
+.motion-popover[data-side='top'] { --pop-y: 4px; }
+.motion-popover[data-side='left'] { --pop-x: 4px; }
+.motion-popover[data-side='right'] { --pop-x: -4px; }
+
+.motion-popover[data-state='open'],
+.motion-popover[data-state='delayed-open'],
+.motion-popover[data-state='instant-open'] {
+  animation: motion-pop-in 180ms var(--ease-emph);
+}
+
+.motion-popover[data-state='closed'] {
+  animation: motion-pop-out 120ms var(--ease-in) forwards;
+}
+
+.motion-overlay[data-state='open'] {
+  animation: motion-fade-in var(--dur-base) var(--ease-out);
+}
+
+.motion-overlay[data-state='closed'] {
+  animation: motion-fade-out 150ms var(--ease-in) forwards;
+}
+
+.motion-dialog[data-state='open'] {
+  animation: motion-pop-in 240ms var(--ease-emph);
+}
+
+.motion-dialog[data-state='closed'] {
+  animation: motion-pop-out 150ms var(--ease-in) forwards;
+}
+
+.motion-drawer {
+  animation: motion-drawer-in 280ms var(--ease-emph);
+}
+
+/* ------------------------------------------------------- hover and press */
+
+/* Pills and round icon buttons press in slightly. */
+button[class*='rounded-full'],
+a[class*='rounded-full'] {
+  transition-property: color, background-color, border-color, box-shadow, opacity, scale,
+    translate;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button[class*='rounded-full']:not(:disabled):active,
+a[class*='rounded-full']:active {
+  scale: 0.97;
+}
+
+/* Cards that open something lift on hover. */
+.motion-lift {
+  transition-property: color, background-color, border-color, box-shadow, translate;
+  transition-duration: var(--dur-base);
+  transition-timing-function: var(--ease-out);
+}
+
+@media (hover: hover) {
+  .motion-lift:hover {
+    translate: 0 -2px;
+    box-shadow: var(--lift-shadow);
+  }
+}
+
+/* Arrows point where they go. */
+.lucide-arrow-up-right,
+.lucide-arrow-right,
+.lucide-arrow-left,
+.lucide-chevron-down,
+.lucide-chevron-right {
+  transition: translate var(--dur-base) var(--ease-out), rotate var(--dur-base) var(--ease-out);
+}
+
+@media (hover: hover) {
+  :is(a, button):hover > .lucide-arrow-up-right,
+  :is(a, button):hover > span > .lucide-arrow-up-right {
+    translate: 2px -2px;
+  }
+
+  :is(a, button):hover > .lucide-arrow-right,
+  :is(a, button):hover > .lucide-chevron-right {
+    translate: 2px 0;
+  }
+
+  :is(a, button):hover > .lucide-arrow-left {
+    translate: -2px 0;
+  }
+}
+
+[aria-expanded='true'] > .lucide-chevron-down {
+  rotate: 180deg;
+}
+
+/* --------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .intro [data-canvas],
+  .intro [data-canvas-overlay],
+  .intro .floating-frame,
+  [data-reveal],
+  [data-stagger] > *,
+  .motion-drawer {
+    animation: none !important;
+  }
+
+  .motion-popover,
+  .motion-dialog,
+  .motion-overlay {
+    animation-name: motion-fade-in !important;
+    animation-duration: 100ms !important;
+  }
+
+  .motion-popover[data-state='closed'],
+  .motion-dialog[data-state='closed'],
+  .motion-overlay[data-state='closed'] {
+    animation-name: motion-fade-out !important;
+  }
+
+  button[class*='rounded-full']:active,
+  a[class*='rounded-full']:active,
+  .motion-lift:hover,
+  :is(a, button):hover > .lucide-arrow-up-right,
+  :is(a, button):hover > .lucide-arrow-right,
+  :is(a, button):hover > .lucide-arrow-left,
+  :is(a, button):hover > .lucide-chevron-right {
+    scale: none;
+    translate: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

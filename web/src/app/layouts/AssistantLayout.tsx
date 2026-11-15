@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
+import { prefetchAppPages } from '@/app/prefetchPages';
 import { GuidedTour } from '@/components/common/GuidedTour';
 import { OfflineBanner } from '@/components/common/OfflineBanner';
 import { AppFrame } from '@/components/grove/AppFrame';
@@ -61,6 +62,8 @@ export function AssistantLayout() {
     [queryClient]
   );
 
+  useEffect(() => prefetchAppPages(), []);
+
   useSocketEvent<ThreadListItem>('thread:created', onThreadCreated);
   useSocketEvent('thread:updated', onThreadUpdated);
   useSocketEvent('counts:changed', onCountsChanged);
@@ -106,7 +109,7 @@ export function AssistantLayout() {
       >
         {!ownsHero && !isInbox ? (
           <div className="mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex min-h-0 flex-1 flex-col">
-            <div className="working-panel flex min-h-0 flex-1 flex-col">
+            <div data-reveal="" className="working-panel flex min-h-0 flex-1 flex-col">
               <Outlet />
             </div>
           </div>

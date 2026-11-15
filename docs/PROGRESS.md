@@ -28,6 +28,18 @@ _None yet._
 
 ---
 
+### 2026-11-16 05:10 · claude · G9.5 motion
+- Done (asked by Aryan in chat): one motion language picked per context (DESIGN_SYSTEM §5.1, D23).
+  - **Load:** background settles, the glass frame floats up, then the page's blocks rise in order. Once per page load. The saved theme is applied before first paint (no light flash in dark mode) and the first-load skeleton outside the frame is gone.
+  - **Page switch:** View Transitions API. The page crossfades, the nav holds still and the active pill glides to the new tab. Moving inside a page (thread, segment) doesn't run it. Navigation runs as a React transition (`v7_startTransition`) and main pages prefetch on idle, so a page never flashes a skeleton.
+  - **Theme:** a circle of the new theme grows from the button pressed. New visible sun/moon button in the nav at ≥1280 and 640–1023 (1024–1279 keeps it in the user menu so the tabs fit).
+  - **In page:** Today tab underline and Statistics range pill slide; Today cards and Inbox rows animate out and in on live changes; counts tick up (`AnimatedNumber`); reading pane fades on thread change; AI drawer slides in.
+  - **Hover and press:** clickable cards lift, pills and round buttons press, arrows nudge, open menus flip their chevron. Popovers, tooltips and dialogs fade and scale in and out.
+  - **Reduced motion:** all of it off except 100ms fades on popovers and dialogs; theme swaps at once.
+- New: `styles/motion.css`, `lib/motion.ts`, `lib/intro.ts`, `lib/useThemeToggle.ts`, `app/RouteTransitions.tsx` (+ test), `app/prefetchPages.ts`, `components/common/AnimatedNumber.tsx`.
+- Contract changes (additive): `TopNav.onToggleTheme` receives the click position; `GlassTabs` takes `viewTransitionScope` (page nav only).
+- Checked: lint, typecheck, tests. No page scroll at 1920, 1440, 1024, 820 and 390, light and dark, on Today, Inbox, a thread, Statistics, About and Settings. Nav fits at 1024, 1280 and 1366. No console errors. Recording and stills in project files `reviews/shots-motion/`.
+
 ### 2026-11-16 04:15 · claude · G9.3b client's desk in the Inbox
 - Done (Aryan asked me to build it instead of handing it to Gemini): the client view's features now live in the Inbox.
 - **"{Client}'s desk" strip** above the Inbox columns: 4 chips (Waiting on {client}, {Client}'s on it, Handed back to you, Handled by {client} · 7d) that open the matching segment with `?handoff=` (clicking the active chip clears it), the latest client note (opens its thread), "See what {client} sees" (`/c?preview=1`) and a collapse toggle remembered in `relay-ui` (`clientDeskCollapsed`; collapsed by default under 768). One row from 1600px, two rows below that, short chip labels on phones. Hidden on phones while a thread is open.

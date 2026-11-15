@@ -5,6 +5,7 @@ import { TopNav } from '@/components/grove/TopNav';
 import { useLogout, useMe } from '@/features/auth/api';
 import { useSimulateEmail, useThreadCounts } from '@/features/inbox/api';
 import { getInitials } from '@/lib/format';
+import { useThemeToggle } from '@/lib/useThemeToggle';
 import { useCommandStore } from '@/stores/command';
 import { useUiStore } from '@/stores/ui';
 
@@ -16,7 +17,8 @@ export function AssistantTopNav() {
   const location = useLocation();
   const logout = useLogout();
   const { data: me } = useMe();
-  const { activeClientId, setActiveClientId, theme, toggleTheme } = useUiStore();
+  const { activeClientId, setActiveClientId, theme } = useUiStore();
+  const toggleTheme = useThemeToggle();
   const { setOpen: setPaletteOpen, openAsk } = useCommandStore();
 
   const validClientIds = new Set(me?.clients?.map((c) => c.id) ?? []);

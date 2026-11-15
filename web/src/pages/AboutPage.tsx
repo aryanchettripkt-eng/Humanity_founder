@@ -90,7 +90,10 @@ export function AboutPage() {
       />
 
       <div className="mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex min-h-0 flex-1 flex-col">
-        <div className="working-panel grove-scroll min-h-0 flex-1 space-y-4 overflow-y-auto">
+        <div
+          data-stagger=""
+          className="working-panel grove-scroll min-h-0 flex-1 space-y-4 overflow-y-auto"
+        >
           <Section title="How it works">
             <ol className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
               {steps.map((s, i) => (

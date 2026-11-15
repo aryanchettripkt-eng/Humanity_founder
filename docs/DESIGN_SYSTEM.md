@@ -81,6 +81,27 @@ Removed in R1: the public landing page and the signed-in app now share the same 
 - Patterns: list row remove → height collapse + fade 200ms; client card handled → slide right + fade; new row → slide down + 1.2s soft indigo highlight; pill change → crossfade.
 - Respect `prefers-reduced-motion`: disable transforms, keep opacity fades ≤ 100ms.
 
+### 5.1 Motion v2 (2026-11-16, D23)
+One motion language, picked per context. Code: `web/src/styles/motion.css` (all CSS motion), `web/src/lib/motion.ts` (easings, View Transitions wrapper, `revealDelay`, `vtName`).
+
+| Context | What moves | How | Timing |
+|---|---|---|---|
+| First load (once per page load) | Background image settles (scale 1.04 → 1, fade), the glass frame floats up 14px, then the page's content rises in order | CSS keyframes under `html.intro` (set in `index.html`, cleared by `lib/intro.ts`) | canvas 1.2s, frame 760ms after 120ms, content from 360ms, 70ms apart |
+| Page switch (Today ↔ Inbox ↔ Statistics ↔ About ↔ Settings, `/c`) | The page crossfades; the nav and phone tab bar stay still; the active nav pill glides to the new tab under the labels | View Transitions API (`html[data-vt='page']`), started by `app/RouteTransitions.tsx` for any in-app link that changes page | out 140ms, in 250ms, pill 380ms |
+| Moving inside a page (thread, segment, filter) | No page transition. The reading pane fades in (260ms); rows that leave or arrive while you watch collapse or open (220ms) | `[data-reveal='fade']`, Motion `AnimatePresence` | |
+| Light ↔ dark | A circle of the new theme grows from the button you pressed. Colour transitions are paused during the swap so nothing fades twice | View Transitions API (`html[data-vt='theme']`), `lib/useThemeToggle.ts` | 560ms |
+| Page enter | Cards and panels rise 8px and fade, in order | `[data-reveal]` + `style={revealDelay(i)}`, or `[data-stagger]` on a parent | 480ms, 60ms apart |
+| Numbers | Counts tick up when they appear and glide when live data changes them | `AnimatedNumber` | 700ms |
+| Tabs in place (Today filters, Statistics range) | The active pill or underline slides | Motion `layoutId` | 350–380ms |
+| Popovers, menus, tooltips | Fade + scale from 96% out of the trigger's side | `.motion-popover` on Radix content | in 180ms, out 120ms |
+| Dialogs (⌘K, Ask AI, menu) | Overlay fades, panel scales in from 96% | `.motion-overlay`, `.motion-dialog` | in 240ms, out 150ms |
+| AI drawer (768–1279) | Slides in 24px from the right | `.motion-drawer` | 280ms |
+| Hover | Clickable cards lift 2px with a soft shadow (`.motion-lift`); pills and round buttons press to 97%; arrows nudge the way they point; open menus flip their chevron | CSS | 150–200ms |
+
+Easings: `--ease-out` `cubic-bezier(0.2, 0.8, 0.2, 1)` for small UI, `--ease-emph` `cubic-bezier(0.16, 1, 0.3, 1)` for anything that travels. Motion uses opacity and transform only and never changes resting colours, so text contrast is unchanged.
+
+Reduced motion: no intro, reveals, lifts, presses, page or theme transitions (the theme swaps at once); popovers and dialogs keep a 100ms fade. Motion components follow it through `MotionConfig reducedMotion="user"`.
+
 ## 6. Components (build in `web/src/components`)
 
 > **Reuse rule (D17):** every screen, including the landing page, is assembled from the shared components listed in [DESIGN_V2.md §8](./DESIGN_V2.md) (previously WORKSPACE_UX §8). Components take view models; pages only map data. If a screen needs a variation, add a prop to the shared component instead of copying it.

@@ -9,12 +9,14 @@ import {
   Settings,
   Sun,
 } from 'lucide-react';
+import { AnimatePresence, m } from 'framer-motion';
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/grove/Avatar';
 import { GlassTabs, type GlassTabItem } from '@/components/grove/GlassTabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { EASE_EMPH, vtName } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export type TopNavClientOption = {
@@ -37,7 +39,8 @@ export type TopNavProps = {
   userEmail?: string;
   userInitials?: string;
   theme?: 'light' | 'dark';
-  onToggleTheme?: () => void;
+  /** Gets the click position so the theme reveal can grow from it. */
+  onToggleTheme?: (origin?: { clientX: number; clientY: number }) => void;
   onOpenSearch?: () => void;
   /** Pass null to hide the settings button (e.g. the client view). */
   settingsHref?: string | null;
@@ -78,7 +81,10 @@ export function TopNav({
   const clientFirstName = activeClient?.name.split(' ')[0] || 'Client';
 
   return (
-    <header className={cn('flex flex-nowrap items-center justify-between gap-3', className)}>
+    <header
+      {...vtName('app-nav')}
+      className={cn('flex flex-nowrap items-center justify-between gap-3', className)}
+    >
       <div className="flex min-w-0 items-center gap-3">
         <Link
           to={logoHref}
@@ -97,6 +103,7 @@ export function TopNav({
             items={tabs}
             activeId={activeTabId}
             onChange={onTabChange}
+            viewTransitionScope="nav"
             className="hidden lg:inline-flex"
           />
         ) : null}
@@ -216,6 +223,29 @@ export function TopNav({
             </button>
           ) : null}
 
+          {/* Hidden 1024–1279 where the tabs need the room; the user menu still has it. */}
+          {onToggleTheme ? (
+            <button
+              type="button"
+              onClick={(e) => onToggleTheme(e)}
+              aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+              className="glass hidden h-11 w-11 items-center justify-center overflow-hidden rounded-full transition-colors hover:bg-[var(--glass-hover)] sm:flex lg:hidden xl:flex"
+            >
+              <AnimatePresence mode="popLayout" initial={false}>
+                <m.span
+                  key={theme}
+                  initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
+                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                  exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
+                  transition={{ duration: 0.35, ease: EASE_EMPH }}
+                  className="flex"
+                >
+                  {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                </m.span>
+              </AnimatePresence>
+            </button>
+          ) : null}
+
           {settingsHref ? (
             <Link
               to={settingsHref}
@@ -249,9 +279,9 @@ export function TopNav({
                 <button
                   type="button"
                   role="menuitem"
-                  onClick={() => {
+                  onClick={(e) => {
                     setUserOpen(false);
-                    onToggleTheme();
+                    onToggleTheme(e);
                   }}
                   className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface"
                 >

@@ -13,7 +13,7 @@
 | UI state | Zustand (small stores only; see §5) |
 | Forms | react-hook-form + zod |
 | Realtime | socket.io-client |
-| Motion | framer-motion |
+| Motion | framer-motion + View Transitions API + CSS (`styles/motion.css`), see DESIGN_SYSTEM §5.1 and D23 |
 | Toasts | sonner |
 | Dates | date-fns |
 | HTTP | fetch wrapper in `lib/api.ts` (no axios) |
@@ -117,6 +117,13 @@ Route guards: `RequireAuth role="assistant"|"client"`. Assistant without any con
 - Socket events can arrive twice (assistant is in two rooms, BACKEND §7). Handlers must be idempotent: patch by id, set absolute progress values, never increment.
 - Client view (`/c`) refetches `/client/queue` on window focus and every 60s, because a thread moved away from the client by AI isn't pushed to the client socket.
 - Lint/format: ESLint (typescript-eslint, react-hooks) + Prettier (2 spaces, single quotes, semi, width 100). Run `npm run lint && npm run typecheck` before committing.
+
+### 6.1 Motion conventions (D23)
+- Page transitions are automatic: `app/RouteTransitions.tsx` catches in-app link clicks that change page (`pageSection()`) and runs them in a view transition. Links inside a page don't transition. Add `data-no-transition` to a link to opt out. `BrowserRouter` uses `future={{ v7_startTransition: true }}`, so a page whose code is loading keeps the old page on screen; `app/prefetchPages.ts` warms the main pages when the app is idle.
+- Theme changes go through `useThemeToggle()` (pass the click event so the reveal grows from it), never `toggleTheme` directly.
+- Entering content: put `data-reveal` (+ `style={revealDelay(i)}`) on the few top-level blocks of a page, or `data-stagger` on their parent. Don't put it on list rows.
+- Elements that must stay still during a page switch get `{...vtName('name')}`; names must be unique on the page.
+- `index.html` applies the saved theme before first paint and arms the one-time intro.
 
 ## 7. Screen composition (what each page uses)
 - **LandingPage**: `AppTopBar` · `WorkspaceHeader` · `WorkspaceGrid` (`PersonCard`, `TaskCard`, `FocusPanel` mapped from `sampleData.ts`) · `HowItWorks` · `FeatureStrip` · `LandingFooter`.

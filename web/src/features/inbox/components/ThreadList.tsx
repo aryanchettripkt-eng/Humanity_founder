@@ -1,7 +1,9 @@
+import { AnimatePresence, m } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EASE_OUT } from '@/lib/motion';
 import { SEGMENTS } from '@/lib/segments';
 import { cn } from '@/lib/utils';
 import type { Owner, SegmentId, ThreadListItem } from '@/types/api';
@@ -136,10 +138,20 @@ export function ThreadList({
             className="py-12"
           />
         ) : (
-          <div className="space-y-0.5">
+          // Keyed by the view, so switching segment, search or filters swaps the list at
+          // once; rows that leave or arrive while you watch (archive, live mail) animate.
+          <div key={`${segment}|${search}|${activeFilters.join(',')}`} className="space-y-0.5">
+            <AnimatePresence initial={false}>
             {threads.map((t, idx) => (
-              <ThreadRow
+              <m.div
                 key={t.id}
+                layout="position"
+                initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                animate={{ opacity: 1, height: 'auto', transitionEnd: { overflow: 'visible' } }}
+                exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                transition={{ duration: 0.22, ease: EASE_OUT }}
+              >
+              <ThreadRow
                 thread={t}
                 selected={t.id === selectedId}
                 focused={idx === focusedIndex}
@@ -148,7 +160,9 @@ export function ThreadList({
                 onToggleImportant={(imp) => onToggleImportant(t.id, imp)}
                 onChangeOwner={(owner, remember) => onChangeOwner(t.id, owner, remember)}
               />
+              </m.div>
             ))}
+            </AnimatePresence>
           </div>
         )}
       </div>

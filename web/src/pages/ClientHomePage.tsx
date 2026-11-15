@@ -26,6 +26,7 @@ import { MessageItem } from '@/features/thread/components/MessageItem';
 import { getInitials } from '@/lib/format';
 import { qk } from '@/lib/queryKeys';
 import { useSocketEvent } from '@/lib/socket';
+import { useThemeToggle } from '@/lib/useThemeToggle';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
 
@@ -41,7 +42,8 @@ export function ClientHomePage() {
   const queryClient = useQueryClient();
   const logout = useLogout();
   const { data: me } = useMe();
-  const { activeClientId, theme, toggleTheme } = useUiStore();
+  const { activeClientId, theme } = useUiStore();
+  const toggleTheme = useThemeToggle();
 
   const isPreview = me?.user.role === 'assistant' && searchParams.get('preview') === '1';
   const qs = isPreview ? '?preview=1' : '';
@@ -163,7 +165,7 @@ export function ClientHomePage() {
       />
 
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden px-[clamp(16px,2.5vw,32px)] pb-[clamp(16px,2.5vw,32px)]">
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:gap-4">
+        <div data-stagger="" className="flex min-h-0 flex-1 flex-col lg:flex-row lg:gap-4">
           {/* Queue list */}
           <div
             className={cn(

@@ -22,6 +22,7 @@ import {
 import { ThreadList } from '@/features/inbox/components/ThreadList';
 import { MessageItem } from '@/features/thread/components/MessageItem';
 import { ThreadHeader } from '@/features/thread/components/ThreadHeader';
+import { revealDelay } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
 import type { DeskFilter } from '@/features/client-desk/mappers';
@@ -233,7 +234,11 @@ export function InboxPage() {
     />
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:gap-4">
       {/* Segment rail: horizontal chips on mobile (<768 when list visible), vertical 72px rail on >=768 */}
-      <div className={cn('shrink-0 md:min-h-0', threadId ? 'hidden md:flex' : 'flex')}>
+      <div
+        data-reveal=""
+        style={revealDelay(1)}
+        className={cn('shrink-0 md:min-h-0', threadId ? 'hidden md:flex' : 'flex')}
+      >
         <InboxRail
           activeSegment={segment as SegmentId}
           counts={counts as Partial<Record<SegmentId, number>> | undefined}
@@ -243,6 +248,8 @@ export function InboxPage() {
 
       {/* List column (360-380px) */}
       <div
+        data-reveal=""
+        style={revealDelay(2)}
         className={cn(
           'min-h-0 w-full shrink-0 md:w-[360px] lg:w-[380px]',
           threadId ? 'hidden lg:flex lg:flex-col' : 'flex flex-1 flex-col lg:flex-none'
@@ -279,6 +286,8 @@ export function InboxPage() {
 
       {/* Reading column (flex) */}
       <div
+        data-reveal=""
+        style={revealDelay(3)}
         className={cn(
           'glass-pane flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
           !threadId ? 'hidden lg:flex' : 'flex'
@@ -361,7 +370,11 @@ export function InboxPage() {
               }}
             />
 
-            <div className="grove-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6">
+            <div
+              key={detail.id}
+              data-reveal="fade"
+              className="grove-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6"
+            >
               <MobileAISummary
                 thread={detail}
                 reclassifying={reclassify.isPending}
@@ -423,7 +436,11 @@ export function InboxPage() {
 
       {/* AI insights column (>=1280 desktop) */}
       {detail && aiPanelOpen ? (
-        <div className="hidden min-h-0 w-[320px] shrink-0 xl:flex xl:flex-col">
+        <div
+          data-reveal=""
+          style={revealDelay(4)}
+          className="hidden min-h-0 w-[320px] shrink-0 xl:flex xl:flex-col"
+        >
           <AIPanel
             thread={detail}
             reclassifying={reclassify.isPending}
@@ -435,7 +452,7 @@ export function InboxPage() {
 
       {/* AI insights slide-over drawer (768–1279) */}
       {detail && aiDrawerOpen ? (
-        <div className="fixed inset-y-4 right-4 z-50 hidden w-[340px] max-w-[calc(100vw-2rem)] md:block xl:hidden">
+        <div className="motion-drawer fixed inset-y-4 right-4 z-50 hidden w-[340px] max-w-[calc(100vw-2rem)] md:block xl:hidden">
           <AIPanel
             thread={detail}
             reclassifying={reclassify.isPending}
