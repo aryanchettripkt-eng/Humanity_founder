@@ -68,23 +68,27 @@ export function CommandPalette() {
             <span>{query ? `Ask AI: "${query}"` : 'Ask AI about your inbox…'}</span>
           </button>
 
-          <div className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Segments
-          </div>
-          {filteredSegments.map((seg) => {
-            const Icon = seg.icon;
-            return (
-              <button
-                key={seg.id}
-                type="button"
-                onClick={() => goSegment(seg.id)}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-surface"
-              >
-                <Icon className="h-4 w-4 text-muted-foreground" />
-                <span>{seg.label}</span>
-              </button>
-            );
-          })}
+          {filteredSegments.length > 0 && (
+            <>
+              <div className="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Segments
+              </div>
+              {filteredSegments.map((seg) => {
+                const Icon = seg.icon;
+                return (
+                  <button
+                    key={seg.id}
+                    type="button"
+                    onClick={() => goSegment(seg.id)}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-surface"
+                  >
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                    <span>{seg.label}</span>
+                  </button>
+                );
+              })}
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -85,10 +85,17 @@ export function AIPanel({
           <span className="text-xs font-medium text-muted-foreground">
             Why {ownerMeta.label}?
           </span>
-          <ConfidenceMeter value={thread.confidence} />
+          {thread.ownerSource === 'ai' && <ConfidenceMeter value={thread.confidence} />}
         </div>
         <p className="text-sm leading-relaxed text-foreground">
-          {thread.reason || 'No classification reason recorded yet.'}
+          {thread.ownerSource === 'ai'
+            ? thread.reason || 'No classification reason recorded yet.'
+            : thread.history?.[thread.history.length - 1]?.reason ||
+              (thread.ownerSource === 'client'
+                ? 'Updated by client.'
+                : thread.ownerSource === 'rule'
+                  ? 'Matched sender rule.'
+                  : 'Set manually.')}
         </p>
         <div className="flex items-center justify-between pt-1 text-xs text-muted-foreground">
           <span>Source: {thread.ownerSource}</span>

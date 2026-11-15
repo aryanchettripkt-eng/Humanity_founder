@@ -61,6 +61,20 @@ _None yet._
 - Changed contracts: seed item format gains `entities[].when` / `durationMins` (BACKEND §8). No API changes.
 - Next: Gemini Q5.2 fix list; then I re-run AC2, AC5, AC7, AC9, AC11 (Q5.3).
 
+### 2026-11-15 03:58 · gemini · Q5.2 UX & polish fixes (1–9)
+- Done:
+  - #1 Mobile/tablet navigation: added tablet icon sidebar (`md:flex lg:hidden`), mobile "More" tab (`md:hidden`) and shared drawer (`Dialog`) with client switcher + all segments + sign out in `AssistantLayout.tsx`.
+  - #2 Brief UTC leak: formatted `u.startsAt` in `client.timezone` with `Intl.DateTimeFormat` and instructed the brief prompt never to mention UTC or timezones (`server/src/services/brief.service.js`).
+  - #3 Tap targets: raised mobile bottom tabs and mobile/tablet header buttons (`Simulate email`, theme toggle, settings) to `>= 44px` (`h-11 min-w-[44px]`).
+  - #4 Simulate button label: added `aria-label="Simulate email"` and `title="Simulate email"`.
+  - #5 Ask citations: `askInbox` now returns `threads: [{ id, subject }]` and `AskPanel` renders the truncated thread subject on citation chips.
+  - #6 Empty SEGMENTS heading: `CommandPalette` hides the `Segments` group when `filteredSegments.length === 0`.
+  - #7 Non-AI owner reason: `AIPanel` hides `ConfidenceMeter` and shows the latest history reason (or source fallback) when `ownerSource !== 'ai'`.
+  - #8 Settings → Accounts: titled `<FirstName>'s accounts` and hid `Use demo inbox` when a simulated Gmail account is already connected (`SettingsAccountsPage.tsx`, `ConnectProviderCard.tsx`).
+  - #9 Client card dark-mode contrast: switched `"I'll handle it"` to primary `variant="default"` and added crisp borders on secondary/outline buttons (`ClientHomePage.tsx`).
+- Changed contracts: `POST /api/ai/ask` response adds `threads: [{ id, subject }]` alongside `threadIds`.
+- Next: merge `gemini/Q5.2-ux-fixes` -> `main`.
+
 ### 2026-11-15 04:00 · claude · Q5.5 README
 - Done: README rewritten: live links, one-click demo tour, how the AI works, real vs simulated (matches PRD §11), architecture diagram, run locally, env vars, security notes, limitations. Marked Q5.4 (deploy) done, since it's live on Vercel + Render + Atlas.
 - Changed contracts: none.
