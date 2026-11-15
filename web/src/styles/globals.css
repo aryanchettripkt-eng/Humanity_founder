@@ -33,7 +33,7 @@
     --radius: 10px;
 
     /* Grove v2 full-bleed background + glass shell */
-    --canvas-image: url('/bg/app-bg.webp');
+    --canvas-image: url('/bg/app-bg-light.jpg');
     --canvas-fallback: #1A1B19;
     --canvas-overlay: transparent;
     --frame-gap-x: clamp(12px, 6.4vw, 128px);
