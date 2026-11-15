@@ -34,11 +34,11 @@ web/
         ClientLayout.tsx     # minimal header + outlet
         AuthLayout.tsx
     pages/                   # thin route components; compose features
-      LoginPage.tsx  SignupPage.tsx  OnboardingPage.tsx
+      LandingPage.tsx  LoginPage.tsx  SignupPage.tsx  OnboardingPage.tsx
       TodayPage.tsx  InboxPage.tsx  SettingsAccountsPage.tsx
       ClientHomePage.tsx  ClientThreadPage.tsx  NotFoundPage.tsx
     features/                # one folder per domain; owns its hooks + components
-      auth/ onboarding/ today/ inbox/ thread/ composer/ ai/ client-view/ accounts/ activity/ command/
+      landing/ auth/ onboarding/ today/ inbox/ thread/ composer/ ai/ client-view/ accounts/ activity/ command/
         components/  hooks/  api.ts  types.ts (if domain-specific)
     components/
       ui/                    # shadcn generated — do not hand-edit except via shadcn CLI
@@ -64,7 +64,7 @@ web/
 ## 3. Routes
 | Path | Page | Auth | Notes |
 |---|---|---|---|
-| `/` | redirect | – | → `/app/today` (assistant), `/c` (client), `/login` (anon) |
+| `/` | Landing / redirect | – | shows `LandingPage` (anon); redirects signed-in users → `/app/today` (assistant) or `/c` (client) |
 | `/login`, `/signup` | Login/Signup | anon | demo buttons call `POST /api/auth/demo`; "Continue with Google" navigates to `${API}/auth/google/start` (shown only if `/health` says `googleLogin:true`) |
 | `/auth/callback` | AuthCallback | anon | reads `#token=` (or `?error=`), stores token, clears the hash, routes by role. P1 |
 | `/onboarding` | Onboarding | assistant | step via `?step=welcome|connect|sync`; after real Gmail OAuth the server lands here with `&accountId=` or `&error=` (`not_test_user`, `access_denied`, …) |

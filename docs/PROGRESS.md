@@ -27,6 +27,35 @@ _None yet._
 
 ---
 
+### 2026-11-15 17:53 · gemini · L7.1 full-bleed landing + replace TodayPage with lime workspace
+- Done:
+  - Extended `LandingPage` edge-to-edge (`w-full`, removed outer grey frame and `max-w-[1400px]` box) and stretched `LandingTopBar` schedule bar across wide screens.
+  - Replaced the old `TodayPage` UI (`/app/today`) with the new lime-workspace layout powered by live `useDashboard` data (`web/src/features/today/mappers.ts`, `TodaySummaryPanel.tsx`, and `TodayPage.tsx`), preserving Morning Brief + refresh, owner counts, Quick Review 1-click owner assignment, Recent conversations (`ReplyCard`), Upcoming dates, Follow-up nudges (`TaskCard`), and Activity.
+- Changed contracts: none.
+- Next: review on `gemini/L7.1-landing-page` and merge PR.
+
+### 2026-11-15 17:47 · gemini · L7.1 landing page audit fixes (P1 + P2 + a11y)
+- Done:
+  - P1 #1 (`StatWithDelta`): absolute top-right delta badge on the number wrapper; stacked label under number below `sm` so 320/375/390 stats never overlap.
+  - P1 #2 (`ReplyCard`, `TaskCard`): `w-full flex-1` on `<article>` to fill grid cells; fixed two-row footer pinned with `mt-auto` on `ReplyCard`.
+  - P1 #3 (`LandingPage`): removes `.dark` from `<html>` on mount and restores on unmount so `OWNER_META` pills and portalled tooltips always render light.
+  - P1 #4: removed fake header bell, task-card bell, and status dropdown chevron; made decorative search/sliders non-interactive `<span>`s; labelled real demo triggers with `"Opens the live demo"` tooltips.
+  - P1 #5 (`SummaryPanel`): `/c` preview only renders when `owner === 'client'`; shows owner-specific preview for `assistant`, `none`, and `review` with per-thread timelines.
+  - P1 #6: dynamic filtered counts via `SectionHeader`, fixed `task-3` tags (`waiting`, `urgent`), added `THREAD_EMPTY_COPY` / `TASK_EMPTY_COPY` empty states.
+  - P1 #7 (`LandingTopBar`): `<section aria-label>`, bold time + short title in `flex-1` slots (no truncation at 1440), absolute `54%` `"now"` needle.
+  - P2 + a11y + refactors: added `--landing-card`, `--landing-card-soft`, `--landing-line`, `--landing-muted`, `--landing-ink-surface`, `--landing-ink-line`, `--landing-ink-muted`, `--landing-delta-down-foreground`, and `shadow-landing`; replaced raw palette classes; extracted `useDemoLogin()` (`features/auth/useDemoLogin.ts`) and `SectionHeader`; added scroll-spy on anchor rail, `82%` mobile carousel peek, `44px` tap targets, `12px` minimum text, `aria-live="polite"`, and 6 tests in `LandingPage.test.tsx`.
+- Changed contracts: none.
+- Next: push `gemini/L7.1-landing-page` and open PR after visual verification.
+
+### 2026-11-15 17:30 · gemini · L7.1 Public landing page
+- Done:
+  - Added `.theme-landing` HSL tokens in `web/src/styles/globals.css` and mapped `landing.*` colors in `web/tailwind.config.ts` (app indigo palette untouched).
+  - Built `web/src/features/landing/` (`sampleData.ts`, `LandingTopBar`, `LandingHero`, `StatWithDelta`, `FilterChips`, `ReplyCard`, `TaskCard`, `SummaryPanel`, `FeatureStrip`, `LandingFooter`) and `web/src/pages/LandingPage.tsx`.
+  - Updated `RootRedirect` in `web/src/app/router.tsx` (`!token` renders lazy `LandingPage` instead of redirecting to `/login`; signed-in redirect unchanged).
+  - Added `web/src/pages/LandingPage.test.tsx` and updated `docs/DESIGN_SYSTEM.md`, `docs/FRONTEND.md`, and `docs/ROADMAP.md`.
+- Changed contracts: none (reuses `demoLoginApi` only).
+- Next: manual visual check in Chrome at 1440/820/390/320 (Chrome remote debugging was unavailable in this session) and merge `gemini/L7.1-landing-page` -> `main`.
+
 ### 2026-11-15 04:15 · claude · Q5.1 QA pass + seed polish
 - Done: QA pass on the live site at 1920 / 820 / 390 / 375 / 320 as Alex and Priya; 9 findings for Gemini under *Open issues* (full report with AC results in `reviews/2026-11-15-qa-pass.md` in project files). Fixed my own: seed entities use `when` (weekday/date in the client's timezone) so dates match the emails; relative times snap to :00/:30 in working hours; outside sender listed first; Reset clears `Client.brief`. Prompt v3 date fix + required `clientReason` are on PR #14.
 - Changed contracts: seed item format gains `entities[].when` / `durationMins` (BACKEND §8). No API changes.

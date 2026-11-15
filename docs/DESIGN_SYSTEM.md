@@ -44,6 +44,30 @@ Exported once from `web/src/lib/owners.ts` as `OWNER_META` — components must r
 
 Category icons (muted, no color): meeting `CalendarDays`, action `CircleAlert`, update `Info`, newsletter `Newspaper`, finance `Receipt`, legal `Scale`, personal `Heart`, general `Mail`.
 
+### 2.3 Landing theme (`.theme-landing`)
+Scoped to `.theme-landing` on the public landing page (`/`) so the app (`/app`, `/c`, `/login`) keeps the indigo palette untouched. `LandingPage` also removes `.dark` from `<html>` while mounted (restoring it on unmount) so `OWNER_META` pills and portalled tooltips always render in light mode.
+
+| Token | Value (HSL) | Use |
+|---|---|---|
+| `--landing-canvas` | `240 5.9% 88%` (`#DFE0E2`) | outer page canvas |
+| `--landing-surface` | `240 6% 92%` (`#E9E9EB`) | mid-grey workspace container so white cards pop |
+| `--landing-card` | `0 0% 100%` (`#FFFFFF`) | task cards, active chips, notched buttons |
+| `--landing-card-soft` | `0 0% 97%` (`#F7F7F8`) | lead/reply cards |
+| `--landing-line` | `240 5.9% 84%` (`#D4D4D8`) | hairline borders on light surfaces |
+| `--landing-muted` | `240 4.5% 36%` (`#585860`) | secondary text on light surfaces (≥4.5:1 AA) |
+| `--landing-ink` | `240 4% 5%` (`#0B0B0C`) | primary ink, dark floating panel, pill bars |
+| `--landing-ink-foreground` | `0 0% 98%` (`#FAFAFA`) | text on dark ink surfaces |
+| `--landing-ink-surface` | `240 4% 12%` (`#1E1E20`) | dark sub-cards inside `SummaryPanel` |
+| `--landing-ink-line` | `240 4% 20%` (`#313135`) | hairline borders on dark ink surfaces |
+| `--landing-ink-muted` | `240 5% 65%` (`#A1A1AA`) | secondary text on dark ink surfaces (≥4.5:1 AA) |
+| `--landing-accent` | `80 85% 69%` (`#C6F36B`) | lime highlight card, schedule track, active accents |
+| `--landing-accent-foreground` | `240 4% 5%` (`#0B0B0C`) | high-contrast ink text on lime |
+| `--landing-delta-up` | `80 85% 69%` | positive stat delta pill |
+| `--landing-delta-down` | `351 95% 86%` | negative stat delta pill |
+| `--landing-delta-down-foreground` | `345 85% 20%` | dark rose text on negative delta pill |
+
+Also sets light-mode values on `--background`, `--surface`, `--card`, `--card-foreground`, `--border`, `--foreground`, and `--muted-foreground` inside `.theme-landing`.
+
 ## 3. Typography
 - Font: **Inter** (variable, `font-feature-settings: "cv11","ss01"`), fallback system‑ui. Mono: JetBrains Mono for keyboard hints only.
 - Scale (px / line-height / weight):
@@ -105,6 +129,16 @@ Each component must support the listed states. "✓" = required.
 | `Toast` | sonner; success / error / undo action | | ✓ |
 | `OfflineBanner` | socket disconnected | | ✓ |
 | `KbdHint` | `<kbd>` styled hints in tooltips | | ✓ |
+| `LandingTopBar` | public landing header + "Your day" schedule `<section>` | `demoLoading, onDemoLogin` | mobile compact, desktop full slots w/ now needle ✓ |
+| `LandingHero` | uppercase hero + CTA + `StatWithDelta` row | `demoLoading, onDemoLogin` | loading, responsive wrap ✓ |
+| `StatWithDelta` | large tabular stat + absolute top-right delta pill | `value, label, delta, direction` | up (lime), down (rose), mobile stacked ✓ |
+| `SectionHeader` | section title + underlined dynamic count + `aria-live` status | `id, title, countLabel, liveText` | responsive, accessible ✓ |
+| `FilterChips` | decorative search/sliders + `aria-pressed` filter pills | `items, value, onChange` | active, inactive, keyboard focus ✓ |
+| `ReplyCard` | sample thread card w/ notched arrow, `SourceBadge`, `OWNER_META`, `ConfidenceMeter` | `thread, selected, onSelect` | full-cell fill, pinned 2-row footer ✓ |
+| `TaskCard` | sample task card (lime highlighted or white) | `task, onTryDemo` | highlighted (lime), default (white), honest demo CTA ✓ |
+| `SummaryPanel` | dark floating AI summary + owner-aware preview + timeline | `thread, onTryDemo` | client/assistant/none/review states ✓ |
+| `FeatureStrip` | 4-card product capability strip | | responsive grid ✓ |
+| `LandingFooter` | dark CTA band + dual demo login + simulated tooltip | `demoLoading, onDemoLogin` | loading, tooltip ✓ |
 
 shadcn primitives to install: button, input, textarea, badge, card, dialog, sheet, popover, dropdown-menu, command, tooltip, tabs, scroll-area, separator, skeleton, avatar, checkbox, toggle-group, sonner.
 
@@ -148,3 +182,4 @@ shadcn primitives to install: button, input, textarea, badge, card, dialog, shee
 - [ ] ⌘K palette + Ask AI
 - [ ] Global states: loading, empty, error, offline, toast
 - [ ] Dark mode pass (P1)
+- [ ] Landing: public `/` workspace showcase (320 / 390 / 820 / 1440)

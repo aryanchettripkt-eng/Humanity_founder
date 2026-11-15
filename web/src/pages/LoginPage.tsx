@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { Crown, UserRoundCheck } from 'lucide-react';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -10,7 +9,8 @@ import { AuthLayout } from '@/app/layouts/AuthLayout';
 import { GoogleButton } from '@/components/common/GoogleButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { demoLoginApi, getGoogleLoginUrl, loginApi, useHealth } from '@/features/auth/api';
+import { getGoogleLoginUrl, loginApi, useHealth } from '@/features/auth/api';
+import { useDemoLogin } from '@/features/auth/useDemoLogin';
 import { ApiError } from '@/lib/api';
 
 const schema = z.object({
@@ -23,7 +23,7 @@ type FormValues = z.infer<typeof schema>;
 export function LoginPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [demoLoading, setDemoLoading] = useState<'assistant' | 'client' | null>(null);
+  const { demoLoading, handleDemo } = useDemoLogin();
   const { data: health } = useHealth();
 
   const {
@@ -39,19 +39,6 @@ export function LoginPage() {
       navigate(res.user.role === 'client' ? '/c' : '/app/today', { replace: true });
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Login failed');
-    }
-  };
-
-  const handleDemo = async (role: 'assistant' | 'client') => {
-    setDemoLoading(role);
-    try {
-      await demoLoginApi(role);
-      queryClient.clear();
-      navigate(role === 'client' ? '/c' : '/app/today', { replace: true });
-    } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Demo login failed');
-    } finally {
-      setDemoLoading(null);
     }
   };
 
