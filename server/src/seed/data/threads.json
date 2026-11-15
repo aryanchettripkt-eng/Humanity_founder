@@ -27,9 +27,12 @@
       {
         "type": "meeting",
         "title": "Coffee with Marcus",
-        "startsInHours": 44,
-        "endsInHours": 45,
-        "location": "Blue Bottle SOMA"
+        "location": "Blue Bottle SOMA",
+        "when": {
+          "weekday": "wed",
+          "at": "09:30"
+        },
+        "durationMins": 60
       }
     ],
     "status": "open",
@@ -71,7 +74,10 @@
       {
         "type": "deadline",
         "title": "Catering invoice #1042 due",
-        "startsInHours": 120
+        "when": {
+          "date": "11-19",
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",
@@ -121,7 +127,10 @@
       {
         "type": "deadline",
         "title": "Lisbon fare hold expires",
-        "startsInHours": 22
+        "when": {
+          "inDays": 1,
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",
@@ -178,9 +187,12 @@
       {
         "type": "meeting",
         "title": "Dentist: Dr. Lee",
-        "startsInHours": 52,
-        "endsInHours": 53,
-        "location": "Bright Smile Dental"
+        "location": "Bright Smile Dental",
+        "when": {
+          "weekday": "thu",
+          "at": "16:30"
+        },
+        "durationMins": 60
       }
     ],
     "status": "open",
@@ -226,8 +238,11 @@
       {
         "type": "meeting",
         "title": "Podcast recording: Design Matters FM",
-        "startsInHours": 96,
-        "endsInHours": 97
+        "when": {
+          "weekday": "mon",
+          "at": "10:00"
+        },
+        "durationMins": 60
       }
     ],
     "status": "open",
@@ -408,14 +423,20 @@
       {
         "type": "deadline",
         "title": "Offsite deposit due",
-        "startsInHours": 70
+        "when": {
+          "weekday": "fri",
+          "at": "17:00"
+        }
       },
       {
         "type": "date",
         "title": "Team offsite at The Foundry",
-        "startsInHours": 650,
-        "endsInHours": 658,
-        "location": "The Foundry"
+        "location": "The Foundry",
+        "when": {
+          "date": "12-12",
+          "at": "09:00"
+        },
+        "durationMins": 480
       }
     ],
     "status": "open",
@@ -457,9 +478,12 @@
       {
         "type": "meeting",
         "title": "Config Community Night",
-        "startsInHours": 140,
-        "endsInHours": 143,
-        "location": "SF"
+        "location": "SF",
+        "when": {
+          "weekday": "wed",
+          "at": "18:00"
+        },
+        "durationMins": 180
       }
     ],
     "status": "open",
@@ -501,7 +525,10 @@
       {
         "type": "deadline",
         "title": "Upload vehicle registration",
-        "startsInHours": 133
+        "when": {
+          "inDays": 7,
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",
@@ -622,13 +649,19 @@
       {
         "type": "deadline",
         "title": "Board deck sign-off",
-        "startsInHours": 30
+        "when": {
+          "weekday": "wed",
+          "at": "18:00"
+        }
       },
       {
         "type": "meeting",
         "title": "Q3 board meeting",
-        "startsInHours": 48,
-        "endsInHours": 50
+        "when": {
+          "weekday": "fri",
+          "at": "10:00"
+        },
+        "durationMins": 120
       }
     ],
     "status": "open",
@@ -679,7 +712,10 @@
       {
         "type": "deadline",
         "title": "Sign Series A term sheet",
-        "startsInHours": 90
+        "when": {
+          "weekday": "mon",
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",
@@ -732,7 +768,10 @@
       {
         "type": "deadline",
         "title": "Pick senior designer",
-        "startsInHours": 68
+        "when": {
+          "weekday": "fri",
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",
@@ -812,7 +851,10 @@
       {
         "type": "deadline",
         "title": "Fast Company quote",
-        "startsInHours": 40
+        "when": {
+          "weekday": "thu",
+          "at": "12:00"
+        }
       }
     ],
     "status": "open",
@@ -863,8 +905,11 @@
       {
         "type": "meeting",
         "title": "Dinner at the Kapoors'",
-        "startsInHours": 180,
-        "endsInHours": 183
+        "when": {
+          "date": "11-22",
+          "at": "19:00"
+        },
+        "durationMins": 180
       }
     ],
     "status": "open",
@@ -1908,8 +1953,11 @@
       {
         "type": "date",
         "title": "Flight SFO → JFK",
-        "startsInHours": 72,
-        "endsInHours": 78
+        "when": {
+          "weekday": "fri",
+          "at": "08:15"
+        },
+        "durationMins": 360
       }
     ],
     "status": "open",
@@ -1951,7 +1999,10 @@
       {
         "type": "deadline",
         "title": "LP letter edits",
-        "startsInHours": 34
+        "when": {
+          "weekday": "wed",
+          "at": "18:00"
+        }
       }
     ],
     "status": "open",
@@ -2030,8 +2081,11 @@
       {
         "type": "meeting",
         "title": "Fernbrook board meeting (proposed)",
-        "startsInHours": 260,
-        "endsInHours": 262
+        "when": {
+          "date": "11-25",
+          "at": "10:00"
+        },
+        "durationMins": 120
       }
     ],
     "status": "open",
@@ -2073,7 +2127,10 @@
       {
         "type": "deadline",
         "title": "October expenses due",
-        "startsInHours": 66
+        "when": {
+          "weekday": "fri",
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",
@@ -2209,7 +2266,10 @@
       {
         "type": "deadline",
         "title": "Conference sign-up closes",
-        "startsInHours": 70
+        "when": {
+          "weekday": "fri",
+          "at": "17:00"
+        }
       }
     ],
     "status": "open",

@@ -12,11 +12,25 @@
 - [ ] Sync events reach an assistant twice (in both `assistants:` and `user:` rooms). Harmless if FE handlers are idempotent (FRONTEND §6). Optional server fix: emit with `io.to(a).to(b)` so Socket.io dedupes. — owner: @gemini
 - [ ] Client socket isn't told when AI moves a thread *away* from `client` without a handoff. FE mitigation: `/c` refetches on focus + every 60s (FRONTEND §6). — owner: @gemini
 - [ ] Backend not yet run against a real MongoDB by Claude (sandbox can't download mongod); first full run is Aryan's local start. — owner: Aryan
+- [ ] QA 1 · Inbox/Today/Settings · 390 + 820 · expected DESIGN_SYSTEM §8 ("More" tab on mobile, icon sidebar/drawer on tablet) · actual: sidebar hidden below 1280px with no replacement, so the client picker (Daniel) and the Assistant/Client/No reply/Waiting segments are unreachable. — owner: @gemini
+- [ ] QA 2 · Today brief · all · actual "(scheduled for 07:39 UTC)": `brief.service.js` passes a raw Date in the prompt. Format in `client.timezone` and tell the model not to mention UTC. — owner: @gemini
+- [ ] QA 3 · header + bottom tab bar · 320–390 · expected §8 tap targets ≥ 44px · actual 32–36px. — owner: @gemini
+- [ ] QA 4 · header Simulate icon · 390 · expected §9 accessible label · actual none. — owner: @gemini
+- [ ] QA 5 · ⌘K Ask · all · citations read "Thread #1/#2/#3"; show the subject instead. — owner: @gemini
+- [ ] QA 6 · ⌘K · all · empty "SEGMENTS" heading shows with no items; hide empty groups. — owner: @gemini
+- [ ] QA 7 · AI panel after sending a reply · all · shows "Why No reply · 54%" with the old AI reason; when `ownerSource` isn't `ai`, show the history entry instead. — owner: @gemini
+- [ ] QA 8 · Settings → Accounts · all · "Use demo inbox" offered while the demo inbox is connected; page doesn't name the client. — owner: @gemini
+- [ ] QA 9 · `/c` card · 375 dark · "I'll handle it" button barely visible against the card (§2 contrast). — owner: @gemini
 
 ## Handoffs needed
 _None yet._
 
 ---
+
+### 2026-11-15 04:15 · claude · Q5.1 QA pass + seed polish
+- Done: QA pass on the live site at 1920 / 820 / 390 / 375 / 320 as Alex and Priya; 9 findings for Gemini under *Open issues* (full report with AC results in `reviews/2026-11-15-qa-pass.md` in project files). Fixed my own: seed entities use `when` (weekday/date in the client's timezone) so dates match the emails; relative times snap to :00/:30 in working hours; outside sender listed first; Reset clears `Client.brief`. Prompt v3 date fix + required `clientReason` are on PR #14.
+- Changed contracts: seed item format gains `entities[].when` / `durationMins` (BACKEND §8). No API changes.
+- Next: Gemini Q5.2 fix list; then I re-run AC2, AC5, AC7, AC9, AC11 (Q5.3).
 
 ### 2026-11-15 04:00 · claude · Q5.5 README
 - Done: README rewritten: live links, one-click demo tour, how the AI works, real vs simulated (matches PRD §11), architecture diagram, run locally, env vars, security notes, limitations. Marked Q5.4 (deploy) done, since it's live on Vercel + Render + Atlas.
@@ -25,7 +39,8 @@ _None yet._
 
 ### 2026-11-15 03:50 · claude · B4.5 few-shot corrections, B1.7 reviewed
 - Done: classification prompt now includes up to 5 recent threads whose owner was set by the assistant (manual change) or the client (hand-off) as few-shot examples (`formatCorrections` / `loadRecentCorrections` in `classification.service.js`). Loading them never blocks classification. B1.7 (pipeline written by Gemini) reviewed across the Phase 6 and audit passes and marked done.
-- Changed contracts: `PROMPT_VERSION` v1 → v2 (user prompt gains a "Recent corrections" block). No API or model changes.
+- Also (v3): message times in the prompt are now shown in the client's timezone with the weekday (`formatLocalStamp`), plus a rule to resolve "by Friday" from the message's own date, and `clientReason` is now required for client-owned threads (a live simulated email reached Priya's view with no "Why you" line). Seen live: a Sat 22:03 UTC email (Sunday morning in IST) saying "Friday 5 PM" was saved as Sun Nov 22.
+- Changed contracts: `PROMPT_VERSION` v1 → v3 (user prompt gains a "Recent corrections" block and local message times). No API or model changes.
 - Next: Q5.5 README, then Q5.1/Q5.3 QA pass on the live site.
 
 

@@ -42,3 +42,12 @@ describe('formatCorrections (B4.5 few-shot)', () => {
     expect(lines[0]).toBe('- "S0" from a0@x.com -> none (the assistant corrected it)');
   });
 });
+
+describe('formatLocalStamp', () => {
+  it('shows the message time in the client timezone with its weekday', async () => {
+    const { formatLocalStamp } = await import('../src/services/classification.service.js');
+    // Sat 22:03 UTC is already Sunday morning in India.
+    expect(formatLocalStamp('2026-11-14T22:03:00Z', 'Asia/Kolkata')).toBe('Sun 2026-11-15 03:33');
+    expect(formatLocalStamp('not a date', 'Asia/Kolkata')).toBe('unknown time');
+  });
+});

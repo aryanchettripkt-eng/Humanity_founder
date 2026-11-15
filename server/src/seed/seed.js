@@ -195,18 +195,147 @@ function resolvePerson(person, client) {
   return person;
 }
 
+const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
 /**
- * Seed dates can be absolute (`startsAt`, `sentAt`) or relative to now
- * (`startsInHours`, `hoursOffset`) so the demo always looks current.
- * @param {any} e
+ * Local calendar parts of `date` in time zone `tz`.
+ * @param {Date} date
+ * @param {string} tz
  */
-function toEntity(e) {
-  const startsAt = e.startsAt ? new Date(e.startsAt) : hoursFromNow(e.startsInHours ?? 24);
+function zonedParts(date, tz) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    weekday: 'short',
+  }).formatToParts(date);
+  /** @type {Record<string, string>} */
+  const p = {};
+  for (const { type, value } of parts) p[type] = value;
+  return {
+    year: Number(p.year),
+    month: Number(p.month),
+    day: Number(p.day),
+    hour: Number(p.hour),
+    minute: Number(p.minute),
+    weekday: WEEKDAYS.indexOf(String(p.weekday).slice(0, 3).toLowerCase()),
+  };
+}
+
+/**
+ * The instant of a wall-clock time in `tz` (re-checks the offset, so DST is handled).
+ * @param {number} year
+ * @param {number} month 1-12
+ * @param {number} day
+ * @param {number} hour
+ * @param {number} minute
+ * @param {string} tz
+ */
+function zonedTime(year, month, day, hour, minute, tz) {
+  const wall = Date.UTC(year, month - 1, day, hour, minute);
+  let ts = wall;
+  for (let i = 0; i < 2; i += 1) {
+    const p = zonedParts(new Date(ts), tz);
+    ts += wall - Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute);
+  }
+  return new Date(ts);
+}
+
+/**
+ * Resolve a seed `when` so dates match the wording of the email, in the client's time zone:
+ *   { weekday: 'wed', at: '09:30' }  next Wednesday (1-7 days ahead)
+ *   { inDays: 1, at: '17:00' }       tomorrow at 5 PM
+ *   { date: '11-19', at: '17:00' }   Nov 19 (this year, or next year if long past)
+ * @param {{ weekday?: string, inDays?: number, date?: string, at?: string }} when
+ * @param {string} tz
+ * @param {Date} [now]
+ */
+export function resolveWhen(when, tz, now = new Date()) {
+  const [hour, minute] = String(when.at || '09:00').split(':').map(Number);
+  const today = zonedParts(now, tz);
+  if (when.date) {
+    const [month, day] = when.date.split('-').map(Number);
+    const thisYear = zonedTime(today.year, month, day, hour, minute, tz);
+    const longPast = thisYear.getTime() < now.getTime() - 30 * 24 * 3600 * 1000;
+    return longPast ? zonedTime(today.year + 1, month, day, hour, minute, tz) : thisYear;
+  }
+  let addDays = when.inDays ?? 1;
+  if (when.weekday) {
+    const target = WEEKDAYS.indexOf(when.weekday.slice(0, 3).toLowerCase());
+    addDays = (target - today.weekday + 7) % 7 || 7;
+  }
+  // Calendar arithmetic on the local date, then back to an instant.
+  const local = new Date(Date.UTC(today.year, today.month - 1, today.day + addDays));
+  return zonedTime(
+    local.getUTCFullYear(),
+    local.getUTCMonth() + 1,
+    local.getUTCDate(),
+    hour,
+    minute,
+    tz
+  );
+}
+
+/**
+ * Round a relative seed time to the half hour and keep it within 9:00-19:00 local time,
+ * so the demo never shows "Tomorrow, 1:33 AM".
+ * @param {Date} date
+ * @param {string} tz
+ */
+export function snapToWorkingHours(date, tz) {
+  const p = zonedParts(date, tz);
+  let hour = p.hour;
+  let minute = p.minute < 15 ? 0 : p.minute < 45 ? 30 : 60;
+  if (minute === 60) {
+    hour += 1;
+    minute = 0;
+  }
+  if (hour < 9) [hour, minute] = [9, 0];
+  if (hour >= 19) [hour, minute] = [18, 0];
+  return zonedTime(p.year, p.month, p.day, hour, minute, tz);
+}
+
+/**
+ * Seed dates can be absolute (`startsAt`), tied to the email's wording (`when`, see
+ * `resolveWhen`), or relative to now (`startsInHours`, snapped to working hours), so the
+ * demo always looks current.
+ * @param {any} e
+ * @param {string} [tz]
+ */
+export function toEntity(e, tz = 'Asia/Kolkata') {
+  let startsAt;
+  if (e.startsAt) startsAt = new Date(e.startsAt);
+  else if (e.when) startsAt = resolveWhen(e.when, tz);
+  else startsAt = snapToWorkingHours(hoursFromNow(e.startsInHours ?? 24), tz);
+
   let endsAt;
   if (e.endsAt) endsAt = new Date(e.endsAt);
-  else if (e.endsInHours !== undefined) endsAt = hoursFromNow(e.endsInHours);
-  const { startsInHours: _s, endsInHours: _e, ...rest } = e;
+  else if (e.durationMins !== undefined) {
+    endsAt = new Date(startsAt.getTime() + e.durationMins * 60000);
+  } else if (e.endsInHours !== undefined) {
+    endsAt = new Date(startsAt.getTime() + (e.endsInHours - (e.startsInHours ?? 24)) * 3600000);
+  }
+
+  const { startsInHours: _s, endsInHours: _e, when: _w, durationMins: _d, ...rest } = e;
   return { ...rest, startsAt, ...(endsAt ? { endsAt } : {}) };
+}
+
+/**
+ * Show the outside sender first: list views use `participants[0]` as the sender, so the
+ * client and the assistant go last.
+ * @param {any[]} people
+ * @param {{ name: string, email: string }} client
+ */
+function orderParticipants(people, client) {
+  const isInternal = (/** @type {any} */ p) =>
+    p === 'client' || /^alex@/i.test(p?.email || '') || p?.email === client.email;
+  return [...people.filter((p) => !isInternal(p)), ...people.filter(isInternal)].map((p) =>
+    resolvePerson(p, client)
+  );
 }
 
 /**
@@ -227,7 +356,7 @@ export async function createThreadWithMessages({ client, account, item, pendingA
     accountId: account._id,
     subject: item.subject,
     snippet: String(lastMsg?.bodyText || item.snippet || '').slice(0, 140),
-    participants: (item.participants || []).map((p) => resolvePerson(p, client)),
+    participants: orderParticipants(item.participants || [], client),
     lastMessageAt,
     messageCount: msgs.length,
     lastSender: lastMsg?.direction === 'outbound' ? 'us' : 'them',
@@ -246,7 +375,7 @@ export async function createThreadWithMessages({ client, account, item, pendingA
     waitingOnOthers: item.waitingOnOthers ?? false,
     summary: pendingAI ? '' : item.summary || '',
     keyPoints: pendingAI ? [] : item.keyPoints || [],
-    entities: pendingAI ? [] : (item.entities || []).map(toEntity),
+    entities: pendingAI ? [] : (item.entities || []).map((e) => toEntity(e, client.timezone)),
     aiStatus: pendingAI ? 'pending' : 'done',
     aiModel: pendingAI ? undefined : 'seed',
     ...(pendingAI
@@ -340,6 +469,8 @@ export async function seedDatabase(opts = {}) {
           vipSenders: ['james@sequoiacap.example.com'],
         },
       },
+      // Reset also clears the cached morning brief, so Today matches the fresh demo data.
+      $unset: { brief: 1 },
     },
     { upsert: true, new: true }
   );
@@ -357,6 +488,7 @@ export async function seedDatabase(opts = {}) {
           vipSenders: [],
         },
       },
+      $unset: { brief: 1 },
     },
     { upsert: true, new: true }
   );
