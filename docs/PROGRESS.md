@@ -28,6 +28,14 @@ _None yet._
 
 ---
 
+### 2026-11-16 05:35 · claude · Onboarding in the sign-in style
+- Done (Aryan: fix onboarding "in accordance of the login page"): `/onboarding` now uses the sign-in layout (headline and subline on the left, the same glass card on the right, same type scale from `auth.css`). Step pills (Welcome, Connect, Sync) with a tick on finished steps.
+- Connect step rebuilt: the squashed Gmail card is gone. Two clear rows: **Demo inbox** (lime, loads the sample emails directly, no pretend Google sign-in) and **Gmail · Beta** (read-only, approved test accounts; shown only when the server has Gmail set up). The simulated Outlook option and all "Simulated in prototype" copy are removed from onboarding (D20).
+- Sync step: lime progress bar, "N of M emails sorted", truthful error with "Back to connect".
+- Welcome copy is truthful: replies are drafted to edit and save; Relay never emails anyone on its own.
+- Still open: Settings › Accounts still uses `ConnectProviderCard` and `SimulatedOAuthModal`, which say "Simulated".
+- Checked: lint, typecheck, tests. 1440, 1903, 1024 and 390, light and dark. Screenshots in project files `reviews/shots-onboarding/`.
+
 ### 2026-11-16 05:15 · claude · Remove the old marketing landing page
 - Done (Aryan: "destroy the / while signed out", the main website is the glass app): `/` now sends signed-out visitors to `/login` (signed-in users still go to `/app/today` or `/c`). `/welcome` redirects to `/login`.
 - Deleted the lime landing page and everything only it used: `pages/LandingPage.tsx` (+ test), `features/landing/`, `components/workspace/`. FRONTEND.md routes updated.
