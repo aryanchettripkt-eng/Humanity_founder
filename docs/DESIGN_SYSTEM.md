@@ -44,6 +44,20 @@ Exported once from `web/src/lib/owners.ts` as `OWNER_META` — components must r
 
 Category icons (muted, no color): meeting `CalendarDays`, action `CircleAlert`, update `Info`, newsletter `Newspaper`, finance `Receipt`, legal `Scale`, personal `Heart`, general `Mail`.
 
+### 2.3 Landing theme (`.theme-landing`)
+Scoped to `.theme-landing` on the public landing page (`/`) so the app (`/app`, `/c`, `/login`) keeps the indigo palette untouched.
+
+| Token | Value (HSL) | Use |
+|---|---|---|
+| `--landing-canvas` | `240 5.9% 90%` (`#E4E4E7`) | outer page canvas |
+| `--landing-surface` | `0 0% 98%` (`#FAFAFA`) | main rounded workspace container |
+| `--landing-ink` | `240 4% 5%` (`#0B0B0C`) | primary ink, dark floating panel, pill bars |
+| `--landing-ink-foreground` | `0 0% 98%` (`#FAFAFA`) | text on dark ink surfaces |
+| `--landing-accent` | `80 85% 69%` (`#C6F36B`) | lime highlight card, schedule track, active accents |
+| `--landing-accent-foreground` | `240 4% 5%` (`#0B0B0C`) | high-contrast ink text on lime |
+| `--landing-delta-up` | `80 85% 69%` | positive stat delta pill |
+| `--landing-delta-down` | `351 95% 86%` | negative stat delta pill (with dark rose text) |
+
 ## 3. Typography
 - Font: **Inter** (variable, `font-feature-settings: "cv11","ss01"`), fallback system‑ui. Mono: JetBrains Mono for keyboard hints only.
 - Scale (px / line-height / weight):
@@ -105,6 +119,15 @@ Each component must support the listed states. "✓" = required.
 | `Toast` | sonner; success / error / undo action | | ✓ |
 | `OfflineBanner` | socket disconnected | | ✓ |
 | `KbdHint` | `<kbd>` styled hints in tooltips | | ✓ |
+| `LandingTopBar` | public landing header + "Your day" schedule pill | `demoLoading, onDemoLogin` | mobile compact, desktop full ✓ |
+| `LandingHero` | uppercase hero + CTA + `StatWithDelta` row | `demoLoading, onDemoLogin` | loading, responsive wrap ✓ |
+| `StatWithDelta` | large tabular stat + floating up/down delta pill | `value, label, delta, direction` | up (lime), down (rose) ✓ |
+| `FilterChips` | circular search/sliders + `aria-pressed` filter pills | `items, value, onChange` | active, inactive, keyboard focus ✓ |
+| `ReplyCard` | sample thread card w/ notched arrow, `SourceBadge`, `OWNER_META`, `ConfidenceMeter` | `thread, selected, onSelect` | default, selected, hover ✓ |
+| `TaskCard` | sample task card (lime highlighted or white) | `task` | highlighted (lime), default (white) ✓ |
+| `SummaryPanel` | dark floating AI summary + mini `/c` preview + timeline | `thread` | sticky desktop, stacked tablet/mobile ✓ |
+| `FeatureStrip` | 4-card product capability strip | | responsive grid ✓ |
+| `LandingFooter` | dark CTA band + dual demo login + simulated tooltip | `demoLoading, onDemoLogin` | loading, tooltip ✓ |
 
 shadcn primitives to install: button, input, textarea, badge, card, dialog, sheet, popover, dropdown-menu, command, tooltip, tabs, scroll-area, separator, skeleton, avatar, checkbox, toggle-group, sonner.
 
@@ -148,3 +171,4 @@ shadcn primitives to install: button, input, textarea, badge, card, dialog, shee
 - [ ] ⌘K palette + Ask AI
 - [ ] Global states: loading, empty, error, offline, toast
 - [ ] Dark mode pass (P1)
+- [ ] Landing: public `/` workspace showcase (320 / 390 / 820 / 1440)

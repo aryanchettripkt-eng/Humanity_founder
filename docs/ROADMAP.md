@@ -79,7 +79,7 @@
 - [ ] **G6.8** Review G6.2–G6.7 against spec + update README "What's real" + video script segment — @claude
 
 ## Phase 7 — Landing page
-- [~] **L7.1** Public landing page — @gemini (gemini/L7.1-landing-page)
+- [x] **L7.1** Public landing page — @gemini (gemini/L7.1-landing-page)
 
 ## Backlog (P2, do not start without Aryan's OK)
 - [ ] Keyboard help overlay (`?`)

@@ -43,6 +43,22 @@ const config: Config = {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--primary-foreground))',
         },
+        landing: {
+          canvas: 'hsl(var(--landing-canvas))',
+          surface: 'hsl(var(--landing-surface))',
+          ink: {
+            DEFAULT: 'hsl(var(--landing-ink))',
+            foreground: 'hsl(var(--landing-ink-foreground))',
+          },
+          accent: {
+            DEFAULT: 'hsl(var(--landing-accent))',
+            foreground: 'hsl(var(--landing-accent-foreground))',
+          },
+          delta: {
+            up: 'hsl(var(--landing-delta-up))',
+            down: 'hsl(var(--landing-delta-down))',
+          },
+        },
       },
     },
   },

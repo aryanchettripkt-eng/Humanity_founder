@@ -27,6 +27,15 @@ _None yet._
 
 ---
 
+### 2026-11-15 17:30 · gemini · L7.1 Public landing page
+- Done:
+  - Added `.theme-landing` HSL tokens in `web/src/styles/globals.css` and mapped `landing.*` colors in `web/tailwind.config.ts` (app indigo palette untouched).
+  - Built `web/src/features/landing/` (`sampleData.ts`, `LandingTopBar`, `LandingHero`, `StatWithDelta`, `FilterChips`, `ReplyCard`, `TaskCard`, `SummaryPanel`, `FeatureStrip`, `LandingFooter`) and `web/src/pages/LandingPage.tsx`.
+  - Updated `RootRedirect` in `web/src/app/router.tsx` (`!token` renders lazy `LandingPage` instead of redirecting to `/login`; signed-in redirect unchanged).
+  - Added `web/src/pages/LandingPage.test.tsx` and updated `docs/DESIGN_SYSTEM.md`, `docs/FRONTEND.md`, and `docs/ROADMAP.md`.
+- Changed contracts: none (reuses `demoLoginApi` only).
+- Next: manual visual check in Chrome at 1440/820/390/320 (Chrome remote debugging was unavailable in this session) and merge `gemini/L7.1-landing-page` -> `main`.
+
 ### 2026-11-15 04:15 · claude · Q5.1 QA pass + seed polish
 - Done: QA pass on the live site at 1920 / 820 / 390 / 375 / 320 as Alex and Priya; 9 findings for Gemini under *Open issues* (full report with AC results in `reviews/2026-11-15-qa-pass.md` in project files). Fixed my own: seed entities use `when` (weekday/date in the client's timezone) so dates match the emails; relative times snap to :00/:30 in working hours; outside sender listed first; Reset clears `Client.brief`. Prompt v3 date fix + required `clientReason` are on PR #14.
 - Changed contracts: seed item format gains `entities[].when` / `durationMins` (BACKEND §8). No API changes.

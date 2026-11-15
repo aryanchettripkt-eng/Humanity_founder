@@ -36,6 +36,25 @@
     --destructive: 0 90.6% 70.8%;
   }
 
+  .theme-landing {
+    --landing-canvas: 240 5.9% 90%;
+    --landing-surface: 0 0% 98%;
+    --landing-ink: 240 4% 5%;
+    --landing-ink-foreground: 0 0% 98%;
+    --landing-accent: 80 85% 69%;
+    --landing-accent-foreground: 240 4% 5%;
+    --landing-delta-up: 80 85% 69%;
+    --landing-delta-down: 351 95% 86%;
+    --background: 0 0% 100%;
+    --surface: 240 4.8% 95.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 4% 5%;
+    --border: 240 5.9% 90%;
+    --foreground: 240 4% 5%;
+    --muted-foreground: 240 3.8% 46.1%;
+    color-scheme: light;
+  }
+
   * {
     @apply border-border;
   }
