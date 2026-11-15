@@ -42,7 +42,8 @@ web/
         components/  hooks/  api.ts  types.ts (if domain-specific)
     components/
       ui/                    # shadcn generated — do not hand-edit except via shadcn CLI
-      common/                # OwnerPill, EmptyState, ErrorState, KbdHint, ...
+      common/                # OwnerPill, EmptyState, ErrorState, KbdHint, NotchedCard, PillBar, ChipRow, ...
+      workspace/             # AppTopBar, NavRail, MobileTabBar, WorkspaceHeader, WorkspaceGrid, PersonCard, TaskCard, FocusPanel, Avatar, models.ts
     lib/
       api.ts                 # fetch wrapper, auth header, error normalisation
       socket.ts              # singleton socket + useSocketEvent hook
@@ -65,13 +66,14 @@ web/
 | Path | Page | Auth | Notes |
 |---|---|---|---|
 | `/` | Landing / redirect | – | shows `LandingPage` (anon); redirects signed-in users → `/app/today` (assistant) or `/c` (client) |
+| `/welcome` | Landing (signed-in) | – | always renders `LandingPage` for signed-in users wanting to view the marketing page |
 | `/login`, `/signup` | Login/Signup | anon | demo buttons call `POST /api/auth/demo`; "Continue with Google" navigates to `${API}/auth/google/start` (shown only if `/health` says `googleLogin:true`) |
 | `/auth/callback` | AuthCallback | anon | reads `#token=` (or `?error=`), stores token, clears the hash, routes by role. P1 |
 | `/onboarding` | Onboarding | assistant | step via `?step=welcome|connect|sync`; after real Gmail OAuth the server lands here with `&accountId=` or `&error=` (`not_test_user`, `access_denied`, …) |
 | `/app/today` | Today | assistant | |
 | `/app/inbox/:segment?/:threadId?` | Inbox | assistant | default segment `inbox`. Mobile: threadId present → full‑screen thread |
 | `/app/settings/accounts` | Accounts | assistant | |
-| `/c` | Client home | client | |
+| `/c` | Client home | client (or assistant w/ `?preview=1`) | `?preview=1` lets assistants inspect a read-only preview of the client queue |
 | `/c/thread/:threadId` | Client read view | client | read‑only |
 | `*` | 404 | – | |
 
@@ -116,7 +118,8 @@ Route guards: `RequireAuth role="assistant"|"client"`. Assistant without any con
 - Lint/format: ESLint (typescript-eslint, react-hooks) + Prettier (2 spaces, single quotes, semi, width 100). Run `npm run lint && npm run typecheck` before committing.
 
 ## 7. Screen composition (what each page uses)
-- **TodayPage**: greeting + `RefreshCw`, `PillBar` (upcoming dates in client timezone), `StatWithBadge×3`, `NotchedCard` ("Needs your call" review + "Your day" tasks with `ChipRow`), dark `TodaySummaryPanel` (selected thread + collapsed `ActivityFeed`), recent `ThreadRow×5`.
+- **LandingPage**: `AppTopBar` · `WorkspaceHeader` · `WorkspaceGrid` (`PersonCard`, `TaskCard`, `FocusPanel` mapped from `sampleData.ts`) · `HowItWorks` · `FeatureStrip` · `LandingFooter`.
+- **TodayPage**: `AppTopBar` + `NavRail` + `MobileTabBar` (in `AssistantLayout`) · `WorkspaceHeader` (greeting, `CLIENT'S INBOX`, Ask AI `⌘K`, 3 `StatWithBadge`s w/ `lastSeenCounts` deltas, 1-line brief + `more ▾`) · `WorkspaceGrid` (`PersonCard` w/ 1/2/3 quick-assign on `review`, `TaskCard` w/ status menu, sticky `FocusPanel`) · recent `ThreadRow×5`.
 - **InboxPage**: `SegmentNav` (in layout) · `ThreadList` (+ search/filter bar) · `ThreadView` (`ThreadHeader`, `MessageItem[]`, `DraftComposer`) · `AIPanel`.
 - **ClientHomePage**: greeting, count, `ClientCard[]` with AnimatePresence, all‑caught‑up `EmptyState`.
 - **OnboardingPage**: `Stepper`, `ConnectProviderCard×2`, `SimulatedOAuthModal`, `SyncProgress` (driven by `sync:progress` socket events). Gmail card has two actions: primary **Use demo inbox** (simulated) and secondary **Connect real Gmail (beta)** (when enabled). Handles `?error=` from the OAuth redirect with an inline `ErrorState` + "Use demo inbox instead".

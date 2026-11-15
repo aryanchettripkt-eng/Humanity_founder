@@ -27,6 +27,20 @@ _None yet._
 
 ---
 
+### 2026-11-15 18:45 · gemini · W8.1 shared workspace components, frame, Today & landing migration
+- Done:
+  - Added `@fontsource-variable/urbanist` as `font-display` in Tailwind (`SectionHeader`, `StatWithBadge`, `WorkspaceHeader`, card names).
+  - Built shared workspace components in `web/src/components/workspace/` (`models.ts`, `Avatar.tsx`, `AppTopBar.tsx`, `NavRail.tsx`, `MobileTabBar.tsx`, `WorkspaceHeader.tsx`, `PersonCard.tsx`, `TaskCard.tsx`, `FocusPanel.tsx`, `WorkspaceGrid.tsx`).
+  - Rebuilt `AssistantLayout` with `AppTopBar` (48h `PillBar` + 7-day popover, `⌘K`, 🔔 collapsed activity w/ lime unseen dot, client switcher `"Priya ▾"`, user avatar menu), 64px `NavRail`, `MobileTabBar` + `More` dialog, and floating demo `"+ Simulate"` pill.
+  - Rebuilt `TodayPage` + `features/today/mappers.ts` onto `WorkspaceHeader` + `WorkspaceGrid` + 5 `ThreadRow`s, `lastSeenCounts` stat deltas in `useUiStore`, and `1/2/3` keyboard quick-assign on `review` cards.
+  - Added `/welcome` route and `/c?preview=1` read-only assistant preview (rendered via assistant-accessible `/threads` when `role === 'assistant'` so `server/src/routes/client.routes.js` stays strictly `client`-only).
+  - Migrated `LandingPage` + `sampleData.ts` onto the shared workspace components and `git rm`'d the replaced duplicates (`LandingTopBar`, `LandingHero`, `ReplyCard`, `TaskCard`, `SummaryPanel`, `TodaySummaryPanel`).
+  - Fixed `server/src/services/brief.service.js` to format dates as `"Sun 8:00 pm"` in client timezone (never UTC/year) and sanitize ISO timestamps; bumped `PROMPT_VERSION` to `'v4'`.
+  - Added unit tests (`features/today/mappers.test.ts`, `pages/TodayPage.test.tsx`) and updated `LandingPage.test.tsx`.
+- Changed contracts: Added `/welcome` and `/c?preview=1` frontend routes; bumped `PROMPT_VERSION` to `'v4'` (`docs/BACKEND.md` §5, `docs/FRONTEND.md` §2/§3/§7, `docs/DESIGN_SYSTEM.md` §6).
+- Next: Open PR `feat(workspace): W8.1 shared components, frame and Today` for Claude review, then start W8.2 (Inbox).
+- Notes/risks: Chrome remote debugging (`DevToolsActivePort`) was unavailable in earlier checks, so live browser screenshots at 1440/820/390/320 were not captured in this session.
+
 ### 2026-11-15 18:35 · claude · Workspace UX spec (docs)
 - Done: wrote `docs/WORKSPACE_UX.md`, a screen-by-screen layout mapping the reference to Relay features, approved by Aryan (D14 nav rail + chips, D15 Priya phone preview in the floating panel, D16 Urbanist display font, D17 build-once shared components). Linked from DESIGN_SYSTEM §6/§11, reuse rule added to AGENTS §7, Phase 8 tasks W8.1–W8.4 added.
 - Audits behind it: `reviews/2026-11-15-site-audit.md` (project files).

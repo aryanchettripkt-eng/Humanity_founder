@@ -1,27 +1,30 @@
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { CalendarDays, Flame, Inbox, Layers, Sparkles } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { ChipRow, type ChipRowItem } from '@/components/common/ChipRow';
-import { SectionHeader } from '@/components/common/SectionHeader';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Flame, Loader2, LogIn, Sparkles } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import type { ChipRowItem } from '@/components/common/ChipRow';
+import { AppTopBar } from '@/components/workspace/AppTopBar';
+import { WorkspaceGrid } from '@/components/workspace/WorkspaceGrid';
+import { WorkspaceHeader } from '@/components/workspace/WorkspaceHeader';
 import { useDemoLogin } from '@/features/auth/useDemoLogin';
 import { FeatureStrip } from '@/features/landing/components/FeatureStrip';
 import { LandingFooter } from '@/features/landing/components/LandingFooter';
-import { LandingHero } from '@/features/landing/components/LandingHero';
-import { LandingTopBar } from '@/features/landing/components/LandingTopBar';
-import { ReplyCard } from '@/features/landing/components/ReplyCard';
-import { SummaryPanel } from '@/features/landing/components/SummaryPanel';
-import { TaskCard } from '@/features/landing/components/TaskCard';
 import {
+  LANDING_BRIEF,
+  LANDING_STATS,
   SAMPLE_TASKS,
   SAMPLE_THREADS,
+  SCHEDULE_DATE,
+  SCHEDULE_NOW_PERCENT,
+  SCHEDULE_NOW_TIME,
+  SCHEDULE_SLOTS,
   TASK_EMPTY_COPY,
   THREAD_EMPTY_COPY,
-  type SampleReplyThread,
+  toLandingFocusPanel,
+  toLandingPersonCards,
+  toLandingTaskCards,
   type TaskFilterId,
 } from '@/features/landing/sampleData';
 import { OWNER_META } from '@/lib/owners';
-import { cn } from '@/lib/utils';
 import type { Owner } from '@/types/api';
 
 type OwnerFilter = 'all' | Owner;
@@ -42,40 +45,29 @@ const TASK_CHIPS: ChipRowItem<TaskFilterId>[] = [
   { id: 'done', label: 'Done' },
 ];
 
-const ANCHOR_ITEMS = [
-  { id: 'who-replies', label: 'Who replies', icon: Inbox },
-  { id: 'your-day', label: 'Your day', icon: CalendarDays },
-  { id: 'summary', label: 'Summary', icon: Sparkles },
-  { id: 'features', label: 'Features', icon: Layers },
+const HOW_IT_WORKS = [
+  {
+    step: '01',
+    title: 'Reads every thread, not just subjects',
+    body: 'Relay syncs Gmail read-only and separates what you can handle from what only your client can decide.',
+  },
+  {
+    step: '02',
+    title: 'Drafts in your client’s voice',
+    body: 'For assistant-owned threads, Relay prepares a concise draft with citations and extracted dates.',
+  },
+  {
+    step: '03',
+    title: 'Hands off cleanly on /c',
+    body: 'Your client sees only the decisions that need them — never the noise, newsletters, or scheduling back-and-forth.',
+  },
 ];
 
 export function LandingPage() {
-  const prefersReducedMotion = useReducedMotion();
   const { demoLoading, handleDemo } = useDemoLogin();
-
   const [ownerFilter, setOwnerFilter] = useState<OwnerFilter>('all');
   const [taskFilter, setTaskFilter] = useState<TaskFilterId>('all');
-  const [selectedThread, setSelectedThread] = useState<SampleReplyThread>(SAMPLE_THREADS[0]);
-  const [activeSection, setActiveSection] = useState<string>('who-replies');
-
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return;
-    const elements = ANCHOR_ITEMS.map((item) => document.getElementById(item.id)).filter(
-      (el): el is HTMLElement => el !== null
-    );
-    if (elements.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.find((entry) => entry.isIntersecting);
-        if (visible?.target.id) setActiveSection(visible.target.id);
-      },
-      { rootMargin: '-25% 0px -55% 0px', threshold: 0.1 }
-    );
-
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+  const [selectedId, setSelectedId] = useState<string>(SAMPLE_THREADS[0].id);
 
   const visibleThreads = useMemo(() => {
     if (ownerFilter === 'all') return SAMPLE_THREADS.slice(0, 4);
@@ -87,6 +79,10 @@ export function LandingPage() {
     return SAMPLE_TASKS.filter((t) => t.tags.includes(taskFilter));
   }, [taskFilter]);
 
+  const people = useMemo(() => toLandingPersonCards(visibleThreads), [visibleThreads]);
+  const tasks = useMemo(() => toLandingTaskCards(visibleTasks), [visibleTasks]);
+  const focusModel = useMemo(() => toLandingFocusPanel(selectedId), [selectedId]);
+
   const threadCountLabel =
     ownerFilter === 'all'
       ? `${visibleThreads.length} of ${SAMPLE_THREADS.length} threads`
@@ -95,158 +91,96 @@ export function LandingPage() {
   const taskCountLabel = `${visibleTasks.length} ${visibleTasks.length === 1 ? 'task' : 'tasks'}`;
 
   return (
-    <div className="min-h-screen w-full overflow-x-clip bg-background text-foreground antialiased selection:bg-accent-lime selection:text-accent-lime-foreground">
-      <div className="relative w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-10 lg:py-8">
-        <LandingTopBar demoLoading={demoLoading} onDemoLogin={handleDemo} />
-
-        <main>
-          <LandingHero demoLoading={demoLoading} onDemoLogin={handleDemo} />
-
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-[44px_minmax(0,1fr)_340px] xl:gap-6">
-            <nav
-              aria-label="Landing section navigation"
-              className="hidden xl:sticky xl:top-8 xl:flex xl:flex-col xl:gap-3 xl:self-start"
-            >
-              {ANCHOR_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeSection === item.id;
-                return (
-                  <Tooltip key={item.id}>
-                    <TooltipTrigger asChild>
-                      <a
-                        href={`#${item.id}`}
-                        aria-label={item.label}
-                        aria-current={isActive ? 'true' : undefined}
-                        className={cn(
-                          'flex h-11 w-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                          isActive
-                            ? 'bg-primary text-primary-foreground'
-                            : 'border border-border bg-card text-muted-foreground hover:text-foreground'
-                        )}
-                      >
-                        <Icon className="h-4 w-4" aria-hidden="true" />
-                      </a>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
-                  </Tooltip>
-                );
-              })}
-            </nav>
-
-            <div className="min-w-0 space-y-10">
-              <section id="who-replies" aria-labelledby="who-replies-heading" className="space-y-4">
-                <SectionHeader
-                  id="who-replies-heading"
-                  title="Who needs to reply"
-                  countLabel={threadCountLabel}
-                  liveText={`Showing ${visibleThreads.length} ${visibleThreads.length === 1 ? 'thread' : 'threads'}`}
-                />
-                <ChipRow items={OWNER_CHIPS} value={ownerFilter} onChange={setOwnerFilter} />
-
-                <AnimatePresence mode="wait">
-                  {visibleThreads.length === 0 ? (
-                    <motion.p
-                      key={`empty-${ownerFilter}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="rounded-[24px] border border-border bg-card/75 px-5 py-6 text-sm text-muted-foreground"
-                    >
-                      {THREAD_EMPTY_COPY[ownerFilter]}
-                    </motion.p>
-                  ) : (
-                    <motion.div
-                      key={ownerFilter}
-                      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                      className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4"
-                    >
-                      {visibleThreads.map((thread, index) => (
-                        <motion.div
-                          key={thread.id}
-                          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: 0.25,
-                            delay: prefersReducedMotion ? 0 : index * 0.06,
-                            ease: [0.2, 0.8, 0.2, 1],
-                          }}
-                          className="flex w-[82%] shrink-0 snap-start md:w-auto"
-                        >
-                          <ReplyCard
-                            thread={thread}
-                            selected={selectedThread.id === thread.id}
-                            onSelect={setSelectedThread}
-                          />
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </section>
-
-              <section id="your-day" aria-labelledby="your-day-heading" className="space-y-4">
-                <SectionHeader
-                  id="your-day-heading"
-                  title="Your day"
-                  countLabel={taskCountLabel}
-                  liveText={`Showing ${visibleTasks.length} ${visibleTasks.length === 1 ? 'task' : 'tasks'}`}
-                />
-                <ChipRow items={TASK_CHIPS} value={taskFilter} onChange={setTaskFilter} />
-
-                <AnimatePresence mode="wait">
-                  {visibleTasks.length === 0 ? (
-                    <motion.p
-                      key={`empty-${taskFilter}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="rounded-[24px] border border-border bg-card px-5 py-6 text-sm text-muted-foreground"
-                    >
-                      {TASK_EMPTY_COPY[taskFilter]}
-                    </motion.p>
-                  ) : (
-                    <motion.div
-                      key={taskFilter}
-                      initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                      className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0"
-                    >
-                      {visibleTasks.map((task, index) => (
-                        <motion.div
-                          key={task.id}
-                          initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, margin: '0px 0px -10% 0px' }}
-                          transition={{
-                            duration: 0.25,
-                            delay: prefersReducedMotion ? 0 : index * 0.06,
-                            ease: [0.2, 0.8, 0.2, 1],
-                          }}
-                          className="flex w-[82%] shrink-0 snap-start md:w-auto"
-                        >
-                          <TaskCard task={task} onTryDemo={() => handleDemo('assistant')} />
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </section>
+    <div className="min-h-screen w-full overflow-x-clip bg-background p-2 text-foreground antialiased selection:bg-accent-lime selection:text-accent-lime-foreground sm:p-4">
+      <div className="mx-auto max-w-[1440px] rounded-[28px] border border-border/60 bg-surface px-4 pb-8 pt-3 shadow-sm sm:rounded-[32px] sm:px-8">
+        <AppTopBar
+          logoHref="/"
+          dateLabel={SCHEDULE_DATE}
+          slots={SCHEDULE_SLOTS}
+          nowTime={SCHEDULE_NOW_TIME}
+          nowPercent={SCHEDULE_NOW_PERCENT}
+          actions={
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-surface px-4 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                Sign in
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleDemo('assistant')}
+                disabled={demoLoading !== null}
+                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+              >
+                {demoLoading === 'assistant' ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5" />
+                )}
+                {demoLoading === 'assistant' ? 'Opening demo…' : 'Try live demo'}
+              </button>
             </div>
+          }
+        />
 
-            <div className="xl:pt-1">
-              <SummaryPanel thread={selectedThread} onTryDemo={handleDemo} />
-            </div>
-          </div>
+        <div className="mt-6 space-y-10">
+          <WorkspaceHeader
+            eyebrow="AI inbox triage for executive assistants"
+            title="WHO NEEDS TO REPLY?"
+            primaryLabel={demoLoading === 'assistant' ? 'Opening demo…' : 'Try live demo'}
+            primaryDisabled={demoLoading !== null}
+            onPrimaryAction={() => handleDemo('assistant')}
+            stats={LANDING_STATS}
+            briefText={LANDING_BRIEF}
+            subtitle="Every email sorted into Assistant, Client, or No reply — with confidence, a one-line reason, and a clean hand-off."
+          />
+
+          <WorkspaceGrid
+            peopleCountLabel={threadCountLabel}
+            peopleChips={OWNER_CHIPS}
+            activePeopleChip={ownerFilter}
+            onPeopleChipChange={setOwnerFilter}
+            people={people}
+            emptyPeopleText={THREAD_EMPTY_COPY[ownerFilter]}
+            tasksCountLabel={taskCountLabel}
+            tasksChips={TASK_CHIPS}
+            activeTasksChip={taskFilter}
+            onTasksChipChange={setTaskFilter}
+            tasks={tasks}
+            emptyTasksText={TASK_EMPTY_COPY[taskFilter]}
+            selectedId={selectedId}
+            onSelectCard={setSelectedId}
+            onOpenPerson={() => handleDemo('assistant')}
+            onOpenTask={() => handleDemo('assistant')}
+            onTaskPrimaryAction={() => handleDemo('assistant')}
+            focusModel={focusModel}
+            onOpenFocusThread={() => handleDemo('assistant')}
+          />
+
+          <section aria-label="How Relay works" className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {HOW_IT_WORKS.map((item) => (
+              <div
+                key={item.step}
+                className="rounded-3xl border border-border bg-muted/30 p-5"
+              >
+                <span className="font-display text-xs font-bold text-muted-foreground">
+                  {item.step}
+                </span>
+                <h3 className="mt-2 font-display text-base font-bold text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </section>
 
           <FeatureStrip />
-        </main>
-
-        <LandingFooter demoLoading={demoLoading} onDemoLogin={handleDemo} />
+          <LandingFooter demoLoading={demoLoading} onDemoLogin={handleDemo} />
+        </div>
       </div>
     </div>
   );

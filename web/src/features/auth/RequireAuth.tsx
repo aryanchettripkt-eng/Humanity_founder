@@ -10,10 +10,16 @@ import { useMe } from './api';
 type RequireAuthProps = {
   role: 'assistant' | 'client';
   allowNoAccounts?: boolean;
+  allowAssistantPreview?: boolean;
   children: ReactNode;
 };
 
-export function RequireAuth({ role, allowNoAccounts = false, children }: RequireAuthProps) {
+export function RequireAuth({
+  role,
+  allowNoAccounts = false,
+  allowAssistantPreview = false,
+  children,
+}: RequireAuthProps) {
   const location = useLocation();
   const token = getAuthToken();
   const { data, isLoading, isError } = useMe();
@@ -52,7 +58,13 @@ export function RequireAuth({ role, allowNoAccounts = false, children }: Require
     return <Navigate to="/login" replace />;
   }
 
-  if (data.user.role !== role) {
+  const isAssistantPreview =
+    allowAssistantPreview &&
+    role === 'client' &&
+    data.user.role === 'assistant' &&
+    new URLSearchParams(location.search).get('preview') === '1';
+
+  if (data.user.role !== role && !isAssistantPreview) {
     return <Navigate to={data.user.role === 'client' ? '/c' : '/app/today'} replace />;
   }
 

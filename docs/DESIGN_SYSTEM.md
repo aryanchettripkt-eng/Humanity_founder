@@ -115,16 +115,23 @@ Each component must support the listed states. "✓" = required.
 | `Toast` | sonner; success / error / undo action | | ✓ |
 | `OfflineBanner` | socket disconnected | | ✓ |
 | `KbdHint` | `<kbd>` styled hints in tooltips | | ✓ |
-| `LandingTopBar` | public landing header + "Your day" schedule `<section>` | `demoLoading, onDemoLogin` | mobile compact, desktop full slots w/ now needle ✓ |
-| `LandingHero` | uppercase hero + CTA + `StatWithDelta` row | `demoLoading, onDemoLogin` | loading, responsive wrap ✓ |
-| `PillBar` | black/ink schedule pill bar with lime track (`components/common`) | `label, slots, nowPercent?, actionHref?` | mobile compact, desktop full ✓ |
+| ~~`LandingTopBar`~~ | replaced by `AppTopBar` (`components/workspace`) | | |
+| ~~`LandingHero`~~ | replaced by `WorkspaceHeader` (`components/workspace`) | | |
+| `PillBar` | black/ink schedule pill bar with lime track (`components/common`) | `label, slots, nowPercent?, actionSlot?` | mobile compact, desktop full ✓ |
 | `ChipRow` | `aria-pressed` filter pills (`components/common`) | `items, value, onChange` | active, inactive, keyboard focus ✓ |
 | `NotchedCard` | rounded-3xl card with notched top-right action slot (`components/common`) | `tone: default/soft/lime, notch` | default, lime, interactive ✓ |
 | `StatWithBadge` | large tabular stat + optional top-right badge (`components/common`) | `value, label, badge?, badgeTone?` | up (lime), down (rose), no badge, mobile stacked ✓ |
 | `SectionHeader` | section title + underlined count + `aria-live` status (`components/common`) | `id, title, countLabel, liveText` | responsive, accessible ✓ |
-| `ReplyCard` | sample thread card w/ notched arrow, `SourceBadge`, `OWNER_META`, `ConfidenceMeter` | `thread, selected, onSelect` | full-cell fill, pinned 2-row footer ✓ |
-| `TaskCard` | sample task card (lime highlighted or white) | `task, onTryDemo` | highlighted (lime), default (white), honest demo CTA ✓ |
-| `SummaryPanel` | dark floating AI summary + owner-aware preview + timeline | `thread, onTryDemo` | client/assistant/none/review states ✓ |
+| `AppTopBar` | shared workspace header + 48h `PillBar` + right actions (`components/workspace`) | `dateLabel, slots, scheduleActionSlot, actions` | landing + app ✓ |
+| `NavRail` | 64px left icon rail (`components/workspace`) | `reviewCount, onOpenAsk` | Today, Inbox, Review, Client view, Ask, Settings ✓ |
+| `MobileTabBar` | `<768px` floating bottom ink pill nav (`components/workspace`) | `reviewCount, onOpenAsk, onOpenMore` | ≥44px tap targets ✓ |
+| `WorkspaceHeader` | greeting, uppercase title, primary CTA, 3 `StatWithBadge`s, 1-line brief (`components/workspace`) | `eyebrow, title, primaryLabel, stats, briefText` | landing + Today ✓ |
+| `PersonCard` | shared reply/triage card (`components/workspace`) | `item: PersonCardModel, selected, onQuickAssign` | review 1/2/3 assign, landing + Today ✓ |
+| `TaskCard` | shared task/date card (`components/workspace`) | `item: TaskCardModel, onStatusChange, onPrimaryAction` | lime next-up, status menu ✓ |
+| `FocusPanel` | sticky dark summary panel (`components/workspace`) | `model: FocusPanelModel, onOpenThread, onChangeOwner` | PhonePreview, Timeline, KeyPoints, Why, Dates ✓ |
+| `WorkspaceGrid` | shared 2-section grid + responsive `FocusPanel` (`components/workspace`) | `people, tasks, focusModel` | desktop sticky, tablet docked, mobile sheet ✓ |
+| ~~`ReplyCard`~~ | replaced by `PersonCard` (`components/workspace`) | | |
+| ~~`SummaryPanel`~~ | replaced by `FocusPanel` (`components/workspace`) | | |
 | `FeatureStrip` | 4-card product capability strip | | responsive grid ✓ |
 | `LandingFooter` | dark CTA band + dual demo login + simulated tooltip | `demoLoading, onDemoLogin` | loading, tooltip ✓ |
 

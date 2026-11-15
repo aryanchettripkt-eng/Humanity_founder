@@ -26,7 +26,7 @@ export function StatWithBadge({
       )}
     >
       <div className={cn('relative inline-block', badge ? 'pr-10 sm:pr-11' : undefined)}>
-        <span className="text-3xl font-light leading-none tracking-tight text-foreground tabular-nums sm:text-[48px]">
+        <span className="font-display text-3xl font-light leading-none tracking-tight text-foreground tabular-nums sm:text-[48px]">
           {value}
         </span>
         {badge && (

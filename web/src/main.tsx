@@ -1,3 +1,4 @@
+import '@fontsource-variable/urbanist';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Providers } from '@/app/providers';

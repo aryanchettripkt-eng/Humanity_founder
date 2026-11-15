@@ -1,3 +1,10 @@
+import type {
+  FocusPanelModel,
+  PersonCardModel,
+  TaskCardModel,
+  WorkspaceStatModel,
+} from '@/components/workspace/models';
+import { OWNER_META } from '@/lib/owners';
 import type { Owner } from '@/types/api';
 
 export type ScheduleSlot = {
@@ -263,4 +270,78 @@ export const TASK_EMPTY_COPY: Record<TaskFilterId, string> = {
   waiting: 'Nothing waiting on Priya.',
   done: 'Nothing marked done yet.',
 };
+
+export const LANDING_BRIEF =
+  "Priya has 4 decisions waiting today, including Maya Chen's Q1 offsite budget sign-off and a 2:00 pm investor call. Alex has 9 drafts queued and ready to send.";
+
+export const LANDING_STATS: WorkspaceStatModel[] = HERO_STATS.map((s) => ({
+  id: s.id,
+  value: s.value,
+  label: s.label,
+  delta: s.delta,
+  deltaTone: s.direction,
+}));
+
+export function toLandingPersonCards(threads: SampleReplyThread[]): PersonCardModel[] {
+  return threads.map((t) => ({
+    id: t.id,
+    name: t.sender,
+    initials: t.initials,
+    subtitle: t.subject,
+    source: t.source,
+    owner: t.owner,
+    confidence: Math.round(t.confidence * 100),
+  }));
+}
+
+export function toLandingTaskCards(tasks: SampleTask[]): TaskCardModel[] {
+  return tasks.map((t) => ({
+    id: t.id,
+    person: t.person,
+    initials: t.personInitials,
+    role: t.personRole,
+    title: t.title,
+    iconKind:
+      t.actionKind === 'calendar'
+        ? 'calendar'
+        : t.actionKind === 'handoff'
+          ? 'crown'
+          : 'sparkles',
+    dateLabel: t.timeLabel || t.subtitle,
+    avatars: t.avatars,
+    statusLabel: t.statusLabel,
+    primaryLabel: 'Try live demo',
+    highlighted: t.highlighted,
+  }));
+}
+
+export function toLandingFocusPanel(selectedId: string | null): FocusPanelModel {
+  const t = SAMPLE_THREADS.find((item) => item.id === selectedId) ?? SAMPLE_THREADS[0];
+  const meta = OWNER_META[t.owner];
+  const isClientQueue = t.owner === 'client';
+
+  return {
+    id: t.id,
+    owner: t.owner,
+    ownerLabel: meta.label,
+    confidence: Math.round(t.confidence * 100),
+    reason: t.reason,
+    subject: t.subject,
+    sender: t.sender,
+    keyPoints: t.keyPoints,
+    timeline: t.timeline,
+    dates:
+      t.id === 't-investor'
+        ? [{ id: 'd-investor', title: 'Investor call', dateLabel: 'Thu 2:00 pm' }]
+        : undefined,
+    phonePreview: {
+      badge: isClientQueue ? 'In client queue' : 'Handled by assistant',
+      headline: t.subject,
+      subline: t.reason,
+      lastAction: t.timeline[t.timeline.length - 1]?.time,
+      isClientQueue,
+    },
+  };
+}
+
 

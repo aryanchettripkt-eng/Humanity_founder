@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, MessageSquarePlus, Send, UserRoundCheck } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { Button } from '@/components/ui/button';
@@ -10,16 +10,40 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMe } from '@/features/auth/api';
 import { useClientAction, useClientQueue } from '@/features/client-view/api';
+import { useThreads } from '@/features/inbox/api';
 import { formatShortDate } from '@/lib/format';
 import { useSocketEvent } from '@/lib/socket';
 import { useQueryClient } from '@tanstack/react-query';
 import { qk } from '@/lib/queryKeys';
-import { useCallback } from 'react';
+import { useUiStore } from '@/stores/ui';
 
 export function ClientHomePage() {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const { activeClientId } = useUiStore();
   const { data: me } = useMe();
-  const { data: queue, isLoading, isError, refetch } = useClientQueue();
+  const isAssistantPreview =
+    me?.user.role === 'assistant' && searchParams.get('preview') === '1';
+
+  const clientQueueQuery = useClientQueue(!isAssistantPreview);
+  const previewThreadsQuery = useThreads({
+    clientId: isAssistantPreview ? activeClientId || undefined : undefined,
+    segment: 'client',
+  });
+
+  const queue = isAssistantPreview
+    ? previewThreadsQuery.data?.data
+    : clientQueueQuery.data;
+  const isLoading = isAssistantPreview
+    ? previewThreadsQuery.isLoading
+    : clientQueueQuery.isLoading;
+  const isError = isAssistantPreview
+    ? previewThreadsQuery.isError
+    : clientQueueQuery.isError;
+  const refetch = isAssistantPreview
+    ? previewThreadsQuery.refetch
+    : clientQueueQuery.refetch;
+
   const actionMutation = useClientAction();
 
   const [noteOpenId, setNoteOpenId] = useState<string | null>(null);
@@ -32,11 +56,29 @@ export function ClientHomePage() {
   useSocketEvent('thread:created', syncQueue);
   useSocketEvent('thread:updated', syncQueue);
 
-  const firstName = me?.user.name.split(' ')[0] || 'there';
+  const activeClient =
+    me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
+  const firstName = isAssistantPreview
+    ? activeClient?.name.split(' ')[0] || 'Client'
+    : me?.user.name.split(' ')[0] || 'there';
   const count = queue?.length ?? 0;
 
   return (
     <div className="space-y-6">
+      {isAssistantPreview ? (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border bg-muted/60 px-4 py-2.5 text-xs">
+          <span className="font-medium text-foreground">
+            Preview of {firstName}&apos;s view (read-only)
+          </span>
+          <Link
+            to="/app/today"
+            className="font-semibold text-foreground underline underline-offset-4"
+          >
+            Back to Workspace
+          </Link>
+        </div>
+      ) : null}
+
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Good morning, {firstName}.
@@ -111,7 +153,12 @@ export function ClientHomePage() {
                     )}
 
                     <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
-                      {isHandling ? (
+                      {isAssistantPreview ? (
+                        <span className="text-xs text-muted-foreground">
+                          Read-only preview — {firstName} sees &ldquo;I&apos;ll handle it&rdquo;,
+                          &ldquo;Assistant take over&rdquo;, and &ldquo;Add note&rdquo; here.
+                        </span>
+                      ) : isHandling ? (
                         <Button
                           size="lg"
                           className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
@@ -137,31 +184,35 @@ export function ClientHomePage() {
                         </Button>
                       )}
 
-                      <Button
-                        size="lg"
-                        variant="secondary"
-                        className="min-h-[44px] w-full whitespace-nowrap border border-border sm:w-auto sm:flex-1"
-                        disabled={actionMutation.isPending}
-                        onClick={() =>
-                          actionMutation.mutate({ threadId: t.id, action: 'handoff' })
-                        }
-                      >
-                        <UserRoundCheck className="h-4 w-4 shrink-0" />
-                        Assistant take over
-                      </Button>
+                      {!isAssistantPreview ? (
+                        <>
+                          <Button
+                            size="lg"
+                            variant="secondary"
+                            className="min-h-[44px] w-full whitespace-nowrap border border-border sm:w-auto sm:flex-1"
+                            disabled={actionMutation.isPending}
+                            onClick={() =>
+                              actionMutation.mutate({ threadId: t.id, action: 'handoff' })
+                            }
+                          >
+                            <UserRoundCheck className="h-4 w-4 shrink-0" />
+                            Assistant take over
+                          </Button>
 
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="min-h-[44px] w-full whitespace-nowrap sm:w-auto"
-                        onClick={() => {
-                          setNoteOpenId(noteOpenId === t.id ? null : t.id);
-                          setNoteText('');
-                        }}
-                      >
-                        <MessageSquarePlus className="h-4 w-4" />
-                        Reply with a note
-                      </Button>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            className="min-h-[44px] w-full whitespace-nowrap sm:w-auto"
+                            onClick={() => {
+                              setNoteOpenId(noteOpenId === t.id ? null : t.id);
+                              setNoteText('');
+                            }}
+                          >
+                            <MessageSquarePlus className="h-4 w-4" />
+                            Reply with a note
+                          </Button>
+                        </>
+                      ) : null}
                     </div>
 
                     {noteOpenId === t.id && (

@@ -4,10 +4,11 @@ import { apiFetch, ApiError } from '@/lib/api';
 import { qk } from '@/lib/queryKeys';
 import type { ThreadDetail, ThreadListItem } from '@/types/api';
 
-export function useClientQueue() {
+export function useClientQueue(enabled = true) {
   return useQuery({
     queryKey: qk.client.queue(),
     queryFn: () => apiFetch<ThreadListItem[]>('/client/queue'),
+    enabled,
     staleTime: 30_000,
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
