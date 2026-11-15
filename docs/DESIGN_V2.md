@@ -89,10 +89,80 @@ Under the greeting there's **one line of AI brief** in white/80 (first sentence,
 - **All caught up:** the hero shows "Nothing needs you, Priya" on a glass card and the working area is empty.
 - The assistant opens it from the **Client view** tab in read-only preview mode.
 
-## 6. Landing page `/` (also `/welcome` when signed in)
-- **The same frame and hero.** The nav shows "How it works · Demo" with the "Log in" text and an olive **Try the demo** pill on the right.
-- **Hero:** "Know who replies." in white, with one line of copy and **Try as assistant** / **Try as client**. On the right are the **real glass cards** (stat cards and "Needs your call") with sample data.
-- **Working area:** the **real filter bar and thread cards row** with sample models (the pager works). Then 3 white cards for **How it works** (Connect Gmail, read-only → AI decides who replies, with a reason → Priya taps once), a feature strip, and a footer with the honest "Simulated in prototype" line.
+## 6. Landing page `/` (also `/welcome` when signed in): a working sandbox
+
+The landing page is **a working mini-version of Relay that runs in the browser on sample data**. Every control does something. It uses the **same components as the app** (D17), fed by a `landingSandbox` store (Zustand, in memory, seeded from `sampleData.ts`) instead of the API. One action in the sandbox updates every widget that reads the same store: chart, stats, list, cards and phone. A **"Reset sample"** link restores the seed. The layout follows the reference exactly: nav, then hero with greeting and chart on the left and glass cards on the right, then a white area with filter pills, a pager and a row of cards.
+
+Sample seed: **10 threads** for Priya (3 For you, 3 For Priya, 2 No reply, 2 Needs your call), each with sender, domain, subject, body (3–6 lines), owner, confidence, reason, summary, key points, 0–1 date and a 14-day message-count series.
+
+### 6.1 Top nav (glass, on the hero)
+| Element | What it does |
+|---|---|
+| Logo | Scrolls to the top |
+| Glass tabs: **Assistant · Client · How it works · Real vs simulated** | **Assistant** and **Client** switch the **right side of the hero** between the assistant cards and Priya's phone (§6.3). **How it works** and **Real vs simulated** scroll to those sections. The active tab is the white pill and follows the scroll position |
+| 🔍 circle | Opens the **Ask sandbox** (§6.5) |
+| ⚙ circle | Toggles light and dark (saved in localStorage) |
+| Avatar circle | Goes to `/login` |
+| **Try the demo** olive pill | Demo login as the assistant (same as §6.2) |
+
+### 6.2 Hero, left
+| Element | What it does |
+|---|---|
+| **"Know who replies."** + one line | Static |
+| Date chip | Today's real date in the visitor's locale |
+| **Try as assistant** / **Try as client** | `useDemoLogin(role)`, then `/app/today` or `/c`. While loading, the button shows a spinner. If the API takes over 4s, the label becomes **"Waking the demo server…"** (Render cold start). On error, a toast with Retry |
+| Server warm-up | On page load, fire `GET /health` once in the background, so the API is warm by the time someone clicks. Nothing is shown unless it fails, and then a small glass note says "Demo server is starting, the first click may take ~30s" |
+| **Glass chart "Sorted this week"** | `StackedBars` for Mon–Sun from the sandbox (day × owner, forest/clay/linen). **Hover** shows a tooltip ("Wed · 2 for you · 1 for Priya"). **Clicking a segment** sets the filters below (owner and day) and scrolls to the cards. It updates live when an owner changes |
+
+### 6.3 Hero, right (switches with the Assistant / Client tab)
+**Assistant tab (default):**
+| Element | What it does |
+|---|---|
+| `GlassStat` **For you** / **For Priya** | Counts from the sandbox, with a delta line ("+1 since you arrived" after a change). **Clicking** sets the Owner filter below and scrolls |
+| `GlassList` **Needs your call** | The sandbox's review threads (avatar, sender, subject, confidence %). Each row has **3 quick-assign buttons (You · Priya · No reply, keys 1–3)**. A click moves the thread to that owner: the row leaves, the stats, chart and cards update, and a toast says "Moved to Priya · Undo". Once the list is empty it shows "AI is confident about everything right now" and a "Reset sample" link |
+
+**Client tab:**
+| Element | What it does |
+|---|---|
+| Glass **phone frame** showing Priya's queue | Lists the sandbox threads that are owned by `client` and not yet handled. Each card has **I'll handle it** and **Alex, take it**. *I'll handle it* marks it handled: the card slides out, and the matching thread card below gets a "Priya is handling it" chip. *Alex, take it* sets the owner to assistant, so the For you count goes up. This demonstrates the live assistant ↔ client sync on one screen |
+
+### 6.4 White working area (the reference's filter row and cards)
+| Element | What it does |
+|---|---|
+| `FilterBar` dropdown pills: **Owner** (All / For you / For Priya / No reply / Needs your call) · **Category** (Meeting, Finance, Legal, Personal, Update…) · **Date** (Any / Has a date / Next 7 days) · **Confidence** (Any / ≥ 90% / 70–89% / < 70%) | Filters the cards. Combined filters use AND. Selected pills show their value ("Owner: For Priya"). The state is mirrored in the URL hash so a link reproduces it |
+| Dark circle | Clears all filters (tooltip "Clear filters"). It shows a dot when any filter is active |
+| Pager `‹ 01 / 03 ›` | 4 cards per page on desktop, 2 on tablet, 1 on phones. Arrows, swipe and ←/→ keys work. It resets to page 1 when the filters change |
+| Empty result | `EmptyState` "No sample threads match" and a Clear filters button |
+| **`ThreadCard`** header: `AvatarTile`, sender, domain, ↗ | ↗ (or clicking the card) opens the **thread sheet** (§6.6) |
+| `StatBox` **OWNER · CONFIDENCE · NEXT DATE** | OWNER is a small dropdown. **Changing it overrides the AI**: the card, chart, stats, list and phone all update, and the confidence becomes "Manual". CONFIDENCE shows a % with a tooltip of the AI's reason. NEXT DATE shows "Fri 5 pm" or "—" |
+| `Sparkline` + `DeltaChip` | The thread's 14-day message counts. The chip shows "↗ 2 new" (olive) or "↘ quiet 5d" (terracotta) |
+| **Olive CTA** (one, chosen by state) | **Draft reply** (owner = you): opens the thread sheet with the draft streaming in (pre-written, typed out at about 40 chars/s), with tone pills that switch between 3 pre-written versions. **Send to Priya** (owner = client, not handed off): marks it handed off, so it appears on the phone in the Client tab, with a toast "Sent to Priya's view". **Nudge Priya** (handed off and waiting): the toast "Nudge drafted" opens the sheet with a short pre-written nudge. **Confirm** (needs your call): accepts the AI's suggestion and moves the thread to the suggested owner |
+
+### 6.5 Ask sandbox (🔍 or ⌘K)
+A glass dialog with **4 suggested questions** ("What does Priya need to sign this week?", "Anything waiting on me?", "Summarise the offsite thread", "Which emails can I ignore?"). Each one returns a **pre-written answer** with **cited thread chips**, and clicking a chip opens that thread sheet. Free-text questions are answered with "In the live demo, Ask searches the whole inbox" and a Try as assistant button. The dialog is labelled **"Sample answers"**.
+
+### 6.6 Thread sheet (right-side sheet, full screen on phones)
+Shows the subject, participants, the sample email body, and an **AI glass panel**: Why (reason + confidence), Summary, Key points, Dates (**Add to calendar** downloads a real `.ics` for that sample date, built in the browser), the draft area (§6.4) and the owner dropdown. Esc closes it.
+
+### 6.7 Below the cards
+- **How it works:** 3 white cards (Connect Gmail read-only → AI decides who replies and why → Priya taps once). Each card has a **"Show me"** button that scrolls to and highlights the matching live widget (the filter bar, the Needs-your-call list, the Client tab).
+- **Real vs simulated:** a table generated from the same list as the README / PRD §11.
+- **Footer:** the two demo buttons again, plus GitHub and video links if Aryan adds them.
+
+### 6.8 Rules
+- **No API calls except `GET /health` and demo login.** Everything else is local and labelled "Sample data" in the hero corner.
+- Everything here is built from the shared components. The sandbox only provides a different data source and different handlers.
+- All states are designed: loading (demo login), empty (filters, review list, phone), errors (login, health) and reduced motion.
+
+### 6.9 What lives on other pages, not the landing page
+| Page | Owns |
+|---|---|
+| Today | Real brief, real counts and chart, real review queue, real cards, Simulate email |
+| Inbox | Real thread reading, full AI panel, real drafts (LLM), owner rules ("Always for this sender") |
+| Client view `/c` | Priya's real queue and actions over the socket |
+| Ask (⌘K) in the app | Real LLM answers over the whole inbox |
+| Onboarding / Settings | Connecting Gmail or the demo inbox, sync, disconnect |
+| Login / Signup | Accounts, Google sign-in |
 
 ## 7. Auth, onboarding, settings, 404
 - **Login/Signup:** the frame splits 50/50. Left is the hero image with one glass sample card ("Needs your call") and the tagline. Right is white with the **demo buttons first**, then Google, then email.
@@ -136,7 +206,8 @@ All visual components live in `web/src/components/grove/` and take **view models
 - No horizontal page scroll at 320. Tap targets ≥ 44px.
 
 ## 10. Build order (ROADMAP Phase 9)
-- **G9.1:** tokens, fonts and the image + fallback, `AppFrame`, `HeroBand`, `TopNav`, `BottomTabBar`, the glass set, `FilterBar`, `ThreadCard`, `StackedBars`, then **Today and Landing** on them. Delete the replaced workspace components.
+- **G9.1:** tokens, fonts and the image + fallback, `AppFrame`, `HeroBand`, `TopNav`, `BottomTabBar`, the glass set, `FilterBar`, `ThreadCard`, `StackedBars`, then **Today** on them. Delete the replaced workspace components.
+- **G9.1b:** the **Landing sandbox** (§6) on the same components.
 - **G9.2:** Inbox, `AIGlassPanel`, composer and ⌘K restyle.
 - **G9.3:** Client view, auth, onboarding, settings and 404.
 - **G9.4** (Claude): review each PR at 1440, 820, 390 and 320 in light and dark.
