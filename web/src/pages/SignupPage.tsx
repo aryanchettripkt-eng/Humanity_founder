@@ -53,23 +53,22 @@ export function SignupPage() {
       headline="Set up your desk."
       subline="Bring in a client's inbox and see in seconds who needs to reply."
     >
-      <h2 className="font-display text-[32px] font-medium leading-tight text-[var(--fg)] sm:text-[36px]">
-        Create your account
-      </h2>
+      <h2 className="auth-title text-[var(--fg)]">Create your account</h2>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
         aria-describedby={formErrorIds}
-        className="mt-6 space-y-4"
+        className="auth-form"
       >
         <div>
-          <label className="mb-2 block text-[14px] font-medium text-[var(--fg)]" htmlFor="name">
+          <label className="auth-label text-[var(--fg)]" htmlFor="name">
             Full name
           </label>
           <Input
             id="name"
             variant="pill"
+            className="auth-input"
             autoComplete="name"
             placeholder="Alex Morgan"
             aria-invalid={Boolean(errors.name)}
@@ -77,20 +76,21 @@ export function SignupPage() {
             {...register('name')}
           />
           {errors.name ? (
-            <p id="signup-name-error" className="mt-1.5 text-[13px] text-destructive">
+            <p id="signup-name-error" className="auth-field-error text-destructive">
               {errors.name.message}
             </p>
           ) : null}
         </div>
 
         <div>
-          <label className="mb-2 block text-[14px] font-medium text-[var(--fg)]" htmlFor="email">
+          <label className="auth-label text-[var(--fg)]" htmlFor="email">
             Email
           </label>
           <Input
             id="email"
             type="email"
             variant="pill"
+            className="auth-input"
             autoComplete="email"
             placeholder="alex@studio.com"
             aria-invalid={Boolean(errors.email)}
@@ -98,23 +98,21 @@ export function SignupPage() {
             {...register('email')}
           />
           {errors.email ? (
-            <p id="signup-email-error" className="mt-1.5 text-[13px] text-destructive">
+            <p id="signup-email-error" className="auth-field-error text-destructive">
               {errors.email.message}
             </p>
           ) : null}
         </div>
 
         <div>
-          <label
-            className="mb-2 block text-[14px] font-medium text-[var(--fg)]"
-            htmlFor="password"
-          >
+          <label className="auth-label text-[var(--fg)]" htmlFor="password">
             Password
           </label>
           <Input
             id="password"
             type="password"
             variant="pill"
+            className="auth-input"
             autoComplete="new-password"
             placeholder="At least 6 characters"
             aria-invalid={Boolean(errors.password)}
@@ -122,7 +120,7 @@ export function SignupPage() {
             {...register('password')}
           />
           {errors.password ? (
-            <p id="signup-password-error" className="mt-1.5 text-[13px] text-destructive">
+            <p id="signup-password-error" className="auth-field-error text-destructive">
               {errors.password.message}
             </p>
           ) : null}
@@ -131,7 +129,7 @@ export function SignupPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 flex h-[52px] w-full items-center justify-center rounded-full bg-[var(--cta-lime-bg)] text-[16px] font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
+          className="auth-submit flex w-full items-center justify-center rounded-full bg-[var(--cta-lime-bg)] font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
         >
           {isSubmitting ? 'Creating account…' : 'Create account'}
         </button>
@@ -139,24 +137,24 @@ export function SignupPage() {
 
       {health?.googleLogin ? (
         <>
-          <div className="my-5 flex items-center gap-3">
+          <div className="auth-divider flex items-center">
             <span className="h-px flex-1 bg-[var(--glass-divider)]" aria-hidden="true" />
-            <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--fg-subtle)]">
-              OR CONTINUE WITH
-            </span>
+            <span className="font-medium uppercase text-[var(--fg-subtle)]">OR CONTINUE WITH</span>
             <span className="h-px flex-1 bg-[var(--glass-divider)]" aria-hidden="true" />
           </div>
-          <GoogleButton
-            variant="glass"
-            label="Google"
-            onClick={() => {
-              window.location.href = getGoogleLoginUrl();
-            }}
-          />
+          <div className="auth-alt-google">
+            <GoogleButton
+              variant="glass"
+              label="Google"
+              onClick={() => {
+                window.location.href = getGoogleLoginUrl();
+              }}
+            />
+          </div>
         </>
       ) : null}
 
-      <p className="mt-6 text-center text-[14px] text-[var(--fg-muted)]">
+      <p className="auth-footer text-center text-[var(--fg-muted)]">
         Already have an account?{' '}
         <Link
           to="/login"
