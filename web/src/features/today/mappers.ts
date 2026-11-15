@@ -1,62 +1,73 @@
-import type { SampleReplyThread, SampleTask } from '@/features/landing/sampleData';
+import type { PillBarSlot } from '@/components/common/PillBar';
 import { formatRelativeTime, formatUpcomingDate, getInitials } from '@/lib/format';
-import type { DashboardSummary, ThreadListItem } from '@/types/api';
+import type { ActivityItem, DashboardSummary, UpcomingItem } from '@/types/api';
 
-export type TodayTask = SampleTask & {
+export type TodayTaskFilter = 'all' | 'dates' | 'follow-ups' | 'client';
+
+export type TodayTaskItem = {
+  id: string;
   threadId: string;
   href: string;
-  isCalendar?: boolean;
+  kind: 'date' | 'nudge' | 'client';
+  highlighted?: boolean;
+  person: string;
+  initials: string;
+  role: string;
+  title: string;
+  subtitle?: string;
+  timeLabel?: string;
+  statusLabel: string;
 };
 
-export function threadToReplyCard(thread: ThreadListItem): SampleReplyThread {
-  const senderName =
-    thread.participants?.[0]?.name || thread.participants?.[0]?.email || 'Unknown sender';
+export type CollapsedActivity = {
+  id: string;
+  actorName: string;
+  actorType: ActivityItem['actor']['type'];
+  label: string;
+  subject?: string;
+  note?: string;
+  createdAt: string;
+  count: number;
+};
 
-  return {
-    id: thread.id,
-    sender: senderName,
-    initials: getInitials(senderName),
-    role: thread.participants?.[0]?.email || '',
-    subject: thread.subject,
-    source: thread.source === 'gmail' ? 'gmail' : 'demo',
-    owner: thread.owner,
-    confidence: thread.confidence,
-    reason: thread.reason || thread.snippet,
-    keyPoints:
-      thread.keyPoints?.length > 0
-        ? thread.keyPoints
-        : [thread.summary || thread.snippet || 'No key points extracted yet.'],
-    timeline: [
-      {
-        time: formatRelativeTime(thread.lastMessageAt),
-        label: `Last message from ${thread.lastSender === 'us' ? 'you' : senderName}`,
-      },
-      {
-        time: `${Math.round(thread.confidence * 100)}%`,
-        label: `Owner: ${thread.owner} (${thread.ownerSource})`,
-      },
-    ],
-  };
+export function getTimeGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
 }
 
-export function buildTodayTasks(data: DashboardSummary): TodayTask[] {
-  const tasks: TodayTask[] = [];
+export function buildScheduleSlots(
+  upcoming: UpcomingItem[],
+  timeZone?: string
+): PillBarSlot[] {
+  return upcoming.slice(0, 3).map((item, index) => ({
+    id: `slot-${item.threadId}-${index}`,
+    time: formatUpcomingDate(item.startsAt, timeZone),
+    title: item.title,
+    href: `/app/inbox/inbox/${item.threadId}`,
+  }));
+}
+
+export function buildTodayTasks(
+  data: DashboardSummary,
+  timeZone?: string
+): TodayTaskItem[] {
+  const tasks: TodayTaskItem[] = [];
 
   data.upcoming.slice(0, 2).forEach((item, index) => {
     tasks.push({
       id: `upcoming-${item.threadId}-${index}`,
       threadId: item.threadId,
       href: `/app/inbox/inbox/${item.threadId}`,
-      isCalendar: true,
+      kind: 'date',
       highlighted: index === 0,
       person: item.subject,
-      personInitials: getInitials(item.title),
-      personRole: 'Extracted date',
+      initials: getInitials(item.title),
+      role: 'Extracted date',
       title: item.title,
-      timeLabel: formatUpcomingDate(item.startsAt),
+      timeLabel: formatUpcomingDate(item.startsAt, timeZone),
       statusLabel: 'Add to calendar',
-      actionKind: 'calendar',
-      tags: ['due-today', 'urgent'],
     });
   });
 
@@ -66,37 +77,86 @@ export function buildTodayTasks(data: DashboardSummary): TodayTask[] {
       id: `nudge-${thread.id}`,
       threadId: thread.id,
       href: `/app/inbox/waiting/${thread.id}`,
+      kind: 'nudge',
+      highlighted: tasks.length === 0,
       person: sender,
-      personInitials: getInitials(sender),
-      personRole: '3+ days silent',
+      initials: getInitials(sender),
+      role: '3+ days silent',
       title: thread.subject,
       subtitle: `Sent ${formatRelativeTime(thread.lastMessageAt)}`,
       statusLabel: 'Follow up',
-      actionKind: 'send',
-      tags: ['waiting', 'urgent'],
     });
   });
 
-  if (tasks.length < 3) {
-    data.review.slice(0, 3 - tasks.length).forEach((thread) => {
+  data.recent
+    .filter((t) => t.owner === 'client')
+    .slice(0, 2)
+    .forEach((thread) => {
       const sender =
         thread.participants?.[0]?.name || thread.participants?.[0]?.email || 'Contact';
       tasks.push({
-        id: `review-${thread.id}`,
+        id: `client-${thread.id}`,
         threadId: thread.id,
-        href: `/app/inbox/review/${thread.id}`,
+        href: `/app/inbox/client/${thread.id}`,
+        kind: 'client',
+        highlighted: tasks.length === 0,
         person: sender,
-        personInitials: getInitials(sender),
-        personRole: 'Needs review',
+        initials: getInitials(sender),
+        role: 'Client hand-off',
         title: thread.subject,
-        subtitle: thread.reason || thread.snippet,
-        statusLabel: 'Review owner',
-        actionKind: 'handoff',
-        tags: ['urgent'],
+        subtitle: thread.clientReason || thread.reason || thread.snippet,
+        statusLabel: 'Waiting on client',
       });
     });
-  }
 
-  return tasks.slice(0, 3);
+  return tasks;
 }
 
+export function collapseActivity(activity: ActivityItem[]): CollapsedActivity[] {
+  const clientItems: CollapsedActivity[] = [];
+  const otherItems: CollapsedActivity[] = [];
+
+  for (const item of activity) {
+    const label = item.type.replace(/_/g, ' ');
+    const subject = typeof item.payload?.subject === 'string' ? item.payload.subject : undefined;
+    const note = typeof item.payload?.note === 'string' ? item.payload.note : undefined;
+
+    if (item.actor.type === 'client') {
+      clientItems.push({
+        id: item.id,
+        actorName: item.actor.name,
+        actorType: item.actor.type,
+        label,
+        subject,
+        note,
+        createdAt: item.createdAt,
+        count: 1,
+      });
+      continue;
+    }
+
+    const existing = otherItems.find(
+      (entry) =>
+        entry.actorName === item.actor.name &&
+        entry.label === label &&
+        entry.subject === subject &&
+        entry.actorType === 'system'
+    );
+    if (existing) {
+      existing.count += 1;
+    } else {
+      otherItems.push({
+        id: item.id,
+        actorName: item.actor.name,
+        actorType: item.actor.type,
+        label,
+        subject,
+        note,
+        createdAt: item.createdAt,
+        count: 1,
+      });
+    }
+  }
+
+  return [...clientItems, ...otherItems].slice(0, 6);
+}

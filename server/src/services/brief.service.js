@@ -70,17 +70,39 @@ export async function generateMorningBrief({
       .limit(5)
       .select('subject owner summary');
 
+    const tz = client?.timezone || 'Asia/Kolkata';
+    let timeFmt;
+    try {
+      timeFmt = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz,
+        weekday: 'short',
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    } catch {
+      timeFmt = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'UTC',
+        weekday: 'short',
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    }
+    const formatUpcomingTime = (val) => {
+      const d = new Date(val);
+      return Number.isNaN(d.getTime()) ? String(val) : timeFmt.format(d);
+    };
+
     const provider = getProvider();
     const prompt = [
       `Morning brief for ${client?.name || clientName}.`,
       `Counts: assistant=${counts.assistant ?? 0}, client=${counts.client ?? 0}, review=${counts.review ?? 0}, waiting=${counts.waiting ?? 0}.`,
       `Top threads:\n${topThreads.map((t) => `- [${t.owner}] ${t.subject}: ${t.summary}`).join('\n')}`,
-      `Upcoming:\n${upcoming.slice(0, 3).map((u) => `- ${u.title} at ${u.startsAt}`).join('\n') || 'None'}`,
+      `Upcoming:\n${upcoming.slice(0, 3).map((u) => `- ${u.title} (${formatUpcomingTime(u.startsAt)})`).join('\n') || 'None'}`,
     ].join('\n\n');
 
     const text = await provider.generateText({
       system:
-        'Write a calm, concise 2-3 sentence morning brief for a personal assistant. No greeting fluff.',
+        'Write a calm, concise 2-3 sentence morning brief for a personal assistant. No greeting fluff. Never mention UTC or timezones.',
       prompt,
       temperature: 0.4,
     });

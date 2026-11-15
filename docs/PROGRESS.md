@@ -27,6 +27,15 @@ _None yet._
 
 ---
 
+### 2026-11-15 18:14 · gemini · R1 lime workspace tokens, shell and Today
+- Done:
+  - Updated `:root` and `.dark` tokens in `web/src/styles/globals.css`, `web/tailwind.config.ts`, `docs/DESIGN_SYSTEM.md`, and `docs/DECISIONS.md` (D13): zinc-200 / zinc-950 canvas, white / zinc-900 cards, ink / lime primary, sky `assistant` owner color (`web/src/lib/owners.ts`), and removed `.theme-landing`.
+  - Moved shared primitives into `web/src/components/common/` (`PillBar`, `ChipRow`, `NotchedCard`, `StatWithBadge`, `SectionHeader`) and updated `LandingPage` to use them.
+  - Restyled `AssistantLayout.tsx`: canvas sidebar with ink/lime active pill, pill client switcher, pill search trigger, black/lime Simulate button, circular theme/settings buttons, and floating mobile ink pill tab bar with lime active state.
+  - Rebuilt `TodayPage.tsx` (`web/src/features/today/mappers.ts`, `TodaySummaryPanel.tsx`, `docs/FRONTEND.md` §7) as an app page with time-of-day greeting, `PillBar` in `client.timezone` (`formatUpcomingDate` updated in `web/src/lib/format.ts`), 3 real `StatWithBadge` counts, `"Needs your call"` review `NotchedCard`s, `"Your day"` tasks with lime highlight + `ChipRow`, collapsed `Activity` + dark summary panel, and last 5 `ThreadRow`s.
+- Changed contracts: none.
+- Next: review R0 (`gemini/R0-merge-q52`) and R1 (`gemini/R1-lime-shell-today`) PRs, then proceed to R2.
+
 ### 2026-11-15 17:53 · gemini · L7.1 full-bleed landing + replace TodayPage with lime workspace
 - Done:
   - Extended `LandingPage` edge-to-edge (`w-full`, removed outer grey frame and `max-w-[1400px]` box) and stretched `LandingTopBar` schedule bar across wide screens.
@@ -60,6 +69,20 @@ _None yet._
 - Done: QA pass on the live site at 1920 / 820 / 390 / 375 / 320 as Alex and Priya; 9 findings for Gemini under *Open issues* (full report with AC results in `reviews/2026-11-15-qa-pass.md` in project files). Fixed my own: seed entities use `when` (weekday/date in the client's timezone) so dates match the emails; relative times snap to :00/:30 in working hours; outside sender listed first; Reset clears `Client.brief`. Prompt v3 date fix + required `clientReason` are on PR #14.
 - Changed contracts: seed item format gains `entities[].when` / `durationMins` (BACKEND §8). No API changes.
 - Next: Gemini Q5.2 fix list; then I re-run AC2, AC5, AC7, AC9, AC11 (Q5.3).
+
+### 2026-11-15 03:58 · gemini · Q5.2 UX & polish fixes (1–9)
+- Done:
+  - #1 Mobile/tablet navigation: added tablet icon sidebar (`md:flex lg:hidden`), mobile "More" tab (`md:hidden`) and shared drawer (`Dialog`) with client switcher + all segments + sign out in `AssistantLayout.tsx`.
+  - #2 Brief UTC leak: formatted `u.startsAt` in `client.timezone` with `Intl.DateTimeFormat` and instructed the brief prompt never to mention UTC or timezones (`server/src/services/brief.service.js`).
+  - #3 Tap targets: raised mobile bottom tabs and mobile/tablet header buttons (`Simulate email`, theme toggle, settings) to `>= 44px` (`h-11 min-w-[44px]`).
+  - #4 Simulate button label: added `aria-label="Simulate email"` and `title="Simulate email"`.
+  - #5 Ask citations: `askInbox` now returns `threads: [{ id, subject }]` and `AskPanel` renders the truncated thread subject on citation chips.
+  - #6 Empty SEGMENTS heading: `CommandPalette` hides the `Segments` group when `filteredSegments.length === 0`.
+  - #7 Non-AI owner reason: `AIPanel` hides `ConfidenceMeter` and shows the latest history reason (or source fallback) when `ownerSource !== 'ai'`.
+  - #8 Settings → Accounts: titled `<FirstName>'s accounts` and hid `Use demo inbox` when a simulated Gmail account is already connected (`SettingsAccountsPage.tsx`, `ConnectProviderCard.tsx`).
+  - #9 Client card dark-mode contrast: switched `"I'll handle it"` to primary `variant="default"` and added crisp borders on secondary/outline buttons (`ClientHomePage.tsx`).
+- Changed contracts: `POST /api/ai/ask` response adds `threads: [{ id, subject }]` alongside `threadIds`.
+- Next: merge `gemini/Q5.2-ux-fixes` -> `main`.
 
 ### 2026-11-15 04:00 · claude · Q5.5 README
 - Done: README rewritten: live links, one-click demo tour, how the AI works, real vs simulated (matches PRD §11), architecture diagram, run locally, env vars, security notes, limitations. Marked Q5.4 (deploy) done, since it's live on Vercel + Render + Atlas.

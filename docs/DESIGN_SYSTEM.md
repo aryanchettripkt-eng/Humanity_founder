@@ -19,15 +19,19 @@ Defined as CSS variables in `web/src/styles/globals.css` (shadcn convention, HSL
 ### 2.1 Base (light / dark)
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--background` | `#FFFFFF` | `#09090B` (zinc‑950) | app background |
-| `--surface` | `#FAFAFA` (zinc‑50) | `#18181B` (zinc‑900) | sidebar, panels |
-| `--card` | `#FFFFFF` | `#18181B` | cards, popovers |
-| `--border` | `#E4E4E7` (zinc‑200) | `#27272A` (zinc‑800) | hairlines (1px) |
-| `--foreground` | `#18181B` (zinc‑900) | `#FAFAFA` | primary text |
-| `--muted-foreground` | `#71717A` (zinc‑500) | `#A1A1AA` (zinc‑400) | secondary text, timestamps |
-| `--primary` (brand) | `#4F46E5` (indigo‑600) | `#818CF8` (indigo‑400) | primary buttons, focus, active nav |
-| `--primary-foreground` | `#FFFFFF` | `#09090B` | text on primary |
-| `--ring` | indigo‑500 @ 40% | indigo‑400 @ 50% | focus rings (2px) |
+| `--background` | `#E4E4E7` (zinc‑200) | `#09090B` (zinc‑950) | app canvas |
+| `--surface` | `#FFFFFF` | `#18181B` (zinc‑900) | elevated panels, inputs |
+| `--card` | `#FFFFFF` | `#18181B` (zinc‑900) | cards, popovers |
+| `--border` | `#D4D4D8` (zinc‑300) | `#27272A` (zinc‑800) | hairlines (1px) |
+| `--foreground` | `#0B0B0C` (ink) | `#FAFAFA` | primary text |
+| `--muted-foreground` | `#585860` | `#A1A1AA` (zinc‑400) | secondary text, timestamps (AA) |
+| `--primary` (brand) | `#0B0B0C` (ink) | `#C6F36B` (lime) | primary buttons, active nav |
+| `--primary-foreground` | `#FAFAFA` | `#0B0B0C` (ink) | text on primary |
+| `--accent-lime` | `#C6F36B` | `#C6F36B` | highlight cards, schedule track, mobile active pill |
+| `--accent-lime-foreground` | `#0B0B0C` | `#0B0B0C` | text on lime |
+| `--ink` | `#0B0B0C` | `#18181B` | dark summary cards, pill bars |
+| `--ink-foreground` | `#FAFAFA` | `#FAFAFA` | text on ink |
+| `--ring` | `#0B0B0C` (ink) | `#C6F36B` (lime) | focus rings (2px) |
 | `--success` | `#16A34A` | `#4ADE80` | sent, synced |
 | `--warning` | `#D97706` | `#FBBF24` | sync slow (don't confuse with client — use icon) |
 | `--destructive` | `#DC2626` | `#F87171` | errors, disconnect |
@@ -35,38 +39,17 @@ Defined as CSS variables in `web/src/styles/globals.css` (shadcn convention, HSL
 ### 2.2 Owner colors (the core visual language — identical everywhere)
 | Owner | Label | Text | Background (pill) | Border | Icon (lucide) |
 |---|---|---|---|---|---|
-| `assistant` | Assistant | indigo‑700 / dark indigo‑300 | indigo‑50 / indigo‑500@15% | indigo‑200 / indigo‑500@30% | `UserRoundCheck` |
-| `client` | Client | amber‑800 / dark amber‑300 | amber‑50 / amber‑500@15% | amber‑200 / amber‑500@30% | `Crown` |
-| `none` | No reply | slate‑600 / dark slate‑300 | slate‑100 / slate‑500@15% | slate‑200 / slate‑500@30% | `BellOff` |
-| `review` | Needs review | rose‑700 / dark rose‑300 | rose‑50 / rose‑500@15% | **dashed** rose‑300 / rose‑500@40% | `CircleHelp` |
+| `assistant` | Assistant | sky‑800 / dark sky‑300 | sky‑50 / sky‑500@15% | sky‑200 / sky‑500@30% | `UserRoundCheck` |
+| `client` | Client | amber‑900 / dark amber‑300 | amber‑50 / amber‑500@15% | amber‑200 / amber‑500@30% | `Crown` |
+| `none` | No reply | slate‑700 / dark slate‑300 | slate‑100 / slate‑500@15% | slate‑300 / slate‑500@30% | `BellOff` |
+| `review` | Needs review | rose‑800 / dark rose‑300 | rose‑50 / rose‑500@15% | **dashed** rose‑300 / rose‑500@40% | `CircleHelp` |
 
 Exported once from `web/src/lib/owners.ts` as `OWNER_META` — components must read from it, never redefine.
 
 Category icons (muted, no color): meeting `CalendarDays`, action `CircleAlert`, update `Info`, newsletter `Newspaper`, finance `Receipt`, legal `Scale`, personal `Heart`, general `Mail`.
 
-### 2.3 Landing theme (`.theme-landing`)
-Scoped to `.theme-landing` on the public landing page (`/`) so the app (`/app`, `/c`, `/login`) keeps the indigo palette untouched. `LandingPage` also removes `.dark` from `<html>` while mounted (restoring it on unmount) so `OWNER_META` pills and portalled tooltips always render in light mode.
-
-| Token | Value (HSL) | Use |
-|---|---|---|
-| `--landing-canvas` | `240 5.9% 88%` (`#DFE0E2`) | outer page canvas |
-| `--landing-surface` | `240 6% 92%` (`#E9E9EB`) | mid-grey workspace container so white cards pop |
-| `--landing-card` | `0 0% 100%` (`#FFFFFF`) | task cards, active chips, notched buttons |
-| `--landing-card-soft` | `0 0% 97%` (`#F7F7F8`) | lead/reply cards |
-| `--landing-line` | `240 5.9% 84%` (`#D4D4D8`) | hairline borders on light surfaces |
-| `--landing-muted` | `240 4.5% 36%` (`#585860`) | secondary text on light surfaces (≥4.5:1 AA) |
-| `--landing-ink` | `240 4% 5%` (`#0B0B0C`) | primary ink, dark floating panel, pill bars |
-| `--landing-ink-foreground` | `0 0% 98%` (`#FAFAFA`) | text on dark ink surfaces |
-| `--landing-ink-surface` | `240 4% 12%` (`#1E1E20`) | dark sub-cards inside `SummaryPanel` |
-| `--landing-ink-line` | `240 4% 20%` (`#313135`) | hairline borders on dark ink surfaces |
-| `--landing-ink-muted` | `240 5% 65%` (`#A1A1AA`) | secondary text on dark ink surfaces (≥4.5:1 AA) |
-| `--landing-accent` | `80 85% 69%` (`#C6F36B`) | lime highlight card, schedule track, active accents |
-| `--landing-accent-foreground` | `240 4% 5%` (`#0B0B0C`) | high-contrast ink text on lime |
-| `--landing-delta-up` | `80 85% 69%` | positive stat delta pill |
-| `--landing-delta-down` | `351 95% 86%` | negative stat delta pill |
-| `--landing-delta-down-foreground` | `345 85% 20%` | dark rose text on negative delta pill |
-
-Also sets light-mode values on `--background`, `--surface`, `--card`, `--card-foreground`, `--border`, `--foreground`, and `--muted-foreground` inside `.theme-landing`.
+### 2.3 ~~Landing theme (`.theme-landing`)~~ (Superseded by D13)
+Removed in R1: the public landing page and the signed-in app now share the same `:root` and `.dark` tokens in §2.1.
 
 ## 3. Typography
 - Font: **Inter** (variable, `font-feature-settings: "cv11","ss01"`), fallback system‑ui. Mono: JetBrains Mono for keyboard hints only.
@@ -86,7 +69,7 @@ Also sets light-mode values on `--background`, `--surface`, `--card`, `--card-fo
 
 ## 4. Spacing, radius, elevation
 - 4px grid. Common: 4, 8, 12, 16, 20, 24, 32, 48.
-- Radius: `--radius: 10px` (inputs, buttons, pills use `rounded-full`), cards 12px, modals 16px.
+- Radius: `--radius: 10px` (inputs, pills, buttons use `rounded-full`), cards `24px` (`rounded-3xl`), icon buttons `40–44px` circles, modals `16px`.
 - Elevation: borders by default; shadow only for floating layers: popover/menus `shadow-md`, modals/⌘K `shadow-xl`. No shadows on cards in lists.
 - Layout widths: sidebar 240px (collapsed 64px), list pane 380px (min 320), detail flex, AI panel 320px (collapsible). Client view max‑width 560px centered.
 
@@ -131,9 +114,11 @@ Each component must support the listed states. "✓" = required.
 | `KbdHint` | `<kbd>` styled hints in tooltips | | ✓ |
 | `LandingTopBar` | public landing header + "Your day" schedule `<section>` | `demoLoading, onDemoLogin` | mobile compact, desktop full slots w/ now needle ✓ |
 | `LandingHero` | uppercase hero + CTA + `StatWithDelta` row | `demoLoading, onDemoLogin` | loading, responsive wrap ✓ |
-| `StatWithDelta` | large tabular stat + absolute top-right delta pill | `value, label, delta, direction` | up (lime), down (rose), mobile stacked ✓ |
-| `SectionHeader` | section title + underlined dynamic count + `aria-live` status | `id, title, countLabel, liveText` | responsive, accessible ✓ |
-| `FilterChips` | decorative search/sliders + `aria-pressed` filter pills | `items, value, onChange` | active, inactive, keyboard focus ✓ |
+| `PillBar` | black/ink schedule pill bar with lime track (`components/common`) | `label, slots, nowPercent?, actionHref?` | mobile compact, desktop full ✓ |
+| `ChipRow` | `aria-pressed` filter pills (`components/common`) | `items, value, onChange` | active, inactive, keyboard focus ✓ |
+| `NotchedCard` | rounded-3xl card with notched top-right action slot (`components/common`) | `tone: default/soft/lime, notch` | default, lime, interactive ✓ |
+| `StatWithBadge` | large tabular stat + optional top-right badge (`components/common`) | `value, label, badge?, badgeTone?` | up (lime), down (rose), no badge, mobile stacked ✓ |
+| `SectionHeader` | section title + underlined count + `aria-live` status (`components/common`) | `id, title, countLabel, liveText` | responsive, accessible ✓ |
 | `ReplyCard` | sample thread card w/ notched arrow, `SourceBadge`, `OWNER_META`, `ConfidenceMeter` | `thread, selected, onSelect` | full-cell fill, pinned 2-row footer ✓ |
 | `TaskCard` | sample task card (lime highlighted or white) | `task, onTryDemo` | highlighted (lime), default (white), honest demo CTA ✓ |
 | `SummaryPanel` | dark floating AI summary + owner-aware preview + timeline | `thread, onTryDemo` | client/assistant/none/review states ✓ |

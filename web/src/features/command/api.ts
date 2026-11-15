@@ -4,6 +4,7 @@ import { apiFetch } from '@/lib/api';
 export interface AskResponse {
   answer: string;
   threadIds: string[];
+  threads?: Array<{ id: string; subject: string }>;
   action?: { type: 'draft'; threadId: string };
 }
 

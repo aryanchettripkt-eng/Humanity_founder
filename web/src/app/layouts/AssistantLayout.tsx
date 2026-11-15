@@ -4,19 +4,26 @@ import {
   Inbox,
   LogOut,
   MailPlus,
+  Menu,
   Moon,
   Search,
   Settings,
   Sparkles,
   Sun,
 } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { KbdHint } from '@/components/common/KbdHint';
 import { OfflineBanner } from '@/components/common/OfflineBanner';
 import { GuidedTour } from '@/components/common/GuidedTour';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAccounts } from '@/features/accounts/api';
 import { AccountStatusBadge } from '@/features/accounts/components/AccountStatusBadge';
 import { useLogout, useMe } from '@/features/auth/api';
@@ -41,6 +48,7 @@ export function AssistantLayout() {
   const { data: me } = useMe();
   const { activeClientId, setActiveClientId, theme, toggleTheme, markNewThread } = useUiStore();
   const { setOpen: setPaletteOpen, openAsk } = useCommandStore();
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const validClientIds = new Set(me?.clients?.map((c) => c.id) ?? []);
   const clientId =
@@ -108,10 +116,10 @@ export function AssistantLayout() {
         key={seg.id}
         to={to}
         className={cn(
-          'flex items-center justify-between rounded-lg px-2.5 py-1.5 text-sm transition-colors',
+          'flex items-center justify-between rounded-full px-3 py-2 text-sm transition-colors',
           active
-            ? 'bg-primary/10 font-medium text-primary'
-            : 'text-foreground/80 hover:bg-background hover:text-foreground'
+            ? 'bg-primary font-medium text-primary-foreground'
+            : 'text-foreground/80 hover:bg-card hover:text-foreground'
         )}
       >
         <div className="flex min-w-0 items-center gap-2.5">
@@ -119,7 +127,14 @@ export function AssistantLayout() {
           <span className="truncate">{seg.label}</span>
         </div>
         {count !== undefined && count > 0 && (
-          <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
+          <span
+            className={cn(
+              'text-xs tabular-nums',
+              active ? 'text-primary-foreground/80' : 'text-muted-foreground'
+            )}
+          >
+            {count}
+          </span>
         )}
       </NavLink>
     );
@@ -130,11 +145,61 @@ export function AssistantLayout() {
       <OfflineBanner />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
+        {/* Tablet icon sidebar (768px - 1023px) */}
+        <aside className="hidden w-14 shrink-0 flex-col items-center border-r border-border bg-background py-2 md:flex lg:hidden">
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label="Switch client and segments"
+            title="Switch client & segments"
+            onClick={() => setMoreOpen(true)}
+            className="mb-2 h-11 w-11 rounded-full"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <nav className="flex flex-1 flex-col items-center gap-1 overflow-y-auto">
+            {SEGMENTS.map((seg) => {
+              const Icon = seg.icon;
+              const to = segmentPath(seg.id);
+              const active =
+                seg.id === 'today'
+                  ? location.pathname === '/app/today'
+                  : location.pathname.startsWith(`/app/inbox/${seg.id}`);
+              return (
+                <NavLink
+                  key={seg.id}
+                  to={to}
+                  aria-label={seg.label}
+                  title={seg.label}
+                  className={cn(
+                    'flex h-11 w-11 items-center justify-center rounded-full transition-colors',
+                    active
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-foreground/80 hover:bg-card hover:text-foreground'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                </NavLink>
+              );
+            })}
+          </nav>
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label="Ask AI"
+            title="Ask AI"
+            onClick={() => openAsk('')}
+            className="mt-2 h-11 w-11 rounded-full"
+          >
+            <Sparkles className="h-4 w-4 text-primary" />
+          </Button>
+        </aside>
+
         {/* Sidebar (desktop) */}
-        <aside className="hidden w-[240px] shrink-0 flex-col border-r border-border bg-surface lg:flex">
+        <aside className="hidden w-[240px] shrink-0 flex-col border-r border-border bg-background lg:flex">
           <div className="flex h-14 items-center justify-between border-b border-border px-4">
             <Link to="/app/today" className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
                 <Inbox className="h-4 w-4" />
               </div>
               <span className="text-base font-semibold tracking-tight text-foreground">Relay</span>
@@ -144,7 +209,7 @@ export function AssistantLayout() {
               variant="ghost"
               aria-label="Ask AI"
               onClick={() => openAsk('')}
-              className="h-8 w-8"
+              className="h-10 w-10 rounded-full"
             >
               <Sparkles className="h-4 w-4 text-primary" />
             </Button>
@@ -153,7 +218,7 @@ export function AssistantLayout() {
           {/* Client switcher */}
           {me?.clients && me.clients.length > 0 && (
             <div className="border-b border-border p-3">
-              <label className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Client inbox
               </label>
               <select
@@ -164,7 +229,7 @@ export function AssistantLayout() {
                   queryClient.invalidateQueries({ queryKey: ['threads'] });
                   queryClient.invalidateQueries({ queryKey: ['dashboard'] });
                 }}
-                className="h-8 w-full rounded-lg border border-border bg-background px-2 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="h-9 w-full rounded-full border border-border bg-card px-3 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 {me.clients.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -222,7 +287,7 @@ export function AssistantLayout() {
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="flex h-9 w-full max-w-sm items-center justify-between rounded-lg border border-border bg-surface px-3 text-xs text-muted-foreground hover:text-foreground"
+              className="flex h-10 w-full max-w-sm items-center justify-between rounded-full border border-border bg-card px-4 text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
               <span className="flex items-center gap-2">
                 <Search className="h-3.5 w-3.5" />
@@ -231,15 +296,17 @@ export function AssistantLayout() {
               <KbdHint keys="⌘K" />
             </button>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               {DEMO_MODE && me?.user?.email === 'alex@example.com' && primaryAccount?.simulated && (
                 <Button
                   size="sm"
-                  variant="outline"
+                  aria-label="Simulate email"
+                  title="Simulate email"
+                  className="h-11 min-w-[44px] rounded-full bg-primary px-4 text-primary-foreground hover:opacity-90 xl:h-10 xl:min-w-0"
                   disabled={simulateEmail.isPending}
                   onClick={() => simulateEmail.mutate(clientId)}
                 >
-                  <MailPlus className="h-3.5 w-3.5" />
+                  <MailPlus className="h-4 w-4" />
                   <span className="hidden sm:inline">
                     {simulateEmail.isPending ? 'Simulating…' : 'Simulate email'}
                   </span>
@@ -248,15 +315,23 @@ export function AssistantLayout() {
 
               <Button
                 size="icon"
-                variant="ghost"
+                variant="outline"
                 aria-label="Toggle dark mode"
+                title="Toggle dark mode"
+                className="h-11 w-11 rounded-full xl:h-10 xl:w-10"
                 onClick={toggleTheme}
               >
                 {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
 
               <Link to="/app/settings/accounts">
-                <Button size="icon" variant="ghost" aria-label="Account settings">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Account settings"
+                  title="Account settings"
+                  className="h-11 w-11 rounded-full xl:h-10 xl:w-10"
+                >
                   <Settings className="h-4 w-4" />
                 </Button>
               </Link>
@@ -264,20 +339,25 @@ export function AssistantLayout() {
           </header>
 
           {/* Content */}
-          <main className="min-h-0 flex-1 overflow-y-auto">
+          <main className="min-h-0 flex-1 overflow-y-auto pb-20 md:pb-0">
             <Outlet />
           </main>
         </div>
       </div>
 
-      {/* Mobile bottom tab bar */}
-      <nav className="flex h-14 shrink-0 items-center justify-around border-t border-border bg-background lg:hidden">
+      {/* Mobile bottom pill tab bar */}
+      <nav
+        aria-label="Mobile navigation"
+        className="fixed inset-x-3 bottom-3 z-40 flex items-center justify-around rounded-full bg-ink px-2 py-1.5 text-ink-foreground shadow-lg md:hidden"
+      >
         <NavLink
           to="/app/today"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center gap-0.5 text-[11px]',
-              isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+              'flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-3 text-xs transition-colors',
+              isActive
+                ? 'bg-accent-lime font-semibold text-accent-lime-foreground'
+                : 'text-ink-muted hover:text-ink-foreground'
             )
           }
         >
@@ -288,8 +368,10 @@ export function AssistantLayout() {
           to="/app/inbox/inbox"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center gap-0.5 text-[11px]',
-              isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+              'flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-3 text-xs transition-colors',
+              isActive
+                ? 'bg-accent-lime font-semibold text-accent-lime-foreground'
+                : 'text-ink-muted hover:text-ink-foreground'
             )
           }
         >
@@ -300,8 +382,10 @@ export function AssistantLayout() {
           to="/app/inbox/review"
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center gap-0.5 text-[11px]',
-              isActive ? 'text-primary font-medium' : 'text-muted-foreground'
+              'flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-3 text-xs transition-colors',
+              isActive
+                ? 'bg-accent-lime font-semibold text-accent-lime-foreground'
+                : 'text-ink-muted hover:text-ink-foreground'
             )
           }
         >
@@ -311,24 +395,94 @@ export function AssistantLayout() {
         <button
           type="button"
           onClick={() => openAsk('')}
-          className="flex flex-col items-center gap-0.5 text-[11px] text-muted-foreground"
+          className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-3 text-xs text-ink-muted transition-colors hover:text-ink-foreground"
         >
           <Sparkles className="h-4 w-4" />
           <span>Ask</span>
         </button>
-        <NavLink
-          to="/app/settings/accounts"
-          className={({ isActive }) =>
-            cn(
-              'flex flex-col items-center gap-0.5 text-[11px]',
-              isActive ? 'text-primary font-medium' : 'text-muted-foreground'
-            )
-          }
+        <button
+          type="button"
+          onClick={() => setMoreOpen(true)}
+          aria-label="More navigation and client switcher"
+          className="flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-full px-3 text-xs text-ink-muted transition-colors hover:text-ink-foreground"
         >
-          <Settings className="h-4 w-4" />
-          <span>Accounts</span>
-        </NavLink>
+          <Menu className="h-4 w-4" />
+          <span>More</span>
+        </button>
       </nav>
+
+      {/* Mobile / Tablet More drawer (clients + all segments + sign out) */}
+      <Dialog open={moreOpen} onOpenChange={setMoreOpen}>
+        <DialogContent className="max-w-sm p-4">
+          <DialogHeader>
+            <DialogTitle>Switch client & segments</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 space-y-4">
+            {me?.clients && me.clients.length > 0 && (
+              <div>
+                <label className="mb-1 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Client inbox
+                </label>
+                <select
+                  aria-label="Select client"
+                  value={clientId || ''}
+                  onChange={(e) => {
+                    setActiveClientId(e.target.value);
+                    queryClient.invalidateQueries({ queryKey: ['threads'] });
+                    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+                    setMoreOpen(false);
+                  }}
+                  className="h-11 w-full rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {me.clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="max-h-72 space-y-3 overflow-y-auto" onClick={() => setMoreOpen(false)}>
+              <div className="space-y-0.5">{primarySegments.map(renderNavItem)}</div>
+              <div>
+                <p className="mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Who replies
+                </p>
+                <div className="space-y-0.5">{ownerSegments.map(renderNavItem)}</div>
+              </div>
+              <div>
+                <p className="mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Status
+                </p>
+                <div className="space-y-0.5">{statusSegments.map(renderNavItem)}</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-border pt-3">
+              <Link
+                to="/app/settings/accounts"
+                onClick={() => setMoreOpen(false)}
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                Connected accounts
+              </Link>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setMoreOpen(false);
+                  logout();
+                  navigate('/login', { replace: true });
+                }}
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign out
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <CommandPalette />
       <AskPanel />

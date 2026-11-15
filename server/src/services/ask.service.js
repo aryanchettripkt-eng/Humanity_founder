@@ -17,14 +17,17 @@ export async function askInbox({ clientId, question, threadId }) {
       return {
         answer: thread.reason || `This thread is currently assigned to ${thread.owner}.`,
         threadIds: [thread.id],
+        threads: [{ id: thread.id, subject: thread.subject }],
       };
     }
   }
 
   if (threadId && /\bdraft\b|\breply\b/.test(lower)) {
+    const thread = await Thread.findOne({ _id: threadId, clientId }).select('subject');
     return {
       answer: 'I can open the draft composer for this conversation.',
       threadIds: [threadId],
+      threads: thread ? [{ id: threadId, subject: thread.subject }] : [],
       action: { type: 'draft', threadId },
     };
   }
@@ -49,10 +52,11 @@ export async function askInbox({ clientId, question, threadId }) {
     return {
       answer: 'No matching open conversations were found for that question.',
       threadIds: [],
+      threads: [],
     };
   }
 
-  const allowedIds = new Set(candidates.map((t) => t.id));
+  const candidateById = new Map(candidates.map((t) => [t.id, t]));
   const contextLines = candidates.map(
     (t) =>
       `id=${t.id} owner=${t.owner} subject="${t.subject}" summary="${t.summary || t.snippet}"`
@@ -71,15 +75,19 @@ export async function askInbox({ clientId, question, threadId }) {
       temperature: 0.2,
     });
 
+    const citedIds = res.threadIds.filter((id) => candidateById.has(id));
     return {
       answer: res.answer,
-      threadIds: res.threadIds.filter((id) => allowedIds.has(id)),
+      threadIds: citedIds,
+      threads: citedIds.map((id) => ({ id, subject: candidateById.get(id).subject })),
     };
   } catch (err) {
     logger.warn('Ask AI failed; returning matched threads', { message: err?.message });
+    const top = candidates.slice(0, 5);
     return {
       answer: `Found ${candidates.length} relevant conversation(s) in your inbox.`,
-      threadIds: candidates.slice(0, 5).map((t) => t.id),
+      threadIds: top.map((t) => t.id),
+      threads: top.map((t) => ({ id: t.id, subject: t.subject })),
     };
   }
 }

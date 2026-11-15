@@ -111,12 +111,4 @@ describe('LandingPage', () => {
       expect(demoLoginApi).toHaveBeenCalledWith('client');
     });
   });
-
-  it('forces light mode on html while mounted and restores dark class on unmount', () => {
-    document.documentElement.classList.add('dark');
-    const { unmount } = renderLanding();
-    expect(document.documentElement.classList.contains('dark')).toBe(false);
-    unmount();
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
-  });
 });

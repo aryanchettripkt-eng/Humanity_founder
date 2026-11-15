@@ -6,6 +6,7 @@ type ConnectProviderCardProps = {
   provider: 'gmail' | 'outlook';
   connectedAddress?: string;
   loading?: boolean;
+  demoAvailable?: boolean;
   realAvailable?: boolean;
   realLoading?: boolean;
   onConnect: () => void;
@@ -16,6 +17,7 @@ export function ConnectProviderCard({
   provider,
   connectedAddress,
   loading = false,
+  demoAvailable = true,
   realAvailable = false,
   realLoading = false,
   onConnect,
@@ -63,12 +65,14 @@ export function ConnectProviderCard({
         </span>
       ) : showDual ? (
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <Button size="sm" onClick={onConnect} disabled={loading || realLoading}>
-            {loading ? 'Opening…' : 'Use demo inbox'}
-          </Button>
+          {demoAvailable && (
+            <Button size="sm" onClick={onConnect} disabled={loading || realLoading}>
+              {loading ? 'Opening…' : 'Use demo inbox'}
+            </Button>
+          )}
           <Button
             size="sm"
-            variant="outline"
+            variant={demoAvailable ? 'outline' : 'default'}
             onClick={onConnectReal}
             disabled={loading || realLoading}
           >

@@ -126,7 +126,7 @@ export function ClientHomePage() {
                       ) : (
                         <Button
                           size="lg"
-                          variant="outline"
+                          variant="default"
                           className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
                           disabled={actionMutation.isPending}
                           onClick={() =>
@@ -140,7 +140,7 @@ export function ClientHomePage() {
                       <Button
                         size="lg"
                         variant="secondary"
-                        className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
+                        className="min-h-[44px] w-full whitespace-nowrap border border-border sm:w-auto sm:flex-1"
                         disabled={actionMutation.isPending}
                         onClick={() =>
                           actionMutation.mutate({ threadId: t.id, action: 'handoff' })
@@ -152,7 +152,7 @@ export function ClientHomePage() {
 
                       <Button
                         size="lg"
-                        variant="ghost"
+                        variant="outline"
                         className="min-h-[44px] w-full whitespace-nowrap sm:w-auto"
                         onClick={() => {
                           setNoteOpenId(noteOpenId === t.id ? null : t.id);
