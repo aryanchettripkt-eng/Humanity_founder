@@ -325,7 +325,7 @@ export function TodayPage() {
         }
       />
 
-      <div className="working-panel space-y-6">
+      <div className="working-panel mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] space-y-6">
         <div
           role="tablist"
           aria-label="Filter threads"

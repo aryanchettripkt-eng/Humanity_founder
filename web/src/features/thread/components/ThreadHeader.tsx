@@ -2,16 +2,15 @@ import {
   Archive,
   ArrowLeft,
   CheckCircle2,
+  Mail,
   MailOpen,
   PanelRight,
   RefreshCw,
   Reply,
   Star,
 } from 'lucide-react';
-import { KbdHint } from '@/components/common/KbdHint';
 import { OwnerPill } from '@/components/common/OwnerPill';
 import { OwnerPopover } from '@/components/common/OwnerPopover';
-import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { Owner, ThreadDetail } from '@/types/api';
@@ -45,138 +44,175 @@ export function ThreadHeader({
   onReclassify,
   onToggleAiPanel,
 }: ThreadHeaderProps) {
-  const senderEmail = thread.participants?.[0]?.email;
+  const sender = thread.participants?.[0];
+  const participantsLabel = thread.participants
+    .map((p) => (p.name ? `${p.name} <${p.email}>` : p.email))
+    .join(', ');
+
+  const iconBtnClass =
+    'flex h-10 w-10 items-center justify-center rounded-full border border-[var(--pane-border)] bg-[var(--card-glass-bg)] text-[var(--fg)] transition-colors hover:bg-[var(--row-selected-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50';
 
   return (
-    <div className="border-b border-border bg-background px-4 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          {onBack && (
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Back to list"
+    <header className="shrink-0 border-b border-[var(--glass-divider)] px-5 pb-4 pt-5 sm:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          {onBack ? (
+            <button
+              type="button"
               onClick={onBack}
-              className="md:hidden"
+              aria-label="Back to list"
+              className={cn(iconBtnClass, 'lg:hidden')}
             >
               <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
+            </button>
+          ) : null}
+
           <OwnerPopover
             current={thread.owner}
-            senderEmail={senderEmail}
+            senderEmail={sender?.email}
             onSelect={onChangeOwner}
           >
-            <OwnerPill owner={thread.owner} source={thread.ownerSource} size="md" interactive />
+            <span>
+              <OwnerPill
+                owner={thread.owner}
+                source={thread.ownerSource}
+                size="md"
+                interactive
+                loading={thread.aiStatus === 'pending'}
+              />
+            </span>
           </OwnerPopover>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Reply" onClick={onReply}>
+              <button
+                type="button"
+                aria-label="Reply"
+                onClick={onReply}
+                className={iconBtnClass}
+              >
                 <Reply className="h-4 w-4" />
-              </Button>
+              </button>
             </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              <span>Draft reply</span>
-              <KbdHint keys="r" />
-            </TooltipContent>
+            <TooltipContent>Reply (r)</TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Star" onClick={onToggleStar}>
+              <button
+                type="button"
+                aria-label={thread.important ? 'Remove star' : 'Star'}
+                onClick={onToggleStar}
+                className={iconBtnClass}
+              >
                 <Star
                   className={cn(
                     'h-4 w-4',
-                    thread.important && 'fill-amber-500 text-amber-500'
+                    thread.important && 'fill-amber-400 text-amber-400'
                   )}
                 />
-              </Button>
+              </button>
             </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              <span>Important</span>
-              <KbdHint keys="s" />
+            <TooltipContent>{thread.important ? 'Remove star (s)' : 'Star (s)'}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label={thread.unread ? 'Mark read' : 'Mark unread'}
+                onClick={onToggleUnread}
+                className={iconBtnClass}
+              >
+                {thread.unread ? (
+                  <MailOpen className="h-4 w-4" />
+                ) : (
+                  <Mail className="h-4 w-4" />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {thread.unread ? 'Mark read (u)' : 'Mark unread (u)'}
             </TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Toggle unread" onClick={onToggleUnread}>
-                <MailOpen className="h-4 w-4" />
-              </Button>
+              <button
+                type="button"
+                aria-label={thread.status === 'done' ? 'Reopen' : 'Mark done'}
+                onClick={onMarkDone}
+                className={cn(
+                  iconBtnClass,
+                  thread.status === 'done' && 'border-[var(--grove-lime)]/50 text-[var(--grove-lime)]'
+                )}
+              >
+                <CheckCircle2 className="h-4 w-4" />
+              </button>
             </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              <span>Mark unread</span>
-              <KbdHint keys="u" />
+            <TooltipContent>
+              {thread.status === 'done' ? 'Reopen (d)' : 'Mark done (d)'}
             </TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Mark done" onClick={onMarkDone}>
-                <CheckCircle2
-                  className={cn('h-4 w-4', thread.status === 'done' && 'text-success')}
-                />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              <span>Mark done</span>
-              <KbdHint keys="d" />
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Archive" onClick={onArchive}>
+              <button
+                type="button"
+                aria-label="Archive"
+                onClick={onArchive}
+                className={iconBtnClass}
+              >
                 <Archive className="h-4 w-4" />
-              </Button>
+              </button>
             </TooltipTrigger>
-            <TooltipContent className="flex items-center gap-2">
-              <span>Archive</span>
-              <KbdHint keys="e" />
-            </TooltipContent>
+            <TooltipContent>Archive (e)</TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
+                type="button"
                 aria-label="Re-analyse with AI"
                 disabled={reclassifying}
                 onClick={onReclassify}
+                className={iconBtnClass}
               >
                 <RefreshCw className={cn('h-4 w-4', reclassifying && 'animate-spin')} />
-              </Button>
+              </button>
             </TooltipTrigger>
             <TooltipContent>Re-analyse with AI</TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant={aiPanelOpen ? 'secondary' : 'ghost'}
-                size="icon"
+              <button
+                type="button"
                 aria-label="Toggle AI panel"
+                aria-pressed={aiPanelOpen}
                 onClick={onToggleAiPanel}
+                className={cn(
+                  iconBtnClass,
+                  'hidden md:flex',
+                  aiPanelOpen && 'bg-[var(--nav-active-bg)] text-[var(--nav-active-fg)] border-transparent'
+                )}
               >
                 <PanelRight className="h-4 w-4" />
-              </Button>
+              </button>
             </TooltipTrigger>
-            <TooltipContent>AI Insights</TooltipContent>
+            <TooltipContent>Toggle AI panel</TooltipContent>
           </Tooltip>
         </div>
       </div>
 
-      <h1 className="mt-2.5 text-lg font-semibold leading-snug text-foreground">
+      <h2 className="mt-4 font-display text-[26px] font-semibold leading-tight tracking-tight text-[var(--fg)]">
         {thread.subject}
-      </h1>
-      <p className="mt-1 truncate text-xs text-muted-foreground">
-        {thread.participants?.map((p) => p.name || p.email).join(', ')}
-      </p>
-    </div>
+      </h2>
+      {participantsLabel ? (
+        <p className="mt-1 truncate text-[15px] text-[var(--fg-muted)]">{participantsLabel}</p>
+      ) : null}
+    </header>
   );
 }
-

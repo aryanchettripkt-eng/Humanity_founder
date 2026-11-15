@@ -32,48 +32,52 @@
     --destructive: 17 64% 46%;
     --radius: 10px;
 
-    /* Grove v2 full-bleed background + floating glass frame */
+    /* Grove v2 full-bleed background + glass shell */
     --canvas-image: url('/bg/app-bg.webp');
     --canvas-fallback: #1A1B19;
     --canvas-overlay: transparent;
-    --frame-gap-x: clamp(12px, 5.5vw, 80px);
+    --frame-gap-x: clamp(12px, 5.5vw, 88px);
     --frame-gap-top: clamp(12px, 2.8vw, 40px);
     --frame-gap-bottom: clamp(12px, 2.8vw, 40px);
-    --frame-max-w: 1280px;
+    --frame-max-w: 1440px;
     --frame-radius: 24px;
-    --frame-border: rgba(255, 255, 255, 0.16);
-    --frame-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.55);
-    --hero-glass-bg: linear-gradient(135deg, rgba(14, 16, 13, 0.58) 0%, rgba(14, 16, 13, 0.46) 60%, rgba(14, 16, 13, 0.40) 100%);
-    --hero-glass-blur: blur(28px) saturate(140%);
-    --hero-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    --hero-card-bg: rgba(255, 255, 255, 0.08);
-    --hero-card-border: rgba(255, 255, 255, 0.20);
-    --hero-fg: #FFFFFF;
-    --hero-muted: rgba(255, 255, 255, 0.85);
-    --hero-scrim: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.10));
-    --hero-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-    --hero-pill-bg: rgba(0, 0, 0, 0.38);
+    --frame-glass-bg: rgba(250, 250, 247, 0.66);
+    --frame-glass-blur: blur(40px) saturate(120%);
+    --frame-border: rgba(30, 31, 28, 0.10);
+    --frame-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.35);
+    --pane-bg: rgba(255, 255, 255, 0.55);
+    --pane-border: rgba(30, 31, 28, 0.10);
+    --pane-radius: 24px;
+    --card-glass-bg: rgba(255, 255, 255, 0.72);
+    --card-glass-border: rgba(30, 31, 28, 0.10);
+    --row-selected-bg: rgba(78, 122, 26, 0.14);
+    --grove-lime: #B7E36A;
+    --fg: #141512;
+    --fg-muted: #4A4C47;
+    --fg-subtle: #6B6E68;
+    --hero-card-bg: rgba(255, 255, 255, 0.55);
+    --hero-card-border: rgba(30, 31, 28, 0.10);
+    --hero-fg: #141512;
+    --hero-muted: #4A4C47;
+    --hero-text-shadow: none;
     --toast-bg: rgba(20, 21, 19, 0.88);
     --toast-fg: #FFFFFF;
-    --glass-bg: rgba(0, 0, 0, 0.25);
-    --glass-border: rgba(255, 255, 255, 0.20);
-    --glass-fg: #FFFFFF;
-    --glass-muted: rgba(255, 255, 255, 0.80);
-    --glass-hover: rgba(0, 0, 0, 0.35);
-    --glass-divider: rgba(255, 255, 255, 0.16);
-    --glass-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.36);
-    --nav-pill-bg: rgba(0, 0, 0, 0.25);
-    --nav-pill-border: rgba(255, 255, 255, 0.20);
-    --nav-circle-bg: rgba(0, 0, 0, 0.25);
-    --nav-active-bg: #FFFFFF;
-    --nav-active-fg: #1E1F1C;
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(30, 31, 28, 0.10);
+    --glass-fg: #141512;
+    --glass-muted: #4A4C47;
+    --glass-hover: rgba(255, 255, 255, 0.72);
+    --glass-divider: rgba(30, 31, 28, 0.10);
+    --glass-shadow: none;
+    --nav-pill-bg: rgba(255, 255, 255, 0.55);
+    --nav-pill-border: rgba(30, 31, 28, 0.10);
+    --nav-circle-bg: rgba(255, 255, 255, 0.55);
+    --nav-active-bg: #141512;
+    --nav-active-fg: #FFFFFF;
     --logo-bg: #B7E36A;
-    --logo-fg: #1E1F1C;
-    --panel-bg: #F6F6F3;
-    --panel-border: rgba(255, 255, 255, 0.55);
-    --panel-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.35);
-    --card-bg: #FFFFFF;
-    --card-border: #E7E7E3;
+    --logo-fg: #141512;
+    --card-bg: rgba(255, 255, 255, 0.72);
+    --card-border: rgba(30, 31, 28, 0.10);
     --statbox-bg: #F0F0EC;
     --chart-assistant: rgba(127, 161, 74, 0.85);
     --chart-client: rgba(160, 126, 102, 0.85);
@@ -124,43 +128,47 @@
     --warning: 43.3 96.4% 56.3%;
     --destructive: 17 70% 58%;
 
-    /* Grove v2 full-bleed background + floating glass frame (dark) */
+    /* Grove v2 full-bleed background + glass shell (dark) */
     --canvas-image: url('/bg/app-bg.webp');
     --canvas-fallback: #1A1B19;
-    --canvas-overlay: rgba(0, 0, 0, 0.20);
-    --frame-border: rgba(255, 255, 255, 0.12);
-    --frame-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.7);
-    --hero-glass-bg: linear-gradient(135deg, rgba(8, 9, 8, 0.66) 0%, rgba(8, 9, 8, 0.54) 60%, rgba(8, 9, 8, 0.48) 100%);
-    --hero-glass-blur: blur(28px) saturate(140%);
-    --hero-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
-    --hero-card-bg: rgba(255, 255, 255, 0.06);
+    --canvas-overlay: rgba(0, 0, 0, 0.12);
+    --frame-glass-bg: rgba(38, 38, 38, 0.62);
+    --frame-glass-blur: blur(40px) saturate(120%);
+    --frame-border: rgba(255, 255, 255, 0.22);
+    --frame-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.70);
+    --pane-bg: rgba(255, 255, 255, 0.05);
+    --pane-border: rgba(255, 255, 255, 0.14);
+    --pane-radius: 24px;
+    --card-glass-bg: rgba(255, 255, 255, 0.08);
+    --card-glass-border: rgba(255, 255, 255, 0.16);
+    --row-selected-bg: rgba(150, 200, 70, 0.22);
+    --grove-lime: #B7E36A;
+    --fg: #FFFFFF;
+    --fg-muted: rgba(255, 255, 255, 0.78);
+    --fg-subtle: rgba(255, 255, 255, 0.56);
+    --hero-card-bg: rgba(255, 255, 255, 0.05);
     --hero-card-border: rgba(255, 255, 255, 0.14);
     --hero-fg: #FFFFFF;
-    --hero-muted: rgba(255, 255, 255, 0.85);
-    --hero-scrim: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.10));
+    --hero-muted: rgba(255, 255, 255, 0.78);
     --hero-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-    --hero-pill-bg: rgba(0, 0, 0, 0.38);
-    --toast-bg: rgba(20, 21, 19, 0.88);
+    --toast-bg: rgba(20, 21, 19, 0.92);
     --toast-fg: #FFFFFF;
-    --glass-bg: rgba(0, 0, 0, 0.25);
-    --glass-border: rgba(255, 255, 255, 0.20);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.14);
     --glass-fg: #FFFFFF;
-    --glass-muted: rgba(255, 255, 255, 0.80);
-    --glass-hover: rgba(0, 0, 0, 0.35);
-    --glass-divider: rgba(255, 255, 255, 0.16);
-    --glass-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.36);
-    --nav-pill-bg: rgba(0, 0, 0, 0.25);
-    --nav-pill-border: rgba(255, 255, 255, 0.20);
-    --nav-circle-bg: rgba(0, 0, 0, 0.25);
+    --glass-muted: rgba(255, 255, 255, 0.78);
+    --glass-hover: rgba(255, 255, 255, 0.08);
+    --glass-divider: rgba(255, 255, 255, 0.14);
+    --glass-shadow: none;
+    --nav-pill-bg: rgba(255, 255, 255, 0.06);
+    --nav-pill-border: rgba(255, 255, 255, 0.18);
+    --nav-circle-bg: rgba(255, 255, 255, 0.06);
     --nav-active-bg: #FFFFFF;
-    --nav-active-fg: #1E1F1C;
+    --nav-active-fg: #141512;
     --logo-bg: #B7E36A;
-    --logo-fg: #1E1F1C;
-    --panel-bg: #1B1B1B;
-    --panel-border: rgba(255, 255, 255, 0.08);
-    --panel-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.65);
-    --card-bg: #252425;
-    --card-border: rgba(255, 255, 255, 0.08);
+    --logo-fg: #141512;
+    --card-bg: rgba(255, 255, 255, 0.08);
+    --card-border: rgba(255, 255, 255, 0.16);
     --statbox-bg: rgba(0, 0, 0, 0.30);
     --chart-assistant: rgba(127, 161, 74, 0.85);
     --chart-client: rgba(160, 126, 102, 0.85);
@@ -195,7 +203,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --frame-radius: 32px;
+    --frame-radius: 36px;
   }
 }
 
@@ -211,18 +219,42 @@
     overflow: hidden;
     overflow: clip;
     isolation: isolate;
+    background: var(--frame-glass-bg);
+    backdrop-filter: var(--frame-glass-blur);
+    -webkit-backdrop-filter: var(--frame-glass-blur);
     border: 1px solid var(--frame-border);
     box-shadow: var(--frame-shadow);
   }
 
+  @media (min-width: 1024px) {
+    .floating-frame {
+      height: calc(100dvh - var(--frame-gap-top) - var(--frame-gap-bottom));
+    }
+  }
+
   .glass {
-    border: 1px solid var(--hero-card-border);
-    background-color: var(--hero-card-bg);
-    color: var(--glass-fg);
+    border: 1px solid var(--pane-border);
+    background-color: var(--pane-bg);
+    color: var(--fg);
+  }
+
+  .glass-pane {
+    border: 1px solid var(--pane-border);
+    background-color: var(--pane-bg);
+    border-radius: var(--pane-radius);
+    color: var(--fg);
+  }
+
+  .glass-card {
+    border: 1px solid var(--card-glass-border);
+    background-color: var(--card-glass-bg);
+    color: var(--fg);
   }
 
   .working-panel {
-    background-color: var(--panel-bg);
+    background-color: var(--pane-bg);
+    border: 1px solid var(--pane-border);
+    border-radius: var(--pane-radius);
     padding: clamp(16px, 2.5vw, 32px);
   }
 }

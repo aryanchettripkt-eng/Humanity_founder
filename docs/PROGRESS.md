@@ -28,6 +28,16 @@ _None yet._
 
 ---
 
+### 2026-11-16 02:41 · gemini · G9.2a glass shell everywhere + new 4-column Inbox
+- Done:
+  - **Part 1 (Glass shell everywhere):** Fixed-height floating glass frame at `>=1024px` (`height: calc(100dvh - var(--frame-gap-top) - var(--frame-gap-bottom))`), `--frame-max-w: 1440px`, `--frame-radius: 36px` (`>=768px`) / `24px` (`<768px`), single `backdrop-filter` on `.floating-frame`, translucent `.glass-pane` / `.glass-card` / `.working-panel` surfaces, removed dead `--hero-glass-*` / `--hero-pill-bg` / `--hero-scrim` / `--panel-*` tokens, updated `TopNav` (`44px` logo, `20px` Relay) / `GlassTabs` (`48px` pill) / `AssistantLayout` (`48px` page title, `overflow-hidden` on Inbox `<main>`, `overflow-y-auto` on other pages).
+  - **Part 2 (New 4-column glass Inbox):** Built `InboxRail` (`72px` vertical pill rail + `More` popover on `>=768px`, horizontal chips `<768px`), rebuilt `ThreadList` + `ThreadRow`, `ThreadHeader`, `MessageItem`, docked `DraftComposer` (`"Save reply"` + `"Saved to this thread. Email delivery isn't connected yet."`), and `AIPanel` (`320px` column `>=1280px`, slide-over drawer `768–1279px` toggled via `aiDrawerOpen`, `MobileAISummary` + bottom sheet `<768px`) with real `.ics` calendar export (`web/src/lib/ics.ts`). Preserved all hooks, API calls, and keyboard shortcuts (`j/k/s/u/e/d/r/o`).
+- Verification:
+  - `npm run lint`, `npm run typecheck --workspace=web`, `npm test --workspace=web` (6 files, 24/24 tests) pass.
+  - Playwright verified 0 horizontal overflow across `1920`, `1586`, `1440`, `1024`, `820`, `390`, `320` (light & dark), and WCAG AA contrast >= 7.0:1 across `1920`, `1440`, `1024`, `390` on both Inbox and Today.
+- Changed contracts: none.
+- Next: G9.2b (remaining pages inside the glass shell).
+
 ### 2026-11-16 02:20 · gemini · G9.1e simplified Today
 - Done: Rebuilt Today (`TodayPage.tsx`) inside the floating glass frame to match `today-simple-target.png`:
   - Nav (`TopNav`): client switcher now shows first name only (`Priya ⌄`), no avatar circle.

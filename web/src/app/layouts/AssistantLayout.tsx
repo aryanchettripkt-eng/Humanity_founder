@@ -13,6 +13,7 @@ import { AskPanel } from '@/features/command/AskPanel';
 import { CommandPalette } from '@/features/command/CommandPalette';
 import { qk } from '@/lib/queryKeys';
 import { useSocketEvent } from '@/lib/socket';
+import { cn } from '@/lib/utils';
 import { useCommandStore } from '@/stores/command';
 import { useUiStore } from '@/stores/ui';
 import type { ActivityItem, ThreadListItem } from '@/types/api';
@@ -66,6 +67,7 @@ export function AssistantLayout() {
   useSocketEvent('draft:created', onThreadUpdated);
 
   const isToday = location.pathname === '/app/today';
+  const isInbox = location.pathname.startsWith('/app/inbox');
   const pageTitle = location.pathname.startsWith('/app/settings') ? 'Settings' : 'Inbox';
 
   return (
@@ -80,7 +82,7 @@ export function AssistantLayout() {
           left={
             <h1
               style={{ textShadow: 'var(--hero-text-shadow)' }}
-              className="font-display text-3xl font-semibold tracking-tight text-[var(--hero-fg)]"
+              className="font-display text-[36px] font-semibold leading-[1.05] tracking-tight text-[var(--fg)] md:text-[48px]"
             >
               {pageTitle}
             </h1>
@@ -88,10 +90,19 @@ export function AssistantLayout() {
         />
       ) : null}
 
-      <main className="flex min-h-0 flex-1 flex-col pb-20 md:pb-0">
-        {!isToday ? (
-          <div className="working-panel flex min-h-0 flex-1 flex-col overflow-hidden">
-            <Outlet />
+      <main
+        className={cn(
+          'flex min-h-0 flex-1 flex-col pb-20 md:pb-0',
+          isInbox
+            ? 'px-[clamp(16px,2.5vw,32px)] pb-[clamp(16px,2.5vw,32px)] lg:overflow-hidden'
+            : 'lg:overflow-y-auto'
+        )}
+      >
+        {!isToday && !isInbox ? (
+          <div className="mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex min-h-0 flex-1 flex-col">
+            <div className="working-panel flex min-h-0 flex-1 flex-col">
+              <Outlet />
+            </div>
           </div>
         ) : (
           <Outlet />

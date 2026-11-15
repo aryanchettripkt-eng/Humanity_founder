@@ -1,7 +1,6 @@
-import { Info, Loader2, RefreshCw, Send, Sparkles, Trash2 } from 'lucide-react';
+import { Loader2, RefreshCw, Send, Sparkles, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   useCreateDraft,
@@ -58,11 +57,15 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
 
   if (!draft && !autoOpen && !createDraft.isPending) {
     return (
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-3">
-        <span className="text-xs text-muted-foreground">
-          Need to reply? Generate an AI draft and review before sending.
+      <div className="glass-card flex items-center justify-between gap-3 rounded-[20px] px-4 py-3">
+        <span className="text-sm text-[var(--fg-muted)]">
+          Need to reply? Generate an AI draft and review before saving.
         </span>
-        <Button size="sm" className="shrink-0 whitespace-nowrap" onClick={handleGenerate}>
+        <Button
+          size="sm"
+          onClick={handleGenerate}
+          className="shrink-0 whitespace-nowrap rounded-full bg-[var(--cta-lime-bg)] text-[var(--cta-lime-fg)] hover:bg-[var(--cta-lime-hover)]"
+        >
           <Sparkles className="h-3.5 w-3.5" />
           Draft with AI
         </Button>
@@ -73,7 +76,7 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
   const recipient = draft?.to?.[0]?.email || 'recipient';
 
   return (
-    <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+    <div className="glass-card space-y-3 rounded-[20px] p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           {TONES.map((t) => (
@@ -82,41 +85,37 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
               type="button"
               onClick={() => setTone(t.id)}
               className={cn(
-                'rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors',
+                'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
                 tone === t.id
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border bg-surface text-muted-foreground hover:text-foreground'
+                  ? 'border-transparent bg-[var(--nav-active-bg)] font-semibold text-[var(--nav-active-fg)]'
+                  : 'border-[var(--pane-border)] bg-[var(--pane-bg)] text-[var(--fg-muted)] hover:text-[var(--fg)]'
               )}
             >
               {t.label}
             </button>
           ))}
         </div>
-
-        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-          <Info className="h-3 w-3" />
-          Simulated send
-        </span>
       </div>
 
-      {draft?.sourceNote && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-1.5 text-xs text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+      {draft?.sourceNote ? (
+        <div className="rounded-xl border border-[var(--pane-border)] bg-[var(--pane-bg)] px-3 py-2 text-xs text-[var(--fg)]">
           Drafted from client note: “{draft.sourceNote}”
         </div>
-      )}
+      ) : null}
 
       <div className="flex gap-2">
-        <Input
+        <input
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="Optional instruction (e.g. decline politely, offer next week)…"
-          className="h-8 text-xs"
+          className="h-9 flex-1 rounded-full border border-[var(--pane-border)] bg-[var(--pane-bg)] px-3.5 text-xs text-[var(--fg)] placeholder:text-[var(--fg-subtle)] focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <Button
           size="sm"
-          variant="secondary"
+          variant="outline"
           disabled={createDraft.isPending}
           onClick={handleGenerate}
+          className="rounded-full border-[var(--pane-border)] bg-[var(--pane-bg)] text-[var(--fg)] hover:bg-[var(--row-selected-bg)]"
         >
           {createDraft.isPending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -128,8 +127,8 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
       </div>
 
       {createDraft.isPending && !draft ? (
-        <div className="flex items-center gap-2 py-6 text-xs text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        <div className="flex items-center gap-2 py-6 text-xs text-[var(--fg-muted)]">
+          <Loader2 className="h-4 w-4 animate-spin text-[var(--grove-lime)]" />
           <span>Drafting reply…</span>
         </div>
       ) : (
@@ -140,14 +139,14 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
               onChange={(e) => setBody(e.target.value)}
               onBlur={handleBodyBlur}
               rows={5}
-              className="text-sm leading-relaxed"
+              className="rounded-2xl border-[var(--pane-border)] bg-[var(--pane-bg)] text-sm leading-relaxed text-[var(--fg)]"
             />
 
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Button
                 size="sm"
                 variant="ghost"
-                className="text-muted-foreground hover:text-destructive"
+                className="text-[var(--fg-muted)] hover:text-destructive"
                 disabled={discardDraft.isPending}
                 onClick={() => discardDraft.mutate({ draftId: draft.id, threadId })}
               >
@@ -157,14 +156,15 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
 
               {confirmSend ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    Send to <strong className="text-foreground">{recipient}</strong>?
+                  <span className="text-xs text-[var(--fg-muted)]">
+                    Save reply for <strong className="text-[var(--fg)]">{recipient}</strong>?
                   </span>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => setConfirmSend(false)}
                     disabled={sendDraft.isPending}
+                    className="rounded-full border-[var(--pane-border)] bg-transparent text-[var(--fg)]"
                   >
                     Cancel
                   </Button>
@@ -172,21 +172,30 @@ export function DraftComposer({ threadId, draft, autoOpen = false }: DraftCompos
                     size="sm"
                     disabled={sendDraft.isPending}
                     onClick={() => sendDraft.mutate({ draftId: draft.id, threadId })}
+                    className="rounded-full bg-[var(--cta-lime-bg)] text-[var(--cta-lime-fg)] hover:bg-[var(--cta-lime-hover)]"
                   >
-                    {sendDraft.isPending ? 'Sending…' : 'Confirm send'}
+                    {sendDraft.isPending ? 'Saving…' : 'Confirm save'}
                   </Button>
                 </div>
               ) : (
-                <Button size="sm" onClick={() => setConfirmSend(true)} disabled={!body.trim()}>
+                <Button
+                  size="sm"
+                  onClick={() => setConfirmSend(true)}
+                  disabled={!body.trim()}
+                  className="rounded-full bg-[var(--cta-lime-bg)] text-[var(--cta-lime-fg)] hover:bg-[var(--cta-lime-hover)]"
+                >
                   <Send className="h-3.5 w-3.5" />
-                  Send
+                  Save reply
                 </Button>
               )}
             </div>
+
+            <p className="text-[11px] text-[var(--fg-subtle)]">
+              Saved to this thread. Email delivery isn&apos;t connected yet.
+            </p>
           </>
         )
       )}
     </div>
   );
 }
-

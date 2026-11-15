@@ -20,26 +20,25 @@ export function HeroBand({
 }: HeroBandProps) {
   const heightClass =
     size === 'short'
-      ? 'min-h-[180px] md:min-h-[200px]'
+      ? 'min-h-[120px]'
       : size === 'split'
         ? 'min-h-[380px] h-full'
-        : 'min-h-[320px] md:min-h-[360px]';
+        : '';
 
   return (
     <section
-      style={{
-        background: 'var(--hero-glass-bg)',
-        backdropFilter: 'var(--hero-glass-blur)',
-        WebkitBackdropFilter: 'var(--hero-glass-blur)',
-        boxShadow: 'var(--hero-glass-highlight)',
-      }}
       className={cn(
-        'relative w-full overflow-hidden text-[var(--hero-fg)]',
+        'relative w-full shrink-0 text-[var(--fg)]',
         heightClass,
         className
       )}
     >
-      <div className="relative z-10 flex h-full flex-col justify-between gap-6 p-[clamp(16px,2.5vw,32px)]">
+      <div
+        className={cn(
+          'relative z-10 flex h-full flex-col justify-between gap-5 p-[clamp(16px,2.5vw,32px)]',
+          size === 'short' && 'pb-4'
+        )}
+      >
         {nav ? <div>{nav}</div> : null}
 
         {(left || right) ? (

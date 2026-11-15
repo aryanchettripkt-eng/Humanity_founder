@@ -27,17 +27,17 @@ export function GlassTabs<T extends string = string>({
     <nav
       aria-label={ariaLabel}
       className={cn(
-        'glass inline-flex items-center gap-1 rounded-full p-1',
+        'inline-flex h-12 items-center gap-1 rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-pill-bg)] p-1',
         className
       )}
     >
       {items.map((item) => {
         const isActive = item.id === activeId;
         const itemClass = cn(
-          'inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-base whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           isActive
             ? 'bg-[var(--nav-active-bg)] text-[var(--nav-active-fg)] shadow-sm font-semibold'
-            : 'text-[var(--hero-muted)] hover:bg-[var(--glass-hover)] hover:text-[var(--hero-fg)]'
+            : 'font-medium text-[var(--fg)] hover:bg-[var(--glass-hover)]'
         );
 
         const content = (

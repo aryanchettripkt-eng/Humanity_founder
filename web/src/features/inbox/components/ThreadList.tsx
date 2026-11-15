@@ -1,9 +1,8 @@
 import { Search, X } from 'lucide-react';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SEGMENT_MAP } from '@/lib/segments';
+import { SEGMENTS } from '@/lib/segments';
 import { cn } from '@/lib/utils';
 import type { Owner, SegmentId, ThreadListItem } from '@/types/api';
 import { ThreadRow } from './ThreadRow';
@@ -18,8 +17,8 @@ type ThreadListProps = {
   search: string;
   activeFilters: string[];
   newThreadIds: string[];
-  onSearchChange: (q: string) => void;
-  onToggleFilter: (f: string) => void;
+  onSearchChange: (val: string) => void;
+  onToggleFilter: (filter: string) => void;
   onSelectThread: (id: string) => void;
   onToggleImportant: (id: string, important: boolean) => void;
   onChangeOwner: (id: string, owner: Owner, remember: 'sender' | 'domain' | null) => void;
@@ -29,7 +28,7 @@ type ThreadListProps = {
 const FILTER_CHIPS = [
   { id: 'unread', label: 'Unread' },
   { id: 'important', label: 'Important' },
-  { id: 'dated', label: 'Has date' },
+  { id: 'hasDate', label: 'Has date' },
 ];
 
 export function ThreadList({
@@ -49,50 +48,62 @@ export function ThreadList({
   onChangeOwner,
   onRetry,
 }: ThreadListProps) {
-  const segMeta = SEGMENT_MAP[segment] ?? SEGMENT_MAP.inbox;
-  const SegIcon = segMeta.icon;
+  const segConfig = SEGMENTS.find((s) => s.id === segment) ?? SEGMENTS[1];
 
   return (
-    <div className="flex h-full flex-col border-r border-border bg-background">
-      <div className="space-y-2.5 border-b border-border p-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-foreground">{segMeta.label}</h2>
-          <span className="text-xs text-muted-foreground tabular-nums">{threads.length}</span>
+    <div className="glass-pane flex h-full min-h-0 flex-col overflow-hidden">
+      {/* Sticky header */}
+      <div className="shrink-0 space-y-3 border-b border-[var(--glass-divider)] px-5 pb-4 pt-5">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-display text-[20px] font-semibold leading-tight text-[var(--fg)]">
+            {segConfig.label}
+          </h2>
+          <span className="text-sm font-medium tabular-nums text-[var(--fg-muted)]">
+            {threads.length}
+          </span>
         </div>
 
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
+        {/* Search pill */}
+        <div className="relative flex items-center">
+          <Search
+            className="pointer-events-none absolute left-3.5 h-4 w-4 text-[var(--fg-subtle)]"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search sender, subject, body…"
-            className="h-8 pl-8 pr-7 text-xs"
+            aria-label="Search threads"
+            className="h-10 w-full rounded-full border border-[var(--pane-border)] bg-[var(--card-glass-bg)] pl-10 pr-9 text-sm text-[var(--fg)] placeholder:text-[var(--fg-subtle)] focus:outline-none focus:ring-2 focus:ring-ring"
           />
-          {search && (
+          {search ? (
             <button
               type="button"
-              aria-label="Clear search"
               onClick={() => onSearchChange('')}
-              className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
+              aria-label="Clear search"
+              className="absolute right-2.5 flex h-6 w-6 items-center justify-center rounded-full text-[var(--fg-muted)] hover:bg-[var(--pane-bg)] hover:text-[var(--fg)]"
             >
               <X className="h-3.5 w-3.5" />
             </button>
-          )}
+          ) : null}
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        {/* Filter chips */}
+        <div className="flex flex-wrap items-center gap-1.5">
           {FILTER_CHIPS.map((chip) => {
             const active = activeFilters.includes(chip.id);
             return (
               <button
                 key={chip.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => onToggleFilter(chip.id)}
                 className={cn(
-                  'rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors',
+                  'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
                   active
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border bg-surface text-muted-foreground hover:text-foreground'
+                    ? 'border-transparent bg-[var(--nav-active-bg)] font-semibold text-[var(--nav-active-fg)]'
+                    : 'border-[var(--pane-border)] bg-transparent text-[var(--fg-muted)] hover:bg-[var(--card-glass-bg)] hover:text-[var(--fg)]'
                 )}
               >
                 {chip.label}
@@ -102,44 +113,45 @@ export function ThreadList({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      {/* Scrollable rows */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
         {isLoading ? (
-          <div className="space-y-3 p-3.5">
-            {Array.from({ length: 8 }).map((_, idx) => (
-              <div key={idx} className="space-y-2 border-b border-border pb-3">
-                <div className="flex justify-between">
-                  <Skeleton className="h-4 w-28" />
-                  <Skeleton className="h-3 w-12" />
-                </div>
-                <Skeleton className="h-4 w-56" />
-                <Skeleton className="h-5 w-20 rounded-full" />
-              </div>
-            ))}
+          <div className="space-y-2.5 p-3">
+            <Skeleton className="h-24 w-full rounded-[18px] bg-[var(--card-glass-bg)]" />
+            <Skeleton className="h-24 w-full rounded-[18px] bg-[var(--card-glass-bg)]" />
+            <Skeleton className="h-24 w-full rounded-[18px] bg-[var(--card-glass-bg)]" />
+            <Skeleton className="h-24 w-full rounded-[18px] bg-[var(--card-glass-bg)]" />
           </div>
         ) : isError ? (
-          <ErrorState onRetry={onRetry} />
+          <ErrorState onRetry={onRetry} className="py-12" />
         ) : threads.length === 0 ? (
           <EmptyState
-            icon={SegIcon}
-            title={search ? `No conversations match "${search}".` : segMeta.emptyTitle}
-            description={search ? 'Try a different keyword or clear filters.' : segMeta.emptyDescription}
+            icon={segConfig.icon}
+            title={search || activeFilters.length > 0 ? 'No matching threads' : segConfig.emptyTitle}
+            description={
+              search || activeFilters.length > 0
+                ? 'Try clearing your search or filter chips.'
+                : segConfig.emptyDescription
+            }
+            className="py-12"
           />
         ) : (
-          threads.map((t, index) => (
-            <ThreadRow
-              key={t.id}
-              thread={t}
-              selected={t.id === selectedId}
-              focused={index === focusedIndex}
-              isNew={newThreadIds.includes(t.id)}
-              onSelect={() => onSelectThread(t.id)}
-              onToggleImportant={(imp) => onToggleImportant(t.id, imp)}
-              onChangeOwner={(owner, rem) => onChangeOwner(t.id, owner, rem)}
-            />
-          ))
+          <div className="space-y-0.5">
+            {threads.map((t, idx) => (
+              <ThreadRow
+                key={t.id}
+                thread={t}
+                selected={t.id === selectedId}
+                focused={idx === focusedIndex}
+                isNew={newThreadIds.includes(t.id)}
+                onSelect={() => onSelectThread(t.id)}
+                onToggleImportant={(imp) => onToggleImportant(t.id, imp)}
+                onChangeOwner={(owner, remember) => onChangeOwner(t.id, owner, remember)}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
   );
 }
-

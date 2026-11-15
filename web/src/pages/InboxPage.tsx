@@ -4,6 +4,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { SourceBadge } from '@/components/common/SourceBadge';
+import { InboxRail } from '@/components/grove/InboxRail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIPanel, MobileAISummary } from '@/features/ai/components/AIPanel';
 import { DraftComposer } from '@/features/composer/components/DraftComposer';
@@ -11,6 +12,7 @@ import {
   useChangeOwner,
   usePatchThread,
   useReclassifyThread,
+  useThreadCounts,
   useThreadDetail,
   useThreads,
   useThreadSuggestion,
@@ -40,7 +42,9 @@ export function InboxPage() {
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
+  const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
 
+  const { data: counts } = useThreadCounts(activeClientId || undefined);
   const {
     data: listData,
     isLoading: listLoading,
@@ -84,7 +88,7 @@ export function InboxPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detail?.id]);
 
-  // Keyboard navigation (j/k, s, u, e, d, r)
+  // Keyboard navigation (j/k, s, u, e, d, r, o)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -101,12 +105,14 @@ export function InboxPage() {
         e.preventDefault();
         const next = Math.min(threads.length - 1, Math.max(0, focusedIndex + 1));
         setFocusedIndex(next);
-        navigate(`/app/inbox/${segment}/${threads[next].id}?${searchParams.toString()}`);
+        const qs = searchParams.toString();
+        navigate(`/app/inbox/${segment}/${threads[next].id}${qs ? `?${qs}` : ''}`);
       } else if (e.key === 'k' && threads.length > 0) {
         e.preventDefault();
         const prev = Math.max(0, focusedIndex - 1);
         setFocusedIndex(prev);
-        navigate(`/app/inbox/${segment}/${threads[prev].id}?${searchParams.toString()}`);
+        const qs = searchParams.toString();
+        navigate(`/app/inbox/${segment}/${threads[prev].id}${qs ? `?${qs}` : ''}`);
       } else if (detail) {
         if (e.key === 's') {
           patchThread.mutate({
@@ -175,6 +181,15 @@ export function InboxPage() {
     updateParam('f', next.join(','));
   };
 
+  const selectSegment = (seg: SegmentId) => {
+    if (seg === 'today') {
+      navigate('/app/today');
+      return;
+    }
+    const qs = searchParams.toString();
+    navigate(`/app/inbox/${seg}${qs ? `?${qs}` : ''}`);
+  };
+
   const selectThread = (id: string) => {
     const qs = searchParams.toString();
     navigate(`/app/inbox/${segment}/${id}${qs ? `?${qs}` : ''}`);
@@ -185,12 +200,21 @@ export function InboxPage() {
   const visibleMessages = collapsedCount > 0 ? messages.slice(-2) : messages;
 
   return (
-    <div className="flex h-full min-h-0 flex-1 overflow-hidden">
-      {/* List pane */}
+    <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4 lg:overflow-hidden">
+      {/* Segment rail: horizontal chips on mobile (<768 when list visible), vertical 72px rail on >=768 */}
+      <div className={cn(threadId ? 'hidden md:flex' : 'flex')}>
+        <InboxRail
+          activeSegment={segment as SegmentId}
+          counts={counts as Partial<Record<SegmentId, number>> | undefined}
+          onSelectSegment={selectSegment}
+        />
+      </div>
+
+      {/* List column (360-380px) */}
       <div
         className={cn(
-          'w-full shrink-0 md:w-[360px] lg:w-[380px]',
-          threadId ? 'hidden md:block' : 'block'
+          'min-h-0 w-full shrink-0 md:w-[360px] lg:w-[380px]',
+          threadId ? 'hidden lg:block' : 'block'
         )}
       >
         <ThreadList
@@ -222,11 +246,11 @@ export function InboxPage() {
         />
       </div>
 
-      {/* Detail pane */}
+      {/* Reading column (flex) */}
       <div
         className={cn(
-          'flex min-w-0 flex-1 flex-col bg-background',
-          !threadId ? 'hidden md:flex' : 'flex'
+          'glass-pane flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
+          !threadId ? 'hidden lg:flex' : 'flex'
         )}
       >
         {!selectedId ? (
@@ -238,9 +262,9 @@ export function InboxPage() {
           />
         ) : detailLoading ? (
           <div className="space-y-4 p-6">
-            <Skeleton className="h-7 w-72" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-7 w-72 rounded-xl bg-[var(--card-glass-bg)]" />
+            <Skeleton className="h-4 w-48 rounded-lg bg-[var(--card-glass-bg)]" />
+            <Skeleton className="h-40 w-full rounded-[20px] bg-[var(--card-glass-bg)]" />
           </div>
         ) : detailError || !detail ? (
           <ErrorState onRetry={() => refetchDetail()} className="flex-1" />
@@ -250,7 +274,10 @@ export function InboxPage() {
               thread={detail}
               aiPanelOpen={aiPanelOpen}
               reclassifying={reclassify.isPending}
-              onBack={() => navigate(`/app/inbox/${segment}`)}
+              onBack={() => {
+                const qs = searchParams.toString();
+                navigate(`/app/inbox/${segment}${qs ? `?${qs}` : ''}`);
+              }}
               onChangeOwner={(owner, remember) =>
                 changeOwner.mutate({
                   id: detail.id,
@@ -294,38 +321,45 @@ export function InboxPage() {
               }}
               onReply={() => setComposerOpen(true)}
               onReclassify={() => reclassify.mutate(detail.id)}
-              onToggleAiPanel={toggleAiPanel}
+              onToggleAiPanel={() => {
+                if (typeof window !== 'undefined' && window.innerWidth < 1280) {
+                  setAiDrawerOpen((v) => !v);
+                } else {
+                  toggleAiPanel();
+                }
+              }}
             />
 
-            <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6">
               <MobileAISummary
                 thread={detail}
                 reclassifying={reclassify.isPending}
                 onReclassify={() => reclassify.mutate(detail.id)}
+                onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
               />
 
-              {detail.handoff?.state && detail.handoff.state !== 'none' && (
-                <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-                  <Crown className="mt-0.5 h-4 w-4 shrink-0" />
+              {detail.handoff?.state && detail.handoff.state !== 'none' ? (
+                <div className="glass-card flex items-start gap-2.5 rounded-[20px] p-3.5 text-xs text-[var(--fg)]">
+                  <Crown className="mt-0.5 h-4 w-4 shrink-0 text-[var(--grove-lime)]" />
                   <div>
                     <p className="font-medium capitalize">
                       Client status: {detail.handoff.state.replace(/_/g, ' ')}
                     </p>
-                    {detail.handoff.note && <p className="mt-0.5">“{detail.handoff.note}”</p>}
+                    {detail.handoff.note ? <p className="mt-0.5">“{detail.handoff.note}”</p> : null}
                   </div>
                 </div>
-              )}
+              ) : null}
 
-              {collapsedCount > 0 && (
+              {collapsedCount > 0 ? (
                 <button
                   type="button"
                   onClick={() => setShowAllMessages(true)}
-                  className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-surface py-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  className="glass-card flex w-full items-center justify-center gap-1.5 rounded-full py-2 text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)]"
                 >
                   <ChevronUp className="h-3.5 w-3.5" />
                   <span>Show {collapsedCount} earlier messages</span>
                 </button>
-              )}
+              ) : null}
 
               <div className="space-y-3">
                 {visibleMessages.map((m) => (
@@ -333,38 +367,41 @@ export function InboxPage() {
                 ))}
               </div>
 
+              {detail.source === 'gmail' ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--glass-divider)] pt-3 text-xs text-[var(--fg-muted)]">
+                  <div className="flex items-center gap-2">
+                    <SourceBadge source="gmail" />
+                    <span>Changes here stay in Relay</span>
+                  </div>
+                  {detail.externalId ? (
+                    <a
+                      href={`https://mail.google.com/mail/u/0/#inbox/${detail.externalId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 font-medium text-[var(--fg)] hover:underline"
+                    >
+                      <span>Open in Gmail</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+
+            {/* Docked DraftComposer at bottom of reading column */}
+            <div className="shrink-0 border-t border-[var(--glass-divider)] p-4 sm:px-6">
               <DraftComposer
                 threadId={detail.id}
                 draft={detail.draft}
                 autoOpen={composerOpen}
               />
-
-              {detail.source === 'gmail' && (
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <SourceBadge source="gmail" />
-                    <span>Changes here stay in Relay</span>
-                  </div>
-                  {detail.externalId && (
-                    <a
-                      href={`https://mail.google.com/mail/u/0/#inbox/${detail.externalId}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-                    >
-                      <span>Open in Gmail</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                </div>
-              )}
             </div>
           </>
         )}
       </div>
 
-      {/* AI Side Panel (desktop) */}
-      {detail && aiPanelOpen && (
+      {/* AI insights column (>=1280 desktop) */}
+      {detail && aiPanelOpen ? (
         <div className="hidden w-[320px] shrink-0 xl:block">
           <AIPanel
             thread={detail}
@@ -373,8 +410,21 @@ export function InboxPage() {
             onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
           />
         </div>
-      )}
+      ) : null}
+
+      {/* AI insights slide-over drawer (768–1279) */}
+      {detail && aiDrawerOpen ? (
+        <div className="fixed inset-y-4 right-4 z-50 hidden w-[340px] max-w-[calc(100vw-2rem)] md:block xl:hidden">
+          <AIPanel
+            thread={detail}
+            reclassifying={reclassify.isPending}
+            onReclassify={() => reclassify.mutate(detail.id)}
+            onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
+            onClose={() => setAiDrawerOpen(false)}
+            className="border-[var(--frame-border)] bg-[#F7F7F4]/95 shadow-2xl backdrop-blur-2xl dark:bg-[#1E1F1C]/95"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
-
