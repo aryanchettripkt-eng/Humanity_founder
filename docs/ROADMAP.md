@@ -88,7 +88,7 @@
 - [ ] ~~**W8.4** Review each W8 PR against WORKSPACE_UX + reference at 1440/820/390/320, light + dark — @claude~~ superseded by Phase 9 (D18)
 
 ## Phase 9 — Design v2 "Grove" (spec: `docs/DESIGN_V2.md`, D18; reuse rule D17)
-- [ ] **G9.1** Tokens + image/fallback, AppFrame, HeroBand, TopNav, BottomTabBar, glass set, FilterBar, ThreadCard, StackedBars; Today on them; delete replaced workspace components — @gemini
+- [x] **G9.1** Tokens + image/fallback, AppFrame, HeroBand, TopNav, BottomTabBar, glass set, FilterBar, ThreadCard, StackedBars; Today on them; delete replaced workspace components — @gemini (gemini/G9.1-grove-foundation)
 - [ ] **G9.1b** Public site (DESIGN_V2 §6, D19/D20): 5 one-screen pages `/`, `/sorting`, `/client-app`, `/ask`, `/how-it-works`, public nav, shared `tourStore`, `/health` warm-up, product copy — @gemini
 - [ ] **G9.2** Inbox (short hero + segment glass tabs, list, reading pane, AIGlassPanel), composer, ⌘K restyle — @gemini
 - [ ] **G9.3** Client view, auth, onboarding, settings, 404 — @gemini

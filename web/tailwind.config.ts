@@ -53,6 +53,12 @@ const config: Config = {
           DEFAULT: 'hsl(var(--delta-down))',
           foreground: 'hsl(var(--delta-down-foreground))',
         },
+        grove: {
+          forest: 'hsl(var(--grove-forest))',
+          clay: 'hsl(var(--grove-clay))',
+          linen: 'hsl(var(--grove-linen))',
+          terracotta: 'hsl(var(--grove-terracotta))',
+        },
         success: 'hsl(var(--success))',
         warning: 'hsl(var(--warning))',
         destructive: {

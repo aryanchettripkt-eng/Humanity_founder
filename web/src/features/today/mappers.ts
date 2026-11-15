@@ -1,22 +1,30 @@
-import type { PillBarSlot } from '@/components/common/PillBar';
 import type {
-  FocusPanelModel,
-  PersonCardModel,
-  TaskCardModel,
-  WorkspaceStatModel,
-} from '@/components/workspace/models';
+  GroveBarDayModel,
+  GroveListRowModel,
+  GroveStatModel,
+  GroveThreadCardModel,
+  GroveThreadRowModel,
+} from '@/components/grove/models';
+import { Crown, UserRoundCheck } from 'lucide-react';
 import { formatRelativeTime, formatUpcomingDate, getInitials } from '@/lib/format';
 import { OWNER_META } from '@/lib/owners';
 import type { SeenClientCounts } from '@/stores/ui';
 import type {
   ActivityItem,
+  Category,
   DashboardSummary,
+  Owner,
   ThreadListItem,
   UpcomingItem,
 } from '@/types/api';
 
-export type TodayPersonFilter = 'all' | 'review' | 'assistant' | 'client' | 'none';
-export type TodayTaskFilter = 'all' | 'dates' | 'follow-ups' | 'client';
+export type TodayGroveFilters = {
+  owner: 'all' | Owner;
+  category: 'all' | Category;
+  date: 'all' | 'week' | 'today';
+  confidence: 'all' | 'high' | 'medium' | 'low';
+  source: 'all' | 'gmail' | 'demo';
+};
 
 export type CollapsedActivity = {
   id: string;
@@ -36,252 +44,219 @@ export function getTimeGreeting(): string {
   return 'Good evening';
 }
 
-export function buildScheduleSlots(
-  upcoming: UpcomingItem[],
-  timeZone?: string
-): PillBarSlot[] {
-  const now = Date.now();
-  const in48h = now + 48 * 60 * 60 * 1000;
-  const within48h = upcoming.filter((item) => {
-    const t = new Date(item.startsAt).getTime();
-    return Number.isFinite(t) && t >= now - 60 * 60 * 1000 && t <= in48h;
-  });
-  const source = within48h.length > 0 ? within48h : upcoming;
-
-  return source.slice(0, 5).map((item, index) => ({
-    id: `slot-${item.threadId}-${index}`,
-    time: formatUpcomingDate(item.startsAt, timeZone),
-    title: item.title,
-    avatars: [getInitials(item.subject || item.title)],
-    href: `/app/inbox/inbox/${item.threadId}`,
-  }));
+export function splitFirstSentence(text: string): { head: string; rest: string } {
+  const trimmed = text.trim();
+  const match = trimmed.match(/^.*?[.!?](?=\s|$)/);
+  if (!match || match[0].length >= trimmed.length) {
+    return { head: trimmed, rest: '' };
+  }
+  return { head: match[0], rest: trimmed.slice(match[0].length).trim() };
 }
 
-export function buildWorkspaceStats(
+export function extractDomain(email: string | undefined): string {
+  if (!email || !email.includes('@')) return 'gmail.com';
+  return email.split('@')[1] || 'gmail.com';
+}
+
+export function buildWeeklyBars(threads: ThreadListItem[]): GroveBarDayModel[] {
+  const now = new Date();
+  const days: GroveBarDayModel[] = [];
+  const dayMap = new Map<string, GroveBarDayModel>();
+
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const label = d.toLocaleDateString([], { weekday: 'short' });
+    const entry: GroveBarDayModel = { key, label, assistant: 0, client: 0, none: 0 };
+    days.push(entry);
+    dayMap.set(key, entry);
+  }
+
+  for (const t of threads) {
+    const key = (t.lastMessageAt || '').slice(0, 10);
+    const bucket = dayMap.get(key);
+    if (!bucket) continue;
+    if (t.owner === 'assistant') bucket.assistant += 1;
+    else if (t.owner === 'client') bucket.client += 1;
+    else if (t.owner === 'none') bucket.none += 1;
+  }
+
+  return days;
+}
+
+export function buildGroveStats(
   counts: Record<string, number> | undefined,
-  seen: SeenClientCounts | undefined
-): WorkspaceStatModel[] {
+  seen: SeenClientCounts | undefined,
+  clientFirstName: string,
+  threads: ThreadListItem[]
+): GroveStatModel[] {
   const assistant = counts?.assistant ?? 0;
   const client = counts?.client ?? 0;
-  const review = counts?.review ?? 0;
+  const waitingOnClient = threads.filter(
+    (t) => t.owner === 'client' && t.handoff?.state !== 'handled'
+  ).length;
 
-  const diff = (curr: number, prev: number | undefined): string | undefined => {
-    if (prev === undefined) return undefined;
-    const d = curr - prev;
-    if (d === 0) return undefined;
-    return d > 0 ? `+${d}` : `${d}`;
-  };
-
-  const tone = (curr: number, prev: number | undefined): 'up' | 'down' | undefined => {
-    if (prev === undefined || curr === prev) return undefined;
-    return curr > prev ? 'up' : 'down';
-  };
+  const diff = seen ? assistant - seen.assistant : 0;
+  const assistantDelta =
+    diff > 0
+      ? `+${diff} since this morning`
+      : diff < 0
+        ? `${diff} since this morning`
+        : `${assistant} ready for reply`;
 
   return [
     {
       id: 'assistant',
+      label: 'For you',
       value: assistant,
-      label: 'Needs you',
-      delta: diff(assistant, seen?.assistant),
-      deltaTone: tone(assistant, seen?.assistant),
+      delta: assistantDelta,
+      deltaTone: diff >= 0 ? 'positive' : 'neutral',
+      icon: UserRoundCheck,
       href: '/app/inbox/assistant',
     },
     {
       id: 'client',
+      label: `For ${clientFirstName}`,
       value: client,
-      label: 'Client',
-      delta: diff(client, seen?.client),
-      deltaTone: tone(client, seen?.client),
+      delta: `${waitingOnClient} waiting on ${clientFirstName}`,
+      deltaTone: 'neutral',
+      icon: Crown,
       href: '/app/inbox/client',
-    },
-    {
-      id: 'review',
-      value: review,
-      label: 'Review',
-      delta: diff(review, seen?.review),
-      deltaTone: tone(review, seen?.review),
-      href: '/app/inbox/review',
     },
   ];
 }
 
-function getThreadSource(_t: ThreadListItem): 'gmail' | 'demo' {
-  return 'gmail';
-}
-
-export function buildPersonCards(
-  data: DashboardSummary,
-  filter: TodayPersonFilter = 'all'
-): PersonCardModel[] {
-  const seen = new Set<string>();
-  const combined: ThreadListItem[] = [];
-
-  for (const t of [...data.review, ...data.recent]) {
-    if (seen.has(t.id)) continue;
-    seen.add(t.id);
-    combined.push(t);
+export function buildNeedsYourCallList(
+  review: ThreadListItem[],
+  upcoming: UpcomingItem[],
+  timeZone?: string
+): { title: string; actionHref: string; rows: GroveListRowModel[]; emptyText: string } {
+  if (review.length > 0) {
+    return {
+      title: 'Needs your call',
+      actionHref: '/app/inbox/review',
+      emptyText: 'All threads have clear owners.',
+      rows: review.slice(0, 3).map((t) => {
+        const sender = t.participants?.[0]?.name || t.participants?.[0]?.email || 'Contact';
+        return {
+          id: t.id,
+          name: sender,
+          initials: getInitials(sender),
+          subtitle: t.subject,
+          rightText: `${Math.round((t.confidence ?? 0.5) * 100)}%`,
+          href: `/app/inbox/review/${t.id}`,
+        };
+      }),
+    };
   }
 
-  const filtered =
-    filter === 'all' ? combined : combined.filter((t) => t.owner === filter);
+  return {
+    title: 'Next up',
+    actionHref: '/app/inbox/inbox',
+    emptyText: 'No upcoming dates extracted.',
+    rows: upcoming.slice(0, 3).map((u, idx) => ({
+      id: `${u.threadId}-${idx}`,
+      name: u.title,
+      initials: getInitials(u.title),
+      subtitle: u.subject,
+      rightText: formatUpcomingDate(u.startsAt, timeZone),
+      href: `/app/inbox/inbox/${u.threadId}`,
+    })),
+  };
+}
 
-  return filtered.slice(0, 6).map((t) => {
+function buildThreadSeries(t: ThreadListItem): number[] {
+  const base = Math.max(1, Math.min(6, t.messageCount || 1));
+  const seed = t.id.charCodeAt(t.id.length - 1) || 3;
+  return Array.from({ length: 8 }, (_, i) => {
+    if (i === 7) return base;
+    return ((seed + i * 3) % (base + 1)) + (i > 4 ? 1 : 0);
+  });
+}
+
+function ctaLabelForThread(t: ThreadListItem, clientFirstName: string): string {
+  if (t.owner === 'assistant') return 'Draft reply';
+  if (t.owner === 'client') {
+    return t.handoff?.state === 'client_handling' ? `Nudge ${clientFirstName}` : `Send to ${clientFirstName}`;
+  }
+  if (t.owner === 'review') return 'Confirm';
+  return 'Open';
+}
+
+export function buildGroveThreadCards(
+  threads: ThreadListItem[],
+  filters: TodayGroveFilters,
+  clientFirstName: string,
+  timeZone?: string
+): GroveThreadCardModel[] {
+  const now = Date.now();
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  const filtered = threads.filter((t) => {
+    if (filters.owner !== 'all' && t.owner !== filters.owner) return false;
+    if (filters.category !== 'all' && t.category !== filters.category) return false;
+    if (filters.source === 'gmail' && t.source !== 'gmail') return false;
+    if (filters.source === 'demo' && t.source === 'gmail') return false;
+
+    const conf = Math.round((t.confidence ?? 0.5) * 100);
+    if (filters.confidence === 'high' && conf < 80) return false;
+    if (filters.confidence === 'medium' && (conf < 60 || conf >= 80)) return false;
+    if (filters.confidence === 'low' && conf >= 60) return false;
+
+    if (filters.date !== 'all') {
+      const ts = new Date(t.lastMessageAt).getTime();
+      if (Number.isFinite(ts)) {
+        if (filters.date === 'today' && now - ts > dayMs) return false;
+        if (filters.date === 'week' && now - ts > weekMs) return false;
+      }
+    }
+    return true;
+  });
+
+  return filtered.map((t) => {
     const sender = t.participants?.[0]?.name || t.participants?.[0]?.email || 'Contact';
+    const domain = extractDomain(t.participants?.[0]?.email);
+    const nextEntity = t.entities?.[0];
+    const ownerLabel =
+      t.owner === 'client' ? `For ${clientFirstName}` : OWNER_META[t.owner].shortLabel;
+    const isFresh = now - new Date(t.lastMessageAt).getTime() < 2 * dayMs;
+
     return {
       id: t.id,
-      name: sender,
+      sender,
       initials: getInitials(sender),
-      subtitle: t.subject,
-      source: getThreadSource(t),
-      category: t.category,
+      domain,
       owner: t.owner,
-      ownerSource: t.ownerSource,
+      ownerLabel,
       confidence: Math.round((t.confidence ?? 0.5) * 100),
+      nextDateLabel: nextEntity ? formatUpcomingDate(nextEntity.startsAt, timeZone) : '—',
+      series: buildThreadSeries(t),
+      sparkTone: t.lastSender === 'them' ? 'olive' : 'ink',
+      deltaText: isFresh ? `${t.messageCount} msgs` : `quiet ${formatRelativeTime(t.lastMessageAt)}`,
+      deltaDirection: isFresh ? 'up' : 'down',
+      ctaLabel: ctaLabelForThread(t, clientFirstName),
       href: `/app/inbox/${t.owner === 'review' ? 'review' : 'inbox'}/${t.id}`,
-      showQuickAssign: t.owner === 'review',
+      category: t.category,
     };
   });
 }
 
-const TASK_STATUS_OPTIONS = [
-  { id: 'open', label: 'Action required' },
-  { id: 'done', label: 'Mark done' },
-];
-
-export function buildTaskCards(
-  data: DashboardSummary,
-  timeZone?: string,
-  filter: TodayTaskFilter = 'all'
-): TaskCardModel[] {
-  const tasks: TaskCardModel[] = [];
-
-  if (filter === 'all' || filter === 'dates') {
-    data.upcoming.slice(0, 2).forEach((item, index) => {
-      tasks.push({
-        id: `upcoming-${item.threadId}-${index}`,
-        threadId: item.threadId,
-        person: item.subject,
-        initials: getInitials(item.title),
-        role: 'Extracted date',
-        title: item.title,
-        iconKind: 'calendar',
-        dateLabel: formatUpcomingDate(item.startsAt, timeZone),
-        avatars: [getInitials(item.subject || item.title)],
-        statusLabel: 'Action required',
-        statusOptions: TASK_STATUS_OPTIONS,
-        primaryLabel: 'Open thread',
-        highlighted: index === 0,
-        href: `/app/inbox/inbox/${item.threadId}`,
-      });
-    });
-  }
-
-  if (filter === 'all' || filter === 'follow-ups') {
-    data.nudges.slice(0, 2).forEach((thread) => {
-      const sender =
-        thread.participants?.[0]?.name || thread.participants?.[0]?.email || 'Contact';
-      tasks.push({
-        id: `nudge-${thread.id}`,
-        threadId: thread.id,
-        person: sender,
-        initials: getInitials(sender),
-        role: '3+ days silent',
-        title: thread.subject,
-        iconKind: 'clock',
-        dateLabel: `Sent ${formatRelativeTime(thread.lastMessageAt)}`,
-        statusLabel: 'Waiting',
-        statusOptions: TASK_STATUS_OPTIONS,
-        primaryLabel: 'Follow up',
-        highlighted: tasks.length === 0 && filter !== 'all',
-        href: `/app/inbox/waiting/${thread.id}`,
-      });
-    });
-  }
-
-  if (filter === 'all' || filter === 'client') {
-    data.recent
-      .filter((t) => t.owner === 'client')
-      .slice(0, 2)
-      .forEach((thread) => {
-        const sender =
-          thread.participants?.[0]?.name || thread.participants?.[0]?.email || 'Contact';
-        tasks.push({
-          id: `client-${thread.id}`,
-          threadId: thread.id,
-          person: sender,
-          initials: getInitials(sender),
-          role: 'Client hand-off',
-          title: thread.subject,
-          iconKind: 'crown',
-          statusLabel: 'Waiting on client',
-          statusOptions: TASK_STATUS_OPTIONS,
-          primaryLabel: 'Open thread',
-          highlighted: tasks.length === 0 && filter !== 'all',
-          href: `/app/inbox/client/${thread.id}`,
-        });
-      });
-  }
-
-  return tasks.slice(0, 6);
-}
-
-export function buildFocusPanelModel(
-  selectedId: string | null,
-  data: DashboardSummary,
-  timeZone?: string
-): FocusPanelModel | null {
-  const allThreads = [...data.review, ...data.recent, ...data.nudges];
-  const thread =
-    (selectedId ? allThreads.find((t) => t.id === selectedId) : undefined) ??
-    allThreads[0];
-  if (!thread) return null;
-
-  const sender =
-    thread.participants?.[0]?.name || thread.participants?.[0]?.email || 'Contact';
-  const meta = OWNER_META[thread.owner];
-
-  const keyPoints = [
-    thread.summary || thread.snippet || 'No summary extracted yet.',
-    ...(thread.reason ? [`Reason: ${thread.reason}`] : []),
-  ];
-
-  const datesForThread = data.upcoming
-    .filter((u) => u.threadId === thread.id)
-    .map((u, idx) => ({
-      id: `${u.threadId}-${idx}`,
-      title: u.title,
-      dateLabel: formatUpcomingDate(u.startsAt, timeZone),
-    }));
-
-  const timeline = data.activity
-    .slice(0, 3)
-    .map((act) => ({
-      time: formatRelativeTime(act.createdAt),
-      label: `${act.actor.name}: ${act.type.replace(/_/g, ' ')}`,
-    }));
-
-  const isClientQueue = thread.owner === 'client';
-
-  return {
-    id: thread.id,
-    owner: thread.owner,
-    ownerLabel: meta.label,
-    confidence: Math.round((thread.confidence ?? 0.5) * 100),
-    reason: thread.reason || thread.clientReason || 'Classified automatically by Relay.',
-    subject: thread.subject,
-    sender,
-    keyPoints,
-    timeline,
-    dates: datesForThread,
-    href: `/app/inbox/inbox/${thread.id}`,
-    phonePreview: {
-      badge: isClientQueue ? 'In client queue' : 'Handled by assistant',
-      headline: thread.subject,
-      subline: thread.clientReason || thread.summary || thread.snippet,
-      lastAction: formatRelativeTime(thread.lastMessageAt),
-      isClientQueue,
-    },
-  };
+export function buildGroveRecentRows(threads: ThreadListItem[]): GroveThreadRowModel[] {
+  return threads.slice(0, 5).map((t) => {
+    const sender = t.participants?.[0]?.name || t.participants?.[0]?.email || 'Contact';
+    return {
+      id: t.id,
+      sender,
+      initials: getInitials(sender),
+      subject: t.subject,
+      owner: t.owner,
+      timeLabel: formatRelativeTime(t.lastMessageAt),
+      unread: t.unread,
+      href: `/app/inbox/inbox/${t.id}`,
+    };
+  });
 }
 
 export function collapseActivity(activity: ActivityItem[]): CollapsedActivity[] {
@@ -332,3 +307,5 @@ export function collapseActivity(activity: ActivityItem[]): CollapsedActivity[] 
 
   return [...clientItems, ...otherItems].slice(0, 6);
 }
+
+export type DashboardUnused = DashboardSummary;

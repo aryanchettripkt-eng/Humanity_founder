@@ -30,23 +30,23 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
   assistant: {
     id: 'assistant',
     label: 'Assistant',
-    shortLabel: 'You',
+    shortLabel: 'For you',
     description: 'You can handle scheduling, vendors, or routine replies',
     icon: UserRoundCheck,
     pillClass:
-      'text-sky-800 bg-sky-50 border-sky-200 dark:text-sky-300 dark:bg-sky-500/15 dark:border-sky-500/30',
-    dotClass: 'bg-sky-600 dark:bg-sky-400',
+      'text-grove-forest bg-grove-forest/10 border-grove-forest/25 dark:text-emerald-300 dark:bg-grove-forest/20 dark:border-grove-forest/40',
+    dotClass: 'bg-grove-forest',
     shortcut: '1',
   },
   client: {
     id: 'client',
     label: 'Client',
-    shortLabel: 'Client',
+    shortLabel: 'For Priya',
     description: 'Needs your client’s personal decision or approval',
     icon: Crown,
     pillClass:
-      'text-amber-900 bg-amber-50 border-amber-200 dark:text-amber-300 dark:bg-amber-500/15 dark:border-amber-500/30',
-    dotClass: 'bg-amber-600 dark:bg-amber-400',
+      'text-grove-clay bg-grove-clay/10 border-grove-clay/25 dark:text-stone-300 dark:bg-grove-clay/20 dark:border-grove-clay/40',
+    dotClass: 'bg-grove-clay',
     shortcut: '2',
   },
   none: {
@@ -56,19 +56,19 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
     description: 'Informational, newsletter, receipt, or resolved',
     icon: BellOff,
     pillClass:
-      'text-slate-700 bg-slate-100 border-slate-300 dark:text-slate-300 dark:bg-slate-500/15 dark:border-slate-500/30',
-    dotClass: 'bg-slate-500 dark:bg-slate-400',
+      'text-foreground bg-grove-linen border-border dark:text-stone-200 dark:bg-grove-linen/60 dark:border-border',
+    dotClass: 'bg-muted-foreground',
     shortcut: '3',
   },
   review: {
     id: 'review',
     label: 'Needs review',
-    shortLabel: 'Review',
+    shortLabel: 'Needs your call',
     description: 'Low AI confidence — quick human check needed',
     icon: CircleHelp,
     pillClass:
-      'text-rose-800 bg-rose-50 border-dashed border-rose-300 dark:text-rose-300 dark:bg-rose-500/15 dark:border-rose-500/40',
-    dotClass: 'bg-rose-600 dark:bg-rose-400',
+      'text-grove-terracotta bg-grove-terracotta/10 border-dashed border-grove-terracotta/40 dark:text-orange-300 dark:bg-grove-terracotta/20 dark:border-grove-terracotta/50',
+    dotClass: 'bg-grove-terracotta',
     shortcut: '4',
   },
 };

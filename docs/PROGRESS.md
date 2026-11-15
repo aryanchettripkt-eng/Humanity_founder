@@ -27,6 +27,18 @@ _None yet._
 
 ---
 
+### 2026-11-15 19:33 · gemini · G9.1 Grove foundation, frame and Today
+- Done:
+  - Updated `:root` and `.dark` tokens in `web/src/styles/globals.css`, `web/tailwind.config.ts`, and `web/src/lib/owners.ts` to the Grove earthy palette (sage `#DDE1D5` canvas, `#F4F4F2` surface, olive `#5E9A18`/`#8CC63F`, forest `#2F5D3A`, clay `#8C7466`, linen `#E8E4DE`, terracotta `#C2562A`).
+  - Built shared Grove components in `web/src/components/grove/`: `models.ts`, `Avatar.tsx` (`Avatar`, `AvatarTile`), `AppFrame.tsx`, `HeroBand.tsx` (with `/hero/grove.webp` + layered CSS radial fallback), `GlassCard.tsx`, `GlassTabs.tsx`, `GlassStat.tsx`, `GlassList.tsx`, `StackedBars.tsx`, `DeltaChip.tsx`, `Sparkline.tsx`, `StatBox.tsx`, `FilterBar.tsx` (dropdowns + all-filters dialog + pager), `ThreadCard.tsx`, `ThreadListRow.tsx`, `BottomTabBar.tsx`, `TopNav.tsx`, and `AssistantTopNav.tsx`.
+  - Migrated `AssistantLayout.tsx` onto `AppFrame` + `BottomTabBar` + `AssistantTopNav` (with `"Send test email"` D20 copy in the user menu).
+  - Rebuilt `TodayPage.tsx` and `features/today/mappers.ts` onto `HeroBand` (`StackedBars` "This week", `GlassStat×2`, `GlassList` "Needs your call" / "Next up"), URL-synced `FilterBar`, 4-column `ThreadCard` pager, and 5 `ThreadListRow`s ("Recently sorted").
+  - Deleted `NavRail.tsx` and `MobileTabBar.tsx` (left `AppTopBar`, `WorkspaceGrid`, `WorkspaceHeader`, `PersonCard`, `TaskCard`, `FocusPanel` in `components/workspace/` solely so `LandingPage` stays working until G9.1b).
+  - Updated `features/today/mappers.test.ts` and `pages/TodayPage.test.tsx`.
+- Changed contracts: none (all client-side view models; weekly chart computed from thread list).
+- Next: Open PR `feat(grove): G9.1 foundation, frame and Today` for Claude review; after Aryan merges it, start G9.1b.
+- Notes/risks: `web/public/hero/grove.webp` is not yet committed, so `HeroBand` renders its layered moss/stone/mist CSS gradient fallback cleanly.
+
 ### 2026-11-15 19:20 · claude · Public site + product copy (docs)
 - Done: DESIGN_V2 §6 rewritten as a 5-page public site (D19) with per-page functionality and a shared `tourStore`; §6.8 product copy with no prototype labels (D20). AGENTS §7, DESIGN_SYSTEM §7 and PRD AC14 amended (struck, not deleted).
 - Next: Gemini G9.1, then G9.1b.
