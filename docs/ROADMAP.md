@@ -100,7 +100,8 @@
 - [x] **G9.3a** Client view (`/c`, `/c/thread/:id`, assistant preview) in the glass Inbox layout: queue list, reading pane with docked actions, at-a-glance column — @claude (claude/project-thread-mnokkm)
 - [x] **G9.3c** Statistics (`/app/stats`) and About (`/app/about`) pages; they replace the Client view tab in the top nav and the phone tab bar — @claude (claude/project-thread-mnokkm)
 - [~] **G9.3b** Client desk header in the Inbox (4 handoff chips that filter, latest note, "See what {client} sees" preview link, collapse), handoff chips on rows, reading-pane handoff card, "Why {client}" in AI insights, server `handoff` filter. Prompt: project files `prompts/gemini-G9.3b-inbox-client-header.md` — @claude (taken over from Gemini by Aryan, claude/project-thread-mnokkm)
-- [ ] **G9.3** Settings and client view (work-page shape, preview banner), then login, signup, onboarding, 404, auth callback (focus-page shape); all "simulated"/"prototype" copy removed — @gemini
+- [ ] **G9.3** Settings and client view (work-page shape, preview banner), then ~~login, signup,~~ onboarding, 404, auth callback (focus-page shape); all "simulated"/"prototype" copy removed — @gemini
+- [x] **G9.3d** Glass sign-in and sign-up pages (`AuthLayout`, `LoginPage`, `SignupPage`, real `Remember me` token storage) — @gemini (gemini/G9.3d-glass-sign-in)
 - [ ] **G9.4** Review each G9 PR against DESIGN_V2 at 1440/820/390/320, light + dark — @claude
 - [~] **G9.5** Motion: load intro, page transitions, theme reveal, hover and press, popovers and dialogs, list and number animation, reduced motion (DESIGN_SYSTEM §5.1, D23) — @claude (claude/project-thread-8ov0q3)
 

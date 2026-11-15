@@ -68,7 +68,7 @@ web/
 |---|---|---|---|
 | `/` | Landing / redirect | – | shows `LandingPage` (anon); redirects signed-in users → `/app/today` (assistant) or `/c` (client) |
 | `/welcome` | Landing (signed-in) | – | always renders `LandingPage` for signed-in users wanting to view the marketing page |
-| `/login`, `/signup` | Login/Signup | anon | demo buttons call `POST /api/auth/demo`; "Continue with Google" navigates to `${API}/auth/google/start` (shown only if `/health` says `googleLogin:true`) |
+| `/login`, `/signup` | Login/Signup | anon | split-screen glass auth (`AuthLayout`); real `Remember me` (`localStorage` vs `sessionStorage` via `setAuthToken(token, { remember })`); demo buttons call `POST /api/auth/demo`; "Google" navigates to `${API}/auth/google/start` (shown only if `/health` says `googleLogin:true`) |
 | `/auth/callback` | AuthCallback | anon | reads `#token=` (or `?error=`), stores token, clears the hash, routes by role. P1 |
 | `/onboarding` | Onboarding | assistant | step via `?step=welcome|connect|sync`; after real Gmail OAuth the server lands here with `&accountId=` or `&error=` (`not_test_user`, `access_denied`, …) |
 | `/app/today` | Today | assistant | |

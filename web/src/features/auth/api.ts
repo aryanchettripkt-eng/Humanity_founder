@@ -30,9 +30,17 @@ export interface MeResponse {
   clients: ClientSummary[];
 }
 
-export async function loginApi(body: { email: string; password: string }): Promise<AuthResponse> {
-  const res = await apiFetch<AuthResponse>('/auth/login', { method: 'POST', body });
-  setAuthToken(res.token);
+export async function loginApi(body: {
+  email: string;
+  password: string;
+  remember?: boolean;
+}): Promise<AuthResponse> {
+  const { remember = true, ...credentials } = body;
+  const res = await apiFetch<AuthResponse>('/auth/login', {
+    method: 'POST',
+    body: credentials,
+  });
+  setAuthToken(res.token, { remember });
   connectSocket();
   return res;
 }
