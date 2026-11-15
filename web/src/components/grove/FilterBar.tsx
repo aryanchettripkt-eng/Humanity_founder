@@ -47,7 +47,7 @@ export function FilterBar({
         {filters.map((filter, idx) => (
           <div
             key={filter.id}
-            className={cn('relative shrink-0', idx === 0 ? 'order-1' : 'order-3 sm:order-none')}
+            className={cn('relative shrink-0', idx === 0 ? 'order-1' : 'order-3 sm:order-2')}
           >
             <select
               aria-label={filter.label}
@@ -72,7 +72,7 @@ export function FilterBar({
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label="All filters"
-          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-ink-foreground transition-opacity hover:opacity-90 sm:order-last"
+          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-ink-foreground transition-opacity hover:opacity-90 sm:order-3"
         >
           <SlidersHorizontal className="h-4 w-4" />
         </button>
