@@ -14,7 +14,7 @@ import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
 import { HeroBand } from '@/components/grove/HeroBand';
 import { OwnerPill } from '@/components/common/OwnerPill';
 import { useMe } from '@/features/auth/api';
-import { getOwnerShortLabel, OWNER_META, OWNER_ORDER } from '@/lib/owners';
+import { getOwnerShortLabel, OWNER_ORDER } from '@/lib/owners';
 import { useUiStore } from '@/stores/ui';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -45,27 +45,35 @@ export function AboutPage() {
   const activeClientId = useUiStore((s) => s.activeClientId) || undefined;
   const activeClient = me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
   const client = activeClient?.name.split(' ')[0] || 'your client';
+  const Client = `${client[0].toUpperCase()}${client.slice(1)}`;
+
+  const ownerText: Record<(typeof OWNER_ORDER)[number], string> = {
+    assistant: 'Routine emails you can answer yourself, like scheduling, vendors and confirmations.',
+    client: `Needs ${client}’s own decision, approval or personal reply.`,
+    none: 'Nothing to reply to: newsletters, receipts, updates, or threads that are already settled.',
+    review: 'The AI wasn’t sure. Take a quick look and pick who should reply.',
+  };
 
   const steps: { icon: typeof Mail; title: string; body: string }[] = [
     {
       icon: Mail,
-      title: 'Connect an inbox',
-      body: 'Relay reads your client’s email. Gmail sync is read-only for now (beta).',
+      title: 'Relay reads the inbox',
+      body: `Connect ${client}’s email. Relay reads each new message. It never sends, deletes or moves anything in Gmail.`,
     },
     {
       icon: Sparkles,
-      title: 'The AI sorts each email',
-      body: 'Every email gets an owner, a one-line reason and a confidence score. When the AI isn’t sure, it goes to Needs your call.',
+      title: 'AI decides who should reply',
+      body: `Each email is marked For you, For ${client}, or No reply, with a one-line reason why. If the AI isn’t sure, it goes to Needs your call and you decide.`,
     },
     {
       icon: UserRoundCheck,
-      title: 'You handle yours',
-      body: 'Draft with AI, edit, and save the reply. Correct a sort once and Relay can remember the sender or domain.',
+      title: 'You reply to yours',
+      body: 'Open an email, let AI write a draft, edit it and save it. If the AI picked wrong, change it, and Relay can remember that sender or domain next time.',
     },
     {
       icon: Crown,
-      title: `${client[0].toUpperCase()}${client.slice(1)} handles theirs`,
-      body: `Emails for ${client} wait in their own queue. They can say they’re on it, mark it handled, hand it back, or leave you a note. A note can become a draft.`,
+      title: `${Client} sees only theirs`,
+      body: `${Client} gets a short list of just the emails that need them. They can say they’ll handle it, mark it handled, hand it back to you, or leave you a note.`,
     },
   ];
 
@@ -83,7 +91,7 @@ export function AboutPage() {
               About Relay
             </h1>
             <p className="max-w-[60ch] text-base text-[var(--fg-muted)] md:text-lg">
-              Every email answers one question: who needs to reply? You, {client}, or nobody.
+              Relay reads {client}’s email and answers one question for each message: who needs to reply? You, {client}, or nobody.
             </p>
           </div>
         }
@@ -116,7 +124,7 @@ export function AboutPage() {
           </Section>
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            <Section title="The four owners">
+            <Section title="Who an email can be for">
               <ul className="space-y-3">
                 {OWNER_ORDER.map((o) => (
                   <li key={o} className="flex items-start gap-3">
@@ -126,7 +134,7 @@ export function AboutPage() {
                       className="shrink-0"
                     />
                     <span className="pt-0.5 text-[15px] text-[var(--fg-muted)]">
-                      {OWNER_META[o].description}
+                      {ownerText[o]}
                     </span>
                   </li>
                 ))}
@@ -154,33 +162,33 @@ export function AboutPage() {
             </Section>
           </div>
 
-          <Section title="What works today">
+          <Section title="Good to know">
             <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {[
                 {
                   icon: Inbox,
-                  title: 'Gmail is read-only (beta)',
-                  body: 'Relay reads and sorts your email. It doesn’t change anything in Gmail.',
+                  title: 'Relay only reads Gmail',
+                  body: 'It sorts your email but never sends, deletes or moves anything in Gmail.',
                 },
                 {
                   icon: Mail,
-                  title: 'Replies are saved, not emailed',
+                  title: 'Replies are saved, not sent',
                   body: 'Save reply keeps your reply in Relay. Copy it into your mail app to send it.',
                 },
                 {
                   icon: Crown,
-                  title: `Relay doesn’t notify ${client}`,
-                  body: `Emails wait in ${client}’s queue until they open Relay.`,
+                  title: `${Client} isn’t notified`,
+                  body: `Emails wait in ${client}’s list until they open Relay.`,
                 },
                 {
                   icon: CalendarPlus,
-                  title: 'Add to calendar downloads a file',
-                  body: 'You get an .ics file to open in your calendar app.',
+                  title: 'Add to calendar gives you a file',
+                  body: 'It downloads an .ics file that you open in your calendar app.',
                 },
                 {
                   icon: MessageSquareQuote,
-                  title: 'Notes become drafts',
-                  body: `When ${client} leaves a note, you can turn it into a reply draft.`,
+                  title: 'Notes turn into drafts',
+                  body: `When ${client} leaves a note on an email, you can turn it into a reply draft.`,
                 },
               ].map((f) => (
                 <li key={f.title} className="flex items-start gap-3">
