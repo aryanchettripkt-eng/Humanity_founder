@@ -1,7 +1,9 @@
+import { AnimatePresence, m } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AnimatedNumber } from '@/components/common/AnimatedNumber';
 import { OwnerPopover } from '@/components/common/OwnerPopover';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
 import { HeroBand } from '@/components/grove/HeroBand';
@@ -19,6 +21,7 @@ import {
   statusChipLabel,
   type TodayTabId,
 } from '@/features/today/mappers';
+import { EASE_EMPH, revealDelay } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
 import type { Owner, ThreadListItem } from '@/types/api';
@@ -180,7 +183,7 @@ export function TodayPage() {
         className="[&>div]:pt-5"
         bottom={
           <div className="space-y-6">
-            <div className="space-y-2">
+            <div data-reveal="" className="space-y-2">
               <h1
                 style={{ textShadow: 'var(--hero-text-shadow)' }}
                 className="font-display text-[clamp(36px,4.4vw,64px)] font-semibold leading-[1.05] tracking-tight text-[var(--hero-fg)]"
@@ -199,6 +202,8 @@ export function TodayPage() {
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
               <section
                 aria-labelledby="needs-your-call-heading"
+                data-reveal=""
+                style={revealDelay(1)}
                 className="glass rounded-[20px] p-6"
               >
                 <div className="flex items-center justify-between gap-3">
@@ -307,7 +312,9 @@ export function TodayPage() {
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-1 lg:gap-6">
                 <Link
                   to="/app/inbox/assistant"
-                  className="glass flex flex-col justify-between rounded-[20px] p-5 transition-colors hover:bg-[var(--glass-hover)] sm:p-6"
+                  data-reveal=""
+                  style={revealDelay(2)}
+                  className="glass motion-lift flex flex-col justify-between rounded-[20px] p-5 hover:bg-[var(--glass-hover)] sm:p-6"
                 >
                   <span className="font-display text-[20px] font-semibold leading-snug text-[var(--hero-fg)] sm:text-[24px]">
                     You reply
@@ -315,15 +322,18 @@ export function TodayPage() {
                   {isLoading ? (
                     <Skeleton className="mt-3 h-12 w-20 rounded-xl bg-[var(--hero-card-bg)]" />
                   ) : (
-                    <span className="mt-2 font-display text-[40px] font-bold leading-none tracking-tight text-[var(--hero-fg)] tabular-nums md:text-[56px]">
-                      {assistantCount}
-                    </span>
+                    <AnimatedNumber
+                      value={assistantCount}
+                      className="mt-2 font-display text-[40px] font-bold leading-none tracking-tight text-[var(--hero-fg)] tabular-nums md:text-[56px]"
+                    />
                   )}
                 </Link>
 
                 <Link
                   to="/app/inbox/client"
-                  className="glass flex flex-col justify-between rounded-[20px] p-5 transition-colors hover:bg-[var(--glass-hover)] sm:p-6"
+                  data-reveal=""
+                  style={revealDelay(3)}
+                  className="glass motion-lift flex flex-col justify-between rounded-[20px] p-5 hover:bg-[var(--glass-hover)] sm:p-6"
                 >
                   <span className="font-display text-[20px] font-semibold leading-snug text-[var(--hero-fg)] sm:text-[24px]">
                     Waiting on {clientFirstName}
@@ -331,9 +341,10 @@ export function TodayPage() {
                   {isLoading ? (
                     <Skeleton className="mt-3 h-12 w-20 rounded-xl bg-[var(--hero-card-bg)]" />
                   ) : (
-                    <span className="mt-2 font-display text-[40px] font-bold leading-none tracking-tight text-[var(--hero-fg)] tabular-nums md:text-[56px]">
-                      {clientCount}
-                    </span>
+                    <AnimatedNumber
+                      value={clientCount}
+                      className="mt-2 font-display text-[40px] font-bold leading-none tracking-tight text-[var(--hero-fg)] tabular-nums md:text-[56px]"
+                    />
                   )}
                 </Link>
               </div>
@@ -342,7 +353,11 @@ export function TodayPage() {
         }
       />
 
-      <div className="working-panel mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex flex-col gap-6 lg:min-h-0 lg:flex-1">
+      <div
+        data-reveal=""
+        style={revealDelay(3)}
+        className="working-panel mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex flex-col gap-6 lg:min-h-0 lg:flex-1"
+      >
         <div
           role="tablist"
           aria-label="Filter threads"
@@ -365,13 +380,15 @@ export function TodayPage() {
                 )}
               >
                 <span>{tab.label}</span>
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'mt-2 block h-1 w-full rounded-[2px] transition-colors',
-                    isActive ? 'bg-[var(--cta-lime-bg)]' : 'bg-transparent'
-                  )}
-                />
+                <span aria-hidden="true" className="mt-2 block h-1 w-full">
+                  {isActive ? (
+                    <m.span
+                      layoutId="today-tab-underline"
+                      transition={{ duration: 0.35, ease: EASE_EMPH }}
+                      className="block h-1 w-full rounded-[2px] bg-[var(--cta-lime-bg)]"
+                    />
+                  ) : null}
+                </span>
               </button>
             );
           })}
@@ -409,7 +426,8 @@ export function TodayPage() {
           </div>
         ) : (
           <div className="space-y-4 lg:grove-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-1">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div data-stagger="" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <AnimatePresence mode="popLayout" initial={false}>
               {visibleCards.map((t) => {
                 const sender =
                   t.participants?.[0]?.name ||
@@ -420,9 +438,12 @@ export function TodayPage() {
                 const isReview = t.owner === 'review';
 
                 return (
-                  <article
+                  <m.article
                     key={t.id}
-                    className="flex flex-col justify-between gap-5 rounded-[20px] border border-[var(--card-border)] bg-[var(--card-bg)] p-6"
+                    layout
+                    exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
+                    transition={{ layout: { duration: 0.35, ease: EASE_EMPH } }}
+                    className="motion-lift flex flex-col justify-between gap-5 rounded-[20px] border border-[var(--card-border)] bg-[var(--card-bg)] p-6"
                   >
                     <div className="min-w-0">
                       <Link to={href} className="block min-w-0">
@@ -451,9 +472,10 @@ export function TodayPage() {
                     >
                       {ctaLabel}
                     </button>
-                  </article>
+                  </m.article>
                 );
               })}
+              </AnimatePresence>
             </div>
 
             <div>

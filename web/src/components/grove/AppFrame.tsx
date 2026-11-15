@@ -12,6 +12,7 @@ export function AppFrame({ children, className, frameClassName }: AppFrameProps)
     <div className={cn('relative flex h-full w-full flex-col overflow-hidden', className)}>
       <div
         aria-hidden="true"
+        data-canvas=""
         style={{
           backgroundColor: 'var(--canvas-fallback)',
           backgroundImage: 'var(--canvas-image)',
@@ -22,6 +23,7 @@ export function AppFrame({ children, className, frameClassName }: AppFrameProps)
       />
       <div
         aria-hidden="true"
+        data-canvas-overlay=""
         style={{ backgroundColor: 'var(--canvas-overlay)' }}
         className="pointer-events-none fixed inset-0 -z-10"
       />

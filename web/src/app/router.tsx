@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AssistantLayout } from '@/app/layouts/AssistantLayout';
+import { RouteTransitions } from '@/app/RouteTransitions';
 import { ClientLayout } from '@/app/layouts/ClientLayout';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useMe } from '@/features/auth/api';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { getAuthToken } from '@/lib/api';
@@ -47,13 +47,11 @@ const TodayPage = lazy(() =>
   import('@/pages/TodayPage').then((m) => ({ default: m.TodayPage }))
 );
 
+// While a page's code loads on first visit: keep the screen calm (the body colour)
+// instead of flashing skeleton bars outside the glass frame. Later page switches
+// keep the old page on screen (v7_startTransition), so this rarely shows.
 function RouteFallback() {
-  return (
-    <div className="space-y-4 p-6">
-      <Skeleton className="h-7 w-48" />
-      <Skeleton className="h-32 w-full rounded-xl" />
-    </div>
-  );
+  return <div aria-busy="true" className="h-full w-full" />;
 }
 
 function RootRedirect() {
@@ -68,7 +66,8 @@ function RootRedirect() {
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true }}>
+      <RouteTransitions />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
         <Route path="/" element={<RootRedirect />} />

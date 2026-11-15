@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { BarChart3, Table2 } from 'lucide-react';
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { AnimatedNumber } from '@/components/common/AnimatedNumber';
 import { ErrorState } from '@/components/common/ErrorState';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
 import { GlassTabs } from '@/components/grove/GlassTabs';
@@ -81,7 +82,7 @@ function Kpi({
         <Skeleton className="mt-2 h-10 w-20 rounded-xl bg-[var(--card-glass-bg)]" />
       ) : (
         <span className="mt-1 font-display text-[32px] font-bold sm:text-[40px] leading-none tracking-tight tabular-nums text-[var(--fg)]">
-          {value}
+          {typeof value === 'number' ? <AnimatedNumber value={value} /> : value}
         </span>
       )}
       <span className="mt-2 text-sm text-[var(--fg-muted)]">{sub}</span>
@@ -89,7 +90,7 @@ function Kpi({
   );
   const cls = 'glass-card flex min-w-0 flex-col rounded-[20px] p-4 sm:p-5';
   return to ? (
-    <Link to={to} className={cn(cls, 'transition-colors hover:bg-[var(--glass-hover)]')}>
+    <Link to={to} className={cn(cls, 'motion-lift hover:bg-[var(--glass-hover)]')}>
       {body}
     </Link>
   ) : (
@@ -190,7 +191,10 @@ export function StatsPage() {
       />
 
       <div className="mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex min-h-0 flex-1 flex-col">
-        <div className="working-panel grove-scroll min-h-0 flex-1 space-y-4 overflow-y-auto">
+        <div
+          data-stagger=""
+          className="working-panel grove-scroll min-h-0 flex-1 space-y-4 overflow-y-auto"
+        >
           {statsQuery.isError ? (
             <ErrorState
               message="Couldn't load your statistics."

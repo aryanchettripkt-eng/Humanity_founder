@@ -102,6 +102,7 @@
 - [x] **G9.3b** Client desk header in the Inbox (4 handoff chips that filter, latest note, "See what {client} sees" preview link, collapse), handoff chips on rows, reading-pane handoff card, "Why {client}" in AI insights, server `handoff` filter. Prompt: project files `prompts/gemini-G9.3b-inbox-client-header.md` — @gemini (gemini/G9.3b-inbox-client-header)
 - [ ] **G9.3** Settings and client view (work-page shape, preview banner), then login, signup, onboarding, 404, auth callback (focus-page shape); all "simulated"/"prototype" copy removed — @gemini
 - [ ] **G9.4** Review each G9 PR against DESIGN_V2 at 1440/820/390/320, light + dark — @claude
+- [~] **G9.5** Motion: load intro, page transitions, theme reveal, hover and press, popovers and dialogs, list and number animation, reduced motion (DESIGN_SYSTEM §5.1, D23) — @claude (claude/project-thread-8ov0q3)
 
 ## Backlog (P2, do not start without Aryan's OK)
 - [ ] Keyboard help overlay (`?`)

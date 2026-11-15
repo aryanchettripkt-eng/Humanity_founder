@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Relay — Inbox Copilot</title>
+    <script>
+      // Before first paint: apply the saved theme (no light flash in dark mode)
+      // and arm the one-time load intro (src/styles/motion.css, src/lib/intro.ts).
+      (function () {
+        var root = document.documentElement;
+        try {
+          var saved = JSON.parse(localStorage.getItem('relay-ui') || '{}');
+          if (saved && saved.state && saved.state.theme === 'dark') root.classList.add('dark');
+        } catch (e) {}
+        root.classList.add('intro');
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
