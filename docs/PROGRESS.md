@@ -27,6 +27,10 @@ _None yet._
 
 ---
 
+### 2026-11-15 21:00 · claude · D21 themes and canvas (docs)
+- Done: Aryan chose gap C (80px on the sides, 40px top and bottom) and gave a light and a dark mockup plus their canvas images. Wrote DESIGN_V2 §1.0 and D21, and added G9.1c to ROADMAP before G9.1b. The hero photo is retired.
+- Next: Gemini G9.1c (prompt in the project files at `prompts/gemini-G9.1c-themes.md`). Aryan copies `grove-light.webp` and `grove-dark.webp` into `web/public/bg/`.
+
 ### 2026-11-15 20:05 · claude · G9.1 review (PR #21) + filter order fix
 - Done: Reviewed PR #21 three times against DESIGN_V2 §1–3, §8, §9 at 1440/820/390/320, light + dark (review and shots in the project files, `reviews/2026-11-15-G9.1-pr21-review.md`). All blockers are fixed in db73551. Fixed one regression from db73551 at Aryan's request: on ≥640px the Owner filter had moved to the end of the filter row (`order-1` vs `sm:order-none`); now Owner · other filters · filter circle. DESIGN_V2 §3.2 CTA labels amended to `Move up for Priya` / `Open in Priya's view` (D20).
 - Changed contracts: none.

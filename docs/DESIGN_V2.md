@@ -10,7 +10,7 @@
 
 | Element | Spec |
 |---|---|
-| Page canvas | Sage `#DDE1D5`. The app sits in one **frame**: radius 28px, a 24px margin on desktop (0 on phones), and a soft shadow. Two faint decorative circles (1px, white at 40% opacity) on the canvas behind the frame, as in the reference |
+| Page canvas | See §1.0 (D21). ~~Sage `#DDE1D5`. The app sits in one **frame**: radius 28px, a 24px margin on desktop (0 on phones), and a soft shadow. Two faint decorative circles (1px, white at 40% opacity) on the canvas behind the frame, as in the reference~~ |
 | Hero band | The top 44–52% of the frame (min 380px desktop, 300px tablet, auto on phones). A full-bleed **nature image** (`/hero/grove.webp`, ≤250 KB, `object-cover`, `fetchpriority=high`), with a 20% dark gradient at the top for nav contrast. **Fallback** when the image is missing or slow: layered radial gradients in moss, stone and mist, plus a subtle noise SVG. It must look intentional with no photo at all |
 | Glass | `bg-white/14 backdrop-blur-xl border border-white/35 shadow-[soft]`, white text, radius 20px. Inner hairlines white at 25%. Text on glass is ≥ 14px and weight ≥ 500, and every glass card gets a 10% dark tint layer so AA contrast holds on any image |
 | Working area | Below the hero: a white or near-white `#F4F4F2` sheet, 24–32px padding. Cards are white, radius 18px, with a 1px `#E7E7E3` border and no shadow |
@@ -18,7 +18,29 @@
 | Ink | `#1E1F1C` text. Muted `#6B6F66`. Dark circle buttons are `#1E1F1C` |
 | Type | **Urbanist** (already installed) for headings, numbers and card titles. Inter for body. Hero greeting 56/60 600, white. Glass numbers 40/44 600. Card titles 18/24 600 |
 | Motion | Glass cards fade up 8px on load (stagger 60ms). The hero image does a slow 1.03 scale-in over 1.2s. Pager slides. Respects reduced motion |
-| Dark mode | Same layout. The hero image gets a 45% dark overlay, the working area is `#141513`, cards are `#1C1D1A` and the olive brightens to `#8CC63F`. Light is the default and is used for the demo video |
+| Dark mode | ~~Same layout. The hero image gets a 45% dark overlay, the working area is `#141513`, cards are `#1C1D1A` and the olive brightens to `#8CC63F`. Light is the default and is used for the demo video~~ See §1.0 (D21) |
+
+### 1.0 Canvas and themes (D21; replaces the "Page canvas", "Hero band" image and "Dark mode" rows above)
+The layout, components and spacing inside the frame don't change. What changes is the canvas behind the frame and how the frame itself is painted in each theme. Reference images are in the project files under `design/grove-themes/`:
+- `light-reference.png` and `dark-reference.png` are the targets.
+- `grove-light.webp` and `grove-dark.webp` are the canvas images. They go in `web/public/bg/`.
+
+| | **Light** | **Dark** |
+|---|---|---|
+| Canvas behind the frame | `/bg/grove-light.webp` (`cover`, `center`, `fixed`): off-white with leaves, soft sage circles and dot grids. Fallback `#F3F4EF` | `/bg/grove-dark.webp` (`cover`, `center`, `fixed`): near-black green with lime leaves, glowing circles and dot grids. Fallback `#0A0F08` |
+| Frame gap (≥768) | **80px left and right, 40px top and bottom.** The frame grows with the screen (no 1440 cap). Radius 28px | Same |
+| Frame gap (<768) | 0, and the canvas image is hidden | Same |
+| Frame | `#F8F8F5` at 92% with `backdrop-blur-xl`, 1px `#ECEDE7` border, soft shadow `0 24px 60px -24px rgba(30,31,28,.18)` | `#10120E` at 78% with `backdrop-blur-xl`, 1px `white/10` border, shadow `0 30px 80px -30px rgba(0,0,0,.7)`. The canvas shows faintly through it |
+| Hero band | **No photo in either theme.** The hero sits on the frame. Greeting 56/60 600 in ink | Same, with the greeting in white |
+| Hero cards (`.glass`) | `bg-white/80`, 1px `#ECEDE7` border, soft shadow, ink text | `bg-white/[0.06]`, 1px `white/12` border, white text |
+| Nav | The tab pill is `white/70` with a hairline border. The active tab is a white pill with a shadow. The circles and client pill are white with a hairline | The tab pill is `white/8` with a `white/12` border, and the active tab is white with ink text. The circles are `white/8` |
+| Working area | Continues on the frame (no separate sheet). Cards are white, radius 18px, 1px `#ECEDE7` | Continues on the frame. Cards are `white/[0.04]` with a 1px `white/10` border, and the inner stat box is `black/30` |
+| Chart stacks | For you `#6DB27A`, For Priya `#E6C4AE`, No reply `#E8E2D3` | Muted: For you `#5E8F3A`, For Priya `#6B5A4E`, No reply `#4A4A42` |
+| Avatars on cards | Dark circle `#2B2E2A` with white initials | Rounded square `#2A2C27` with white initials |
+| Primary pill | Deep olive `#3F7A1E` with white text | Lime `#8CC63F` with ink text |
+| Delta / positive text | `#3F7A1E` | `#B8EB78` |
+
+All values go through tokens in `globals.css` (`--canvas-image`, `--frame-bg`, `--frame-border`, `--hero-fg`, `--glass-bg`, `--glass-border`, `--glass-fg`, `--card-bg`, `--card-border`, `--statbox-bg`, `--chart-assistant`, `--chart-client`, `--chart-none`, `--cta-bg`, `--cta-fg`), set in both `:root` and `.dark`. Components read the tokens and never branch on the theme in JSX. The `/hero/grove.webp` image and its gradient fallback are retired.
 
 ### 1.1 Owner colours (earthy, AA-checked, always icon + label)
 | Owner | Tone | Also used for |
