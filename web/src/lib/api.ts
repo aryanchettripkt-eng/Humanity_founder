@@ -15,14 +15,28 @@ export class ApiError extends Error {
   }
 }
 
+export type SetAuthTokenOptions = {
+  remember?: boolean;
+};
+
 export function getAuthToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY);
 }
 
-export function setAuthToken(token: string | null): void {
-  if (token) {
+export function setAuthToken(
+  token: string | null,
+  { remember = true }: SetAuthTokenOptions = {}
+): void {
+  if (!token) {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    return;
+  }
+  if (remember) {
     localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.removeItem(TOKEN_KEY);
   } else {
+    sessionStorage.setItem(TOKEN_KEY, token);
     localStorage.removeItem(TOKEN_KEY);
   }
 }

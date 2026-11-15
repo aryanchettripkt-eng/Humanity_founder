@@ -28,6 +28,18 @@ _None yet._
 
 ---
 
+### 2026-11-16 04:45 · gemini · G9.3d glass sign-in and sign-up
+- Done:
+  - Rebuilt `AuthLayout.tsx` as a split-screen layout over the full-bleed canvas (`data-canvas` + `data-canvas-overlay` outside `.grove-scroll` so the 24px scroll mask never fades the background edges; no `.floating-frame`), keeping PR #40's `data-reveal=""` and `revealDelay` hooks on both columns.
+  - Rebuilt `LoginPage.tsx` and `SignupPage.tsx` with the frosted-glass card (`--frame-glass-bg` in dark, `rgba(250,250,247,0.78)` in light for contrast over bright waves), 52px pill inputs (`Input` `variant="pill"`), 52px `--cta-lime-*` submit button, `"OR CONTINUE WITH"` divider, conditional glass `GoogleButton` (`variant="glass"`, only when `health?.googleLogin` is true), `"Try the demo"` two-column pills (`Assistant (Alex)` and `Client (Priya)`), and updated copy (removed `"(simulated for prototype)"`). No Microsoft button or Forgot password link.
+  - Made `"Remember me"` real in `web/src/lib/api.ts` (`setAuthToken(token, { remember })` writes `localStorage` or `sessionStorage` and clears the other; `getAuthToken()` reads `localStorage` then `sessionStorage`; `loginApi` passes `remember`, checkbox defaults to checked). Added unit tests in `web/src/lib/api.test.ts`.
+  - Updated `docs/FRONTEND.md` and `docs/ROADMAP.md`.
+- Verification:
+  - `npm run lint`, `npm run typecheck --workspace=web`, `npm test --workspace=web` (11 files, 43/43 tests) pass.
+  - Playwright verified `/login` and `/signup` at `1920`, `1440`, `1024`, `820`, `390` (dark & light), `/login` with Google off, validation error state, `390x700` scrolled to bottom, and `1440x720` with zero horizontal overflow; screenshots saved in `reviews/shots-glass-sign-in/`.
+- Changed contracts: `setAuthToken(token, { remember = true })` in `web/src/lib/api.ts` (additive optional parameter); `loginApi` accepts optional `remember`.
+- Next: Open PR for `gemini/G9.3d-glass-sign-in`.
+
 ### 2026-11-16 05:10 · claude · G9.5 motion
 - Done (asked by Aryan in chat): one motion language picked per context (DESIGN_SYSTEM §5.1, D23).
   - **Load:** background settles, the glass frame floats up, then the page's blocks rise in order. Once per page load. The saved theme is applied before first paint (no light flash in dark mode) and the first-load skeleton outside the frame is gone.

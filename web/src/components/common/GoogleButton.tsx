@@ -1,16 +1,19 @@
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type GoogleButtonProps = {
   loading?: boolean;
   onClick: () => void;
   label?: string;
+  variant?: 'default' | 'glass';
 };
 
 export function GoogleButton({
   loading = false,
   onClick,
   label = 'Continue with Google',
+  variant = 'default',
 }: GoogleButtonProps) {
   return (
     <Button
@@ -18,7 +21,12 @@ export function GoogleButton({
       variant="outline"
       disabled={loading}
       onClick={onClick}
-      className="w-full justify-center gap-2.5 border-border bg-white text-[#1f1f1f] hover:bg-neutral-50 dark:bg-white dark:text-[#1f1f1f] dark:hover:bg-neutral-100"
+      className={cn(
+        'w-full justify-center gap-2.5',
+        variant === 'glass'
+          ? 'h-[52px] rounded-full border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] text-[15px] font-medium text-[var(--fg)] hover:bg-[var(--glass-hover)] focus-visible:ring-[var(--cta-bg)] dark:focus-visible:ring-[var(--grove-lime)]'
+          : 'border-border bg-white text-[#1f1f1f] hover:bg-neutral-50 dark:bg-white dark:text-[#1f1f1f] dark:hover:bg-neutral-100'
+      )}
     >
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" />

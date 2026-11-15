@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
 import { GoogleButton } from '@/components/common/GoogleButton';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getGoogleLoginUrl, signupApi, useHealth } from '@/features/auth/api';
 import { ApiError } from '@/lib/api';
@@ -40,64 +39,132 @@ export function SignupPage() {
     }
   };
 
-  return (
-    <AuthLayout>
-      <div className="mb-6 space-y-1">
-        <h1 className="text-lg font-semibold text-foreground">Create your assistant account</h1>
-        <p className="text-sm text-muted-foreground">
-          Connect a client inbox in under a minute (simulated for prototype).
-        </p>
-      </div>
+  const formErrorIds =
+    [
+      errors.name && 'signup-name-error',
+      errors.email && 'signup-email-error',
+      errors.password && 'signup-password-error',
+    ]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-foreground" htmlFor="name">
+  return (
+    <AuthLayout
+      headline="Set up your desk."
+      subline="Bring in a client's inbox and see in seconds who needs to reply."
+    >
+      <h2 className="font-display text-[32px] font-medium leading-tight text-[var(--fg)] sm:text-[36px]">
+        Create your account
+      </h2>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        aria-describedby={formErrorIds}
+        className="mt-6 space-y-4"
+      >
+        <div>
+          <label className="mb-2 block text-[14px] font-medium text-[var(--fg)]" htmlFor="name">
             Full name
           </label>
-          <Input id="name" placeholder="Alex Morgan" {...register('name')} />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+          <Input
+            id="name"
+            variant="pill"
+            autoComplete="name"
+            placeholder="Alex Morgan"
+            aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? 'signup-name-error' : undefined}
+            {...register('name')}
+          />
+          {errors.name ? (
+            <p id="signup-name-error" className="mt-1.5 text-[13px] text-destructive">
+              {errors.name.message}
+            </p>
+          ) : null}
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-foreground" htmlFor="email">
+        <div>
+          <label className="mb-2 block text-[14px] font-medium text-[var(--fg)]" htmlFor="email">
             Email
           </label>
-          <Input id="email" type="email" placeholder="alex@studio.com" {...register('email')} />
-          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+          <Input
+            id="email"
+            type="email"
+            variant="pill"
+            autoComplete="email"
+            placeholder="alex@studio.com"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? 'signup-email-error' : undefined}
+            {...register('email')}
+          />
+          {errors.email ? (
+            <p id="signup-email-error" className="mt-1.5 text-[13px] text-destructive">
+              {errors.email.message}
+            </p>
+          ) : null}
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-foreground" htmlFor="password">
+        <div>
+          <label
+            className="mb-2 block text-[14px] font-medium text-[var(--fg)]"
+            htmlFor="password"
+          >
             Password
           </label>
-          <Input id="password" type="password" placeholder="At least 6 characters" {...register('password')} />
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
-          )}
+          <Input
+            id="password"
+            type="password"
+            variant="pill"
+            autoComplete="new-password"
+            placeholder="At least 6 characters"
+            aria-invalid={Boolean(errors.password)}
+            aria-describedby={errors.password ? 'signup-password-error' : undefined}
+            {...register('password')}
+          />
+          {errors.password ? (
+            <p id="signup-password-error" className="mt-1.5 text-[13px] text-destructive">
+              {errors.password.message}
+            </p>
+          ) : null}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating account…' : 'Continue'}
-        </Button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-1 flex h-[52px] w-full items-center justify-center rounded-full bg-[var(--cta-lime-bg)] text-[16px] font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
+        >
+          {isSubmitting ? 'Creating account…' : 'Create account'}
+        </button>
       </form>
 
-      {health?.googleLogin && (
-        <div className="mt-3">
+      {health?.googleLogin ? (
+        <>
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-[var(--glass-divider)]" aria-hidden="true" />
+            <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--fg-subtle)]">
+              OR CONTINUE WITH
+            </span>
+            <span className="h-px flex-1 bg-[var(--glass-divider)]" aria-hidden="true" />
+          </div>
           <GoogleButton
+            variant="glass"
+            label="Google"
             onClick={() => {
               window.location.href = getGoogleLoginUrl();
             }}
           />
-        </div>
-      )}
+        </>
+      ) : null}
 
-      <p className="mt-5 text-center text-xs text-muted-foreground">
+      <p className="mt-6 text-center text-[14px] text-[var(--fg-muted)]">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-primary hover:underline">
+        <Link
+          to="/login"
+          className="font-medium text-[var(--cta-bg)] hover:underline dark:text-[var(--grove-lime)]"
+        >
           Sign in
         </Link>
       </p>
     </AuthLayout>
   );
 }
-
