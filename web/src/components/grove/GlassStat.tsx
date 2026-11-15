@@ -14,19 +14,19 @@ export function GlassStat({ stat, className }: GlassStatProps) {
   const inner = (
     <GlassCard
       className={cn(
-        'h-full transition-colors hover:bg-white/20',
+        'h-full transition-colors hover:bg-[var(--glass-hover)]',
         (stat.href || stat.onClick) && 'cursor-pointer',
         className
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-white/85">{stat.label}</span>
+        <span className="text-xs font-medium text-[var(--glass-muted)]">{stat.label}</span>
         {Icon ? (
-          <Icon className="h-3.5 w-3.5 text-white/80" aria-hidden="true" />
+          <Icon className="h-3.5 w-3.5 text-[var(--glass-muted)]" aria-hidden="true" />
         ) : null}
       </div>
 
-      <p className="mt-2 font-display text-[36px] font-semibold leading-[40px] tracking-tight text-white tabular-nums sm:text-[40px] sm:leading-[44px]">
+      <p className="mt-2 font-display text-[36px] font-semibold leading-[40px] tracking-tight text-[var(--glass-fg)] tabular-nums sm:text-[40px] sm:leading-[44px]">
         {stat.value}
       </p>
 
@@ -35,10 +35,10 @@ export function GlassStat({ stat, className }: GlassStatProps) {
           className={cn(
             'mt-1 text-xs font-medium',
             stat.deltaTone === 'positive'
-              ? 'text-[#B8EB78]'
+              ? 'text-[var(--delta-fg)]'
               : stat.deltaTone === 'negative'
-                ? 'text-amber-200'
-                : 'text-white/80'
+                ? 'text-grove-terracotta'
+                : 'text-[var(--glass-muted)]'
           )}
         >
           {stat.delta}
@@ -49,7 +49,7 @@ export function GlassStat({ stat, className }: GlassStatProps) {
 
   if (stat.href) {
     return (
-      <Link to={stat.href} className="block h-full rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+      <Link to={stat.href} className="block h-full rounded-[20px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         {inner}
       </Link>
     );
@@ -60,7 +60,7 @@ export function GlassStat({ stat, className }: GlassStatProps) {
       <button
         type="button"
         onClick={stat.onClick}
-        className="block h-full w-full rounded-[20px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="block h-full w-full rounded-[20px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {inner}
       </button>

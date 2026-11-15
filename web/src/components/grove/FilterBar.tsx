@@ -53,7 +53,7 @@ export function FilterBar({
               aria-label={filter.label}
               value={filter.value}
               onChange={(e) => filter.onChange(e.target.value)}
-              className="h-11 appearance-none rounded-full border border-border bg-card pl-4 pr-8 text-xs font-medium text-foreground transition-colors hover:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-11 appearance-none rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] pl-4 pr-8 text-xs font-medium text-foreground transition-colors hover:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {filter.options.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -72,7 +72,7 @@ export function FilterBar({
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label="All filters"
-          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-ink-foreground transition-opacity hover:opacity-90 sm:order-3"
+          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--avatar-tile-bg)] text-[var(--avatar-tile-fg)] transition-opacity hover:opacity-90 sm:order-3"
         >
           <SlidersHorizontal className="h-4 w-4" />
         </button>
@@ -84,7 +84,7 @@ export function FilterBar({
           onClick={() => onPageChange(Math.max(1, safePage - 1))}
           disabled={safePage <= 1}
           aria-label="Previous page"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-foreground transition-colors hover:bg-[var(--statbox-bg)] disabled:opacity-40"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -96,7 +96,7 @@ export function FilterBar({
           onClick={() => onPageChange(Math.min(safeTotal, safePage + 1))}
           disabled={safePage >= safeTotal}
           aria-label="Next page"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-surface disabled:opacity-40"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-foreground transition-colors hover:bg-[var(--statbox-bg)] disabled:opacity-40"
         >
           <ChevronRight className="h-4 w-4" />
         </button>

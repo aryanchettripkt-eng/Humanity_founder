@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { GlassCard } from '@/components/grove/GlassCard';
 import type { GroveBarDayModel } from '@/components/grove/models';
-import { getOwnerShortLabel, OWNER_META } from '@/lib/owners';
-import { cn } from '@/lib/utils';
+import { getOwnerShortLabel } from '@/lib/owners';
 import type { Owner } from '@/types/api';
 
 export type StackedBarsProps = {
@@ -38,29 +37,29 @@ export function StackedBars({
       actionHref={actionHref}
       actionLabel="Open Inbox"
       rightSlot={
-        <div className="hidden items-center gap-2 text-[11px] font-medium text-white/85 sm:flex">
+        <div className="hidden items-center gap-2 text-[11px] font-medium text-[var(--glass-muted)] sm:flex">
           <button
             type="button"
             onClick={() => onSelectOwner?.('assistant')}
-            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-white"
+            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-[var(--glass-fg)]"
           >
-            <span className={cn('h-2 w-2 rounded-full ring-1 ring-white/40', OWNER_META.assistant.dotClass)} />
+            <span className="h-2 w-2 rounded-full bg-[var(--chart-assistant)] ring-1 ring-[var(--glass-border)]" />
             {assistantLabel}
           </button>
           <button
             type="button"
             onClick={() => onSelectOwner?.('client')}
-            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-white"
+            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-[var(--glass-fg)]"
           >
-            <span className={cn('h-2 w-2 rounded-full ring-1 ring-white/40', OWNER_META.client.dotClass)} />
+            <span className="h-2 w-2 rounded-full bg-[var(--chart-client)] ring-1 ring-[var(--glass-border)]" />
             {clientLabel}
           </button>
           <button
             type="button"
             onClick={() => onSelectOwner?.('none')}
-            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-white"
+            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-[var(--glass-fg)]"
           >
-            <span className={cn('h-2 w-2 rounded-full ring-1 ring-white/40', OWNER_META.none.dotClass)} />
+            <span className="h-2 w-2 rounded-full bg-[var(--chart-none)] ring-1 ring-[var(--glass-border)]" />
             {noneLabel}
           </button>
         </div>
@@ -68,7 +67,7 @@ export function StackedBars({
       className={className}
     >
       <div className="flex flex-col justify-between gap-2">
-        <div aria-live="polite" className="min-h-[16px] text-[11px] font-medium text-white/85">
+        <div aria-live="polite" className="min-h-[16px] text-[11px] font-medium text-[var(--glass-muted)]">
           {hovered ? (
             <span>
               {hovered.label}: {hovered.assistant} {assistantLabel.toLowerCase()} ·{' '}
@@ -120,7 +119,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hNone - 1.5)}
                     rx={5}
-                    fill="hsl(var(--grove-linen))"
+                    fill="var(--chart-none)"
                     onClick={() => onSelectOwner?.('none')}
                   />
                 ) : null}
@@ -131,7 +130,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hClient - 1.5)}
                     rx={5}
-                    fill="hsl(var(--grove-clay))"
+                    fill="var(--chart-client)"
                     onClick={() => onSelectOwner?.('client')}
                   />
                 ) : null}
@@ -142,7 +141,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hAssistant)}
                     rx={5}
-                    fill="hsl(var(--grove-forest))"
+                    fill="var(--chart-assistant)"
                     onClick={() => onSelectOwner?.('assistant')}
                   />
                 ) : null}
@@ -153,14 +152,14 @@ export function StackedBars({
                     width={barW}
                     height={6}
                     rx={3}
-                    fill="rgba(255,255,255,0.22)"
+                    fill="var(--chart-empty)"
                   />
                 ) : null}
                 <text
                   x={x + barW / 2}
                   y={122}
                   textAnchor="middle"
-                  fill="rgba(255,255,255,0.85)"
+                  fill="var(--glass-muted)"
                   fontSize="10"
                   fontWeight="500"
                 >

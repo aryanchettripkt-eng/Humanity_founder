@@ -136,6 +136,7 @@ Each component must support the listed states. "✓" = required.
 | ~~`SummaryPanel`~~ | replaced by `FocusPanel` (`components/workspace`) | | |
 | `FeatureStrip` | 4-card product capability strip | | responsive grid ✓ |
 | `LandingFooter` | dark CTA band + dual demo login + simulated tooltip | `demoLoading, onDemoLogin` | loading, tooltip ✓ |
+| `AppFrame` + `HeroBand` | Grove v2 themed canvas (`grove-light.webp` / `grove-dark.webp`), 80/40 frame gap ≥768px, translucent glass frame, hero on frame (D21) | `size: tall/short/split, nav, left, right` | light + dark tokens, `<768px` gap 0, no hero photo ✓ |
 
 shadcn primitives to install: button, input, textarea, badge, card, dialog, sheet, popover, dropdown-menu, command, tooltip, tabs, scroll-area, separator, skeleton, avatar, checkbox, toggle-group, sonner.
 

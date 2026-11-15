@@ -1,22 +1,7 @@
 import { cn } from '@/lib/utils';
 
-const AVATAR_TONES = [
-  'bg-emerald-900/20 text-white border-white/30',
-  'bg-stone-800/40 text-white border-white/30',
-  'bg-amber-900/30 text-white border-white/30',
-  'bg-teal-900/30 text-white border-white/30',
-];
-
-function toneIndex(name: string): number {
-  let hash = 0;
-  for (let i = 0; i < name.length; i += 1) {
-    hash = (hash * 31 + name.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash) % AVATAR_TONES.length;
-}
-
 export type AvatarProps = {
-  name: string;
+  name?: string;
   initials: string;
   size?: 'sm' | 'md' | 'lg';
   tone?: 'glass' | 'ink' | 'surface';
@@ -24,7 +9,6 @@ export type AvatarProps = {
 };
 
 export function Avatar({
-  name,
   initials,
   size = 'md',
   tone = 'glass',
@@ -42,7 +26,7 @@ export function Avatar({
       ? 'bg-ink text-ink-foreground border-ink-line'
       : tone === 'surface'
         ? 'bg-surface text-foreground border-border'
-        : AVATAR_TONES[toneIndex(name)];
+        : 'bg-[var(--avatar-tile-bg)] text-[var(--avatar-tile-fg)] border-[var(--glass-border)]';
 
   return (
     <span
@@ -69,8 +53,9 @@ export function AvatarTile({ initials, size = 'md', className }: AvatarTileProps
   return (
     <span
       aria-hidden="true"
+      style={{ borderRadius: 'var(--avatar-tile-radius)' }}
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-xl bg-[#1E1F1C] font-display font-semibold text-white dark:bg-[#2A2C27] dark:text-white',
+        'inline-flex shrink-0 items-center justify-center bg-[var(--avatar-tile-bg)] font-display font-semibold text-[var(--avatar-tile-fg)]',
         size === 'sm' ? 'h-9 w-9 text-xs' : 'h-11 w-11 text-sm',
         className
       )}

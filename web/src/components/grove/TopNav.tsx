@@ -78,12 +78,12 @@ export function TopNav({
       <div className="flex items-center gap-3">
         <Link
           to={logoHref}
-          className="inline-flex min-h-[44px] items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="inline-flex min-h-[44px] items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--cta-bg)] text-[var(--cta-fg)] shadow-sm">
             <MailCheck className="h-4 w-4" aria-hidden="true" />
           </span>
-          <span className="font-display text-base font-semibold tracking-tight text-white">
+          <span className="font-display text-base font-semibold tracking-tight text-[var(--hero-fg)]">
             Relay
           </span>
         </Link>
@@ -107,11 +107,11 @@ export function TopNav({
                   type="button"
                   aria-haspopup="menu"
                   aria-expanded={clientOpen}
-                  className="glass inline-flex h-11 items-center gap-2 rounded-full pl-2 pr-3.5 text-xs font-semibold text-white transition-colors hover:bg-white/25"
+                  className="inline-flex h-11 items-center gap-2 rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] pl-2 pr-3.5 text-xs font-semibold text-[var(--hero-fg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)]"
                 >
                   <Avatar name={activeClient.name} initials={activeClient.initials} size="sm" />
                   <span>{clientFirstName}</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-white/80" />
+                  <ChevronDown className="h-3.5 w-3.5 text-[var(--hero-muted)]" />
                 </button>
               </PopoverTrigger>
               <PopoverContent align="end" role="menu" className="w-56 rounded-2xl p-1.5">
@@ -146,7 +146,7 @@ export function TopNav({
               type="button"
               onClick={onOpenSearch}
               aria-label="Search or ask AI (Command K)"
-              className="glass flex h-11 w-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/25"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] text-[var(--hero-fg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)]"
             >
               <Search className="h-4 w-4" />
             </button>
@@ -155,7 +155,7 @@ export function TopNav({
           <Link
             to={settingsHref}
             aria-label="Settings"
-            className="glass hidden h-11 w-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/25 sm:flex"
+            className="hidden h-11 w-11 items-center justify-center rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] text-[var(--hero-fg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)] sm:flex"
           >
             <Settings className="h-4 w-4" />
           </Link>
@@ -167,7 +167,7 @@ export function TopNav({
                 aria-label="User menu"
                 aria-haspopup="menu"
                 aria-expanded={userOpen}
-                className="glass flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-white/25"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-circle-bg)] backdrop-blur-xl transition-colors hover:bg-[var(--glass-hover)]"
               >
                 <Avatar name={userName} initials={userInitials} size="sm" />
               </button>

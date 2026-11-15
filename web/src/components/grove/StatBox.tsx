@@ -15,7 +15,7 @@ export function StatBox({ cells, className }: StatBoxProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-3 gap-2 rounded-xl bg-surface px-3 py-2.5',
+        'grid grid-cols-3 gap-2 rounded-xl bg-[var(--statbox-bg)] px-3 py-2.5',
         className
       )}
     >

@@ -78,7 +78,7 @@ export function AssistantLayout() {
           size="short"
           nav={<AssistantTopNav />}
           left={
-            <h1 className="font-display text-3xl font-semibold tracking-tight text-white">
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--hero-fg)]">
               {pageTitle}
             </h1>
           }
