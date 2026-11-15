@@ -134,7 +134,7 @@ export function buildGroveStats(
   return [
     {
       id: 'assistant',
-      label: 'Assistant queue',
+      label: 'For you',
       value: assistant,
       delta: assistantDelta,
       deltaTone: diff >= 0 ? 'positive' : 'neutral',
@@ -143,7 +143,7 @@ export function buildGroveStats(
     },
     {
       id: 'client',
-      label: `${clientFirstName}'s desk`,
+      label: `For ${clientFirstName}`,
       value: client,
       delta: `${waitingOnClient} waiting on ${clientFirstName}`,
       deltaTone: 'neutral',
@@ -266,7 +266,6 @@ export function buildGroveThreadCards(
       sender,
       initials: getInitials(sender),
       domain,
-      subject: t.subject,
       owner: t.owner,
       ownerLabel,
       confidence: Math.round((t.confidence ?? 0.5) * 100),

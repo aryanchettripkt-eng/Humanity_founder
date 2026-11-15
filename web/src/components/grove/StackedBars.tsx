@@ -89,35 +89,15 @@ export function StackedBars({
         </div>
 
         <svg
-          viewBox={`0 0 ${22 + Math.max(1, days.length) * 44} 126`}
+          viewBox={`0 0 ${Math.max(1, days.length) * 44} 126`}
           className="h-32 w-full overflow-visible"
           role="img"
           aria-label="Weekly sorted threads stacked bar chart"
         >
-          <text
-            x={16}
-            y={13}
-            textAnchor="end"
-            fill="var(--glass-muted)"
-            fontSize="9"
-            fontWeight="500"
-          >
-            {maxTotal}
-          </text>
-          <line
-            x1={22}
-            y1={10}
-            x2={22 + Math.max(1, days.length) * 44}
-            y2={10}
-            stroke="var(--glass-border)"
-            strokeDasharray="3 3"
-            strokeWidth="1"
-          />
-
           {days.map((day, i) => {
-            const x = 22 + i * 44 + 6;
+            const x = i * 44 + 6;
             const barW = 32;
-            const maxH = 96;
+            const maxH = 102;
             const total = day.assistant + day.client + day.none;
             const scale = total > 0 ? maxH / maxTotal : 0;
 

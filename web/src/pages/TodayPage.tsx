@@ -1,6 +1,7 @@
 import { CalendarDays, ChevronDown, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type TouchEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
@@ -8,12 +9,14 @@ import { FilterBar, type FilterDropdownDef } from '@/components/grove/FilterBar'
 import { GlassList } from '@/components/grove/GlassList';
 import { GlassStat } from '@/components/grove/GlassStat';
 import { HeroBand } from '@/components/grove/HeroBand';
+import type { GroveThreadCardModel } from '@/components/grove/models';
 import { StackedBars } from '@/components/grove/StackedBars';
 import { ThreadCard } from '@/components/grove/ThreadCard';
 import { ThreadListRow } from '@/components/grove/ThreadListRow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMe } from '@/features/auth/api';
-import { useThreadCounts, useThreads } from '@/features/inbox/api';
+import { useCreateDraft } from '@/features/composer/api';
+import { useChangeOwner, usePatchThread, useThreadCounts, useThreads } from '@/features/inbox/api';
 import { useDashboard, useRefreshBrief } from '@/features/today/api';
 import {
   buildGroveRecentRows,
@@ -75,10 +78,14 @@ export function TodayPage() {
     clientId: activeClient?.id,
   });
   const refreshBrief = useRefreshBrief(activeClient?.id);
+  const createDraft = useCreateDraft();
+  const patchThread = usePatchThread();
+  const changeOwner = useChangeOwner();
   const pageSize = useResponsivePageSize();
 
   const [briefOpen, setBriefOpen] = useState(false);
   const [weekChartOpen, setWeekChartOpen] = useState(false);
+  const [pendingCardId, setPendingCardId] = useState<string | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
   const filters = useMemo<TodayGroveFilters>(
@@ -185,6 +192,58 @@ export function TodayPage() {
     timeZone: activeClient?.timezone || undefined,
   });
 
+  const handlePrimaryAction = (card: GroveThreadCardModel) => {
+    const thread = allThreads.find((t) => t.id === card.id);
+    setPendingCardId(card.id);
+
+    if (card.owner === 'assistant') {
+      createDraft.mutate(
+        { threadId: card.id, tone: 'formal' },
+        {
+          onSuccess: () => {
+            toast.success('Draft ready');
+            navigate(`/app/inbox/inbox/${card.id}`);
+          },
+          onSettled: () => setPendingCardId(null),
+        }
+      );
+      return;
+    }
+
+    if (card.owner === 'client') {
+      if (!thread?.important && thread?.handoff?.state !== 'client_handling') {
+        patchThread.mutate(
+          {
+            id: card.id,
+            patch: { important: true },
+            undoPatch: { important: false },
+            label: `Moved to the top of ${clientFirstName}'s queue`,
+          },
+          { onSettled: () => setPendingCardId(null) }
+        );
+      } else {
+        setPendingCardId(null);
+        navigate('/c?preview=1');
+      }
+      return;
+    }
+
+    if (card.owner === 'review') {
+      changeOwner.mutate(
+        {
+          id: card.id,
+          owner: thread?.suggestedOwner ?? 'assistant',
+          previousOwner: 'review',
+        },
+        { onSettled: () => setPendingCardId(null) }
+      );
+      return;
+    }
+
+    setPendingCardId(null);
+    if (card.href) navigate(card.href);
+  };
+
   const handleCardTouchStart = (e: TouchEvent<HTMLDivElement>) => {
     touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
   };
@@ -210,8 +269,8 @@ export function TodayPage() {
       onChange: (v) => updateFilter('owner', v),
       options: [
         { value: 'all', label: 'Owner: All' },
-        { value: 'assistant' as Owner, label: 'Owner: Assistant queue' },
-        { value: 'client' as Owner, label: `Owner: ${clientFirstName}'s desk` },
+        { value: 'assistant' as Owner, label: 'Owner: For you' },
+        { value: 'client' as Owner, label: `Owner: For ${clientFirstName}` },
         { value: 'review' as Owner, label: 'Owner: Needs your call' },
         { value: 'none' as Owner, label: 'Owner: No reply' },
       ],
@@ -418,7 +477,9 @@ export function TodayPage() {
                 <ThreadCard
                   key={card.id}
                   item={card}
+                  actionPending={pendingCardId === card.id}
                   onOpen={(item) => item.href && navigate(item.href)}
+                  onPrimaryAction={handlePrimaryAction}
                 />
               ))}
             </div>

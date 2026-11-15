@@ -1,24 +1,41 @@
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { OwnerPill } from '@/components/common/OwnerPill';
 import { AvatarTile } from '@/components/grove/Avatar';
 import { DeltaChip } from '@/components/grove/DeltaChip';
+import { Sparkline } from '@/components/grove/Sparkline';
+import { StatBox } from '@/components/grove/StatBox';
 import type { GroveThreadCardModel } from '@/components/grove/models';
 import { cn } from '@/lib/utils';
 
 export type ThreadCardProps = {
   item: GroveThreadCardModel;
+  actionPending?: boolean;
   onOpen?: (item: GroveThreadCardModel) => void;
+  onPrimaryAction?: (item: GroveThreadCardModel) => void;
   className?: string;
+};
+
+const OWNER_TEXT_CLASS: Record<GroveThreadCardModel['owner'], string> = {
+  assistant: 'text-grove-forest',
+  client: 'text-grove-clay',
+  none: 'text-muted-foreground',
+  review: 'text-grove-terracotta',
 };
 
 export function ThreadCard({
   item,
+  actionPending = false,
   onOpen,
+  onPrimaryAction,
   className,
 }: ThreadCardProps) {
-  const cardBody = (
-    <>
+  return (
+    <article
+      className={cn(
+        'flex h-full flex-col justify-between gap-4 rounded-[18px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-colors hover:border-foreground/20',
+        className
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <AvatarTile initials={item.initials} />
@@ -30,49 +47,62 @@ export function ThreadCard({
           </div>
         </div>
 
-        <span
-          aria-hidden="true"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors group-hover:bg-[var(--statbox-bg)] group-hover:text-foreground"
-        >
-          <ArrowUpRight className="h-4 w-4" />
-        </span>
+        {item.href && !onOpen ? (
+          <Link
+            to={item.href}
+            aria-label={`Open ${item.sender}`}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+          >
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onOpen?.(item)}
+            aria-label={`Open ${item.sender}`}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+          >
+            <ArrowUpRight className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
-      <p className="truncate text-sm font-medium text-foreground/90">
-        {item.subject || item.domain}
-      </p>
+      <StatBox
+        cells={[
+          {
+            label: 'Owner',
+            value: item.ownerLabel,
+            toneClass: OWNER_TEXT_CLASS[item.owner],
+          },
+          {
+            label: 'Confidence',
+            value: `${item.confidence}%`,
+          },
+          {
+            label: 'Next date',
+            value: item.nextDateLabel,
+          },
+        ]}
+      />
 
       <div className="flex items-center justify-between gap-2 pt-0.5">
         <div className="flex min-w-0 items-center gap-2">
+          {item.series.length > 0 ? (
+            <Sparkline values={item.series} tone={item.sparkTone} />
+          ) : null}
           <DeltaChip text={item.deltaText} direction={item.deltaDirection} />
-          <OwnerPill owner={item.owner} label={item.ownerLabel} size="sm" />
         </div>
+
+        <button
+          type="button"
+          disabled={actionPending}
+          onClick={() => (onPrimaryAction ? onPrimaryAction(item) : onOpen?.(item))}
+          className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-[var(--cta-bg)] px-4 py-2 text-xs font-semibold text-[var(--cta-fg)] transition-colors hover:bg-[var(--cta-hover)] disabled:opacity-50"
+        >
+          {item.ctaLabel}
+        </button>
       </div>
-    </>
-  );
-
-  const cardClass = cn(
-    'group flex h-full w-full flex-col justify-between gap-3.5 rounded-[18px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 text-left transition-colors hover:border-foreground/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    className
-  );
-
-  if (item.href && !onOpen) {
-    return (
-      <Link to={item.href} aria-label={`Open ${item.sender}`} className={cardClass}>
-        {cardBody}
-      </Link>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen?.(item)}
-      aria-label={`Open ${item.sender}`}
-      className={cardClass}
-    >
-      {cardBody}
-    </button>
+    </article>
   );
 }
 
