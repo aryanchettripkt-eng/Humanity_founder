@@ -22,9 +22,6 @@ const ClientThreadPage = lazy(() =>
 const InboxPage = lazy(() =>
   import('@/pages/InboxPage').then((m) => ({ default: m.InboxPage }))
 );
-const LandingPage = lazy(() =>
-  import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage }))
-);
 const LoginPage = lazy(() =>
   import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage }))
 );
@@ -58,7 +55,8 @@ function RootRedirect() {
   const token = getAuthToken();
   const { data, isLoading } = useMe();
 
-  if (!token) return <LandingPage />;
+  // Signed out: the sign-in page is the front door (the old marketing landing page is gone).
+  if (!token) return <Navigate to="/login" replace />;
   if (isLoading) return null;
   if (!data?.user) return <Navigate to="/login" replace />;
   return <Navigate to={data.user.role === 'client' ? '/c' : '/app/today'} replace />;
@@ -71,7 +69,7 @@ export function AppRouter() {
       <Suspense fallback={<RouteFallback />}>
         <Routes>
         <Route path="/" element={<RootRedirect />} />
-        <Route path="/welcome" element={<LandingPage />} />
+        <Route path="/welcome" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
