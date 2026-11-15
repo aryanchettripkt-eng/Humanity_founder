@@ -1,6 +1,6 @@
 # Relay — workspace UX spec (reference layout, our product)
 
-> **Status:** approved by Aryan 2026-11-15 (D14–D17). Linked from DESIGN_SYSTEM §11. Drives ROADMAP Phase 8 (W8.1–W8.3).
+> ~~**Status:** approved by Aryan 2026-11-15 (D14–D17).~~ **Superseded by [DESIGN_V2.md](./DESIGN_V2.md) (D18), 2026-11-15.** Kept for history; only §8's reuse principle (D17) carries over. Linked from DESIGN_SYSTEM §11. Drives ROADMAP Phase 8 (W8.1–W8.3).
 > **Inputs:** the reference image ("Workspace" CRM), the live site after R1 (`ef9a8b2`), and PRD §4 principles ("what needs me?" in 3 seconds; AI is visible but humble).
 
 ## 0. Why the live site feels different from the reference

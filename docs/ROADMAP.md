@@ -83,9 +83,16 @@
 
 ## Phase 8 — Workspace layout (spec: `docs/WORKSPACE_UX.md`, D14–D17)
 - [x] **W8.1** Shared workspace components (§8) + frame (AppTopBar, NavRail, MobileTabBar, client switcher, 🔔, avatar menu) + Today (§2), Urbanist font, brief prompt formats times in client timezone — @gemini (gemini/W8.1-frame-today)
-- [ ] **W8.2** Inbox (§3): ChipRow segments, rounded list, thread card, AI panel on `FocusPanel`, composer sheet — @gemini
-- [ ] **W8.3** Client view (§4), landing on `WorkspaceGrid` + `/welcome` (§5), auth/onboarding/settings/404 (§6) — @gemini
-- [ ] **W8.4** Review each W8 PR against WORKSPACE_UX + reference at 1440/820/390/320, light + dark — @claude
+- [ ] ~~**W8.2** Inbox (§3): ChipRow segments, rounded list, thread card, AI panel on `FocusPanel`, composer sheet — @gemini~~ superseded by Phase 9 (D18)
+- [ ] ~~**W8.3** Client view (§4), landing on `WorkspaceGrid` + `/welcome` (§5), auth/onboarding/settings/404 (§6) — @gemini~~ superseded by Phase 9 (D18)
+- [ ] ~~**W8.4** Review each W8 PR against WORKSPACE_UX + reference at 1440/820/390/320, light + dark — @claude~~ superseded by Phase 9 (D18)
+
+## Phase 9 — Design v2 "Grove" (spec: `docs/DESIGN_V2.md`, D18; reuse rule D17)
+- [ ] **G9.1** Tokens + image/fallback, AppFrame, HeroBand, TopNav, BottomTabBar, glass set, FilterBar, ThreadCard, StackedBars; Today on them; delete replaced workspace components — @gemini
+- [ ] **G9.1b** Public site (DESIGN_V2 §6, D19/D20): 5 one-screen pages `/`, `/sorting`, `/client-app`, `/ask`, `/how-it-works`, public nav, shared `tourStore`, `/health` warm-up, product copy — @gemini
+- [ ] **G9.2** Inbox (short hero + segment glass tabs, list, reading pane, AIGlassPanel), composer, ⌘K restyle — @gemini
+- [ ] **G9.3** Client view, auth, onboarding, settings, 404 — @gemini
+- [ ] **G9.4** Review each G9 PR against DESIGN_V2 at 1440/820/390/320, light + dark — @claude
 
 ## Backlog (P2, do not start without Aryan's OK)
 - [ ] Keyboard help overlay (`?`)

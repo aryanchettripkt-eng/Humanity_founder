@@ -175,7 +175,7 @@ A reviewer with no instructions can, on desktop **and** a phone:
 - [ ] AC11 Every list/panel has designed loading, empty and error states; no raw errors or blank screens.
 - [ ] AC12 Works at 375px, 768px and 1440px widths without horizontal scroll.
 - [ ] AC13 App works with **no AI key** (mock provider; default live provider is Groq) so the deployed demo never breaks.
-- [ ] AC14 Anything simulated is labelled subtly in‑app and listed in the README "What's simulated" section.
+- [ ] AC14 ~~Anything simulated is labelled subtly in‑app and~~ Anything simulated is listed in the README "What's simulated" section; the UI uses true product wording without prototype labels (D20, Aryan 2026-11-15).
 
 ## 9. Success metrics for the demo video (≈ 3–4 min)
 Script order: problem (15s) → onboarding (30s) → Today in 3 seconds (30s) → classification + override + why (45s) → draft & send (30s) → client view on phone + live handoff (45s) → simulate new email / reclassify (20s) → ask AI (15s) → what's simulated & next steps (15s).
