@@ -1,5 +1,7 @@
 # Design System
 
+> **2026-11-15 — Design v2 (D18):** colours, layout, materials and components are now defined in **[DESIGN_V2.md](./DESIGN_V2.md)**, which wins wherever this file disagrees (§2 palette, §4 radius/elevation, §6 component list, §8 layout, §11). Principles (§1), motion basics (§5), copy (§7) and accessibility (§9) still apply.
+
 > UI/UX is the #1 evaluation criterion. **Every UI change must follow this file.** If you need a new token or component, add it here first (see AGENTS.md §4), then build it.
 > Stack: Tailwind CSS + shadcn/ui (Radix) + lucide-react icons + Framer Motion.
 
@@ -81,7 +83,7 @@ Removed in R1: the public landing page and the signed-in app now share the same 
 
 ## 6. Components (build in `web/src/components`)
 
-> **Reuse rule (D17):** every screen, including the landing page, is assembled from the shared workspace components listed in [WORKSPACE_UX.md §8](./WORKSPACE_UX.md). Components take view models; pages only map data. If a screen needs a variation, add a prop to the shared component instead of copying it.
+> **Reuse rule (D17):** every screen, including the landing page, is assembled from the shared components listed in [DESIGN_V2.md §8](./DESIGN_V2.md) (previously WORKSPACE_UX §8). Components take view models; pages only map data. If a screen needs a variation, add a prop to the shared component instead of copying it.
 
 Each component must support the listed states. "✓" = required.
 
@@ -180,4 +182,4 @@ shadcn primitives to install: button, input, textarea, badge, card, dialog, shee
 - [ ] Landing: public `/` workspace showcase (320 / 390 / 820 / 1440)
 
 ## 11. Workspace layout (D14–D17)
-The layout of every assistant screen, the client view and the landing page follows **[WORKSPACE_UX.md](./WORKSPACE_UX.md)**: an icon rail, the top bar with the schedule `PillBar`, the uppercase workspace header, person and task cards, and the dark floating `FocusPanel` with Priya's live phone preview. It wins over older layout notes in §4 and §8 where they disagree (sidebar 240px → `NavRail` 64px; segments → `ChipRow` in Inbox).
+~~The layout ... follows WORKSPACE_UX.md~~ Superseded: the layout now follows **[DESIGN_V2.md](./DESIGN_V2.md)** (D18). Old text: the layout of every assistant screen, the client view and the landing page followed **[WORKSPACE_UX.md](./WORKSPACE_UX.md)**: an icon rail, the top bar with the schedule `PillBar`, the uppercase workspace header, person and task cards, and the dark floating `FocusPanel` with Priya's live phone preview. It wins over older layout notes in §4 and §8 where they disagree (sidebar 240px → `NavRail` 64px; segments → `ChipRow` in Inbox).

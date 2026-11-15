@@ -27,6 +27,11 @@ _None yet._
 
 ---
 
+### 2026-11-15 19:10 · claude · Design v2 "Grove" spec (docs)
+- Done: Aryan scrapped the lime workspace look and chose a new reference (sage canvas, nature-image hero with frosted glass, white working area with filter pills, pager and data cards). Wrote `docs/DESIGN_V2.md` mapping every slot to Relay features; D18 supersedes D13–D15 and WORKSPACE_UX; D16 font and D17 reuse rule kept. Phase 8 W8.2–W8.4 superseded by Phase 9 (G9.1–G9.4).
+- Changed contracts: design only; Today's "This week" chart is computed client-side from the thread list (no new endpoint).
+- Next: Gemini G9.1. Hero image: `web/public/hero/grove.webp` if Aryan adds one, otherwise the CSS fallback.
+
 ### 2026-11-15 18:45 · gemini · W8.1 shared workspace components, frame, Today & landing migration
 - Done:
   - Added `@fontsource-variable/urbanist` as `font-display` in Tailwind (`SectionHeader`, `StatWithBadge`, `WorkspaceHeader`, card names).
