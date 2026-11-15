@@ -4,9 +4,11 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { SourceBadge } from '@/components/common/SourceBadge';
+import { ClientDeskHeader } from '@/components/grove/ClientDeskHeader';
 import { InboxRail } from '@/components/grove/InboxRail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIPanel, MobileAISummary } from '@/features/ai/components/AIPanel';
+import { useMe } from '@/features/auth/api';
 import { DraftComposer } from '@/features/composer/components/DraftComposer';
 import {
   useChangeOwner,
@@ -20,6 +22,7 @@ import {
 import { ThreadList } from '@/features/inbox/components/ThreadList';
 import { MessageItem } from '@/features/thread/components/MessageItem';
 import { ThreadHeader } from '@/features/thread/components/ThreadHeader';
+import { formatRelativeTime } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
 import type { SegmentId } from '@/types/api';
@@ -29,11 +32,18 @@ export function InboxPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const { data: me } = useMe();
   const { activeClientId, aiPanelOpen, toggleAiPanel, newThreadIds, clearNewThread } =
     useUiStore();
 
+  const activeClient =
+    me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
+  const clientFirstName =
+    activeClient?.firstName || activeClient?.name.split(' ')[0] || 'Priya';
+
   const q = searchParams.get('q') || '';
   const filtersParam = searchParams.get('f') || '';
+  const handoff = searchParams.get('handoff') || undefined;
   const activeFilters = useMemo(
     () => (filtersParam ? filtersParam.split(',').filter(Boolean) : []),
     [filtersParam]
@@ -54,6 +64,7 @@ export function InboxPage() {
     segment,
     q: q || undefined,
     filters: filtersParam || undefined,
+    handoff,
     clientId: activeClientId || undefined,
   });
 
@@ -200,7 +211,14 @@ export function InboxPage() {
   const visibleMessages = collapsedCount > 0 ? messages.slice(-2) : messages;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+      <ClientDeskHeader
+        activeSegment={segment as SegmentId}
+        activeHandoff={handoff}
+        className={cn(threadId && 'hidden md:block')}
+      />
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:gap-4">
       {/* Segment rail: horizontal chips on mobile (<768 when list visible), vertical 72px rail on >=768 */}
       <div className={cn('shrink-0 md:min-h-0', threadId ? 'hidden md:flex' : 'flex')}>
         <InboxRail
@@ -219,6 +237,7 @@ export function InboxPage() {
       >
         <ThreadList
           segment={segment as SegmentId}
+          clientFirstName={clientFirstName}
           threads={threads}
           isLoading={listLoading}
           isError={listError}
@@ -333,19 +352,44 @@ export function InboxPage() {
             <div className="grove-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6">
               <MobileAISummary
                 thread={detail}
+                clientFirstName={clientFirstName}
                 reclassifying={reclassify.isPending}
                 onReclassify={() => reclassify.mutate(detail.id)}
                 onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
               />
 
               {detail.handoff?.state && detail.handoff.state !== 'none' ? (
-                <div className="glass-card flex items-start gap-2.5 rounded-[20px] p-3.5 text-xs text-[var(--fg)]">
-                  <Crown className="mt-0.5 h-4 w-4 shrink-0 text-[var(--grove-lime)]" />
-                  <div>
-                    <p className="font-medium capitalize">
-                      Client status: {detail.handoff.state.replace(/_/g, ' ')}
-                    </p>
-                    {detail.handoff.note ? <p className="mt-0.5">“{detail.handoff.note}”</p> : null}
+                <div className="glass-card flex items-start gap-3 rounded-[20px] p-4 text-sm text-[var(--fg)]">
+                  <Crown className="mt-0.5 h-4 w-4 shrink-0 text-[var(--grove-lime)]" aria-hidden="true" />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-semibold text-[var(--fg)]">
+                        {detail.handoff.state === 'client_handling'
+                          ? `${clientFirstName} is handling this`
+                          : detail.handoff.state === 'handed_to_assistant'
+                            ? `${clientFirstName} handed this back to you`
+                            : `${clientFirstName} marked this handled`}
+                      </p>
+                      {detail.handoff.at ? (
+                        <span className="text-xs text-[var(--fg-subtle)]">
+                          {formatRelativeTime(detail.handoff.at)}
+                        </span>
+                      ) : null}
+                    </div>
+                    {detail.handoff.note ? (
+                      <p className="text-[14px] text-[var(--fg-muted)]">“{detail.handoff.note}”</p>
+                    ) : null}
+                    {detail.draft ? (
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setComposerOpen(true)}
+                          className="inline-flex h-8 items-center rounded-full border border-[var(--pane-border)] bg-[var(--pane-bg)] px-3 text-xs font-medium text-[var(--fg)] transition-colors hover:bg-[var(--row-selected-bg)]"
+                        >
+                          Open draft
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ) : null}
@@ -405,6 +449,7 @@ export function InboxPage() {
         <div className="hidden min-h-0 w-[320px] shrink-0 xl:flex xl:flex-col">
           <AIPanel
             thread={detail}
+            clientFirstName={clientFirstName}
             reclassifying={reclassify.isPending}
             onReclassify={() => reclassify.mutate(detail.id)}
             onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
@@ -417,6 +462,7 @@ export function InboxPage() {
         <div className="fixed inset-y-4 right-4 z-50 hidden w-[340px] max-w-[calc(100vw-2rem)] md:block xl:hidden">
           <AIPanel
             thread={detail}
+            clientFirstName={clientFirstName}
             reclassifying={reclassify.isPending}
             onReclassify={() => reclassify.mutate(detail.id)}
             onSuggestion={(action) => suggestion.mutate({ id: detail.id, action })}
@@ -425,6 +471,7 @@ export function InboxPage() {
           />
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

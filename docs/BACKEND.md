@@ -78,7 +78,7 @@ Auth required on all routes except `/auth/*` and `/health`. `role` checks noted 
 ### 3.3 Threads [A]
 | Method | Path | Body / Query | Returns |
 |---|---|---|---|
-| GET | `/threads` | `?clientId&segment&q&filters=unread,important,dated&account&page=1&pageSize=50` | `ThreadListItem[]` + meta |
+| GET | `/threads` | `?clientId&segment&q&filters=unread,important,dated&handoff=client_handling\|handed_to_assistant\|handled&account&page=1&pageSize=50` | `ThreadListItem[]` + meta |
 | GET | `/threads/counts` | `?clientId` | `{ [segment]: number }` for every segment |
 | GET | `/threads/:id` | – | `ThreadDetail` (thread + messages + latest draft) |
 | PATCH | `/threads/:id` | any of `{ unread, important, archived, status }` | `ThreadListItem` |
