@@ -43,16 +43,19 @@ export function AssistantLayout() {
   const onThreadUpdated = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: qk.threads.all() });
     queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    queryClient.invalidateQueries({ queryKey: ['activity'] });
   }, [queryClient]);
 
   const onCountsChanged = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: qk.threads.counts(clientId) });
     queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    queryClient.invalidateQueries({ queryKey: ['activity'] });
   }, [clientId, queryClient]);
 
   const onActivityNew = useCallback(
     (act: ActivityItem) => {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['activity'] });
       if (act.actor.type === 'client') {
         toast.info(`${act.actor.name}: ${act.type.replace(/_/g, ' ')}`);
       }

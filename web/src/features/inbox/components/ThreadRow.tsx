@@ -1,4 +1,4 @@
-import { CalendarDays, Star } from 'lucide-react';
+import { CalendarDays, Star, Undo2 } from 'lucide-react';
 import { OwnerPill } from '@/components/common/OwnerPill';
 import { OwnerPopover } from '@/components/common/OwnerPopover';
 import { formatRelativeTime, isWithin24Hours } from '@/lib/format';
@@ -8,6 +8,7 @@ import type { Owner, ThreadListItem } from '@/types/api';
 
 type ThreadRowProps = {
   thread: ThreadListItem;
+  clientFirstName?: string;
   selected?: boolean;
   focused?: boolean;
   isNew?: boolean;
@@ -18,6 +19,7 @@ type ThreadRowProps = {
 
 export function ThreadRow({
   thread,
+  clientFirstName = 'Client',
   selected = false,
   focused = false,
   isNew = false,
@@ -133,6 +135,21 @@ export function ThreadRow({
             />
           </span>
         </OwnerPopover>
+
+        {thread.handoff?.state === 'client_handling' ? (
+          <span className="rounded-full bg-[var(--chip-bg)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--chip-fg)]">
+            {clientFirstName}&apos;s on it
+          </span>
+        ) : thread.handoff?.state === 'handed_to_assistant' ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-[var(--pane-border)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--fg)]">
+            <Undo2 className="h-3 w-3" aria-hidden="true" />
+            Handed back
+          </span>
+        ) : thread.handoff?.state === 'handled' ? (
+          <span className="rounded-full bg-[var(--card-glass-bg)] px-2.5 py-0.5 text-[11px] font-medium text-[var(--fg-muted)]">
+            Handled by {clientFirstName}
+          </span>
+        ) : null}
 
         {hasDate ? (
           <span className="inline-flex items-center gap-1 rounded-full border border-[var(--pane-border)] bg-[var(--card-glass-bg)] px-2 py-0.5 text-[11px] font-medium text-[var(--fg-muted)]">

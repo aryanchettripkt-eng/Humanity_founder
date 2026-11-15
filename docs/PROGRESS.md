@@ -28,6 +28,17 @@ _None yet._
 
 ---
 
+### 2026-11-16 03:51 · gemini · G9.3b client desk header in Inbox
+- Done:
+  - **1. Server `handoff` filter:** Added zod-validated `handoff` query param (`client_handling | handed_to_assistant | handled`) to `GET /api/threads` in `server/src/controllers/threads.controller.js`, updated `docs/BACKEND.md`, and added `server/tests/threads-handoff.test.js`.
+  - **2. `ClientDeskHeader` in Inbox:** Built `web/src/components/grove/ClientDeskHeader.tsx` above the 4 columns in `InboxPage.tsx` with client avatar + `"{Client}'s desk"`, 4 clickable stat chips (`Waiting on {client}`, `{Client}'s on it`, `Handed back to you`, `Handled by {client} · 7d`), latest `client_note` quote via `useActivity` (`qk.activity.list`), `"See what {client} sees"` link (`/c?preview=1`), and persisted collapse (`clientDeskCollapsed` in `relay-ui` store; collapsed by default on `<768px`). Invalidates `activity` alongside `threads` and `dashboard` on socket events in `AssistantLayout.tsx`.
+  - **3. Client's side on rows, reading pane, and AI insights:** Added handoff chips (`{Client}'s on it`, `Handed back` with `↩`, `Handled by {client}`) to `ThreadRow.tsx`, upgraded reading-pane handoff card with title, relative time, quoted note, and `"Open draft"` button in `InboxPage.tsx`, and added `"WHY {CLIENT}"` above `SUMMARY` in `AIPanel.tsx` when `owner === 'client'` and `clientReason` exists.
+- Verification:
+  - `npm run lint`, `npm run typecheck --workspace=web`, `npm test` (server 8 files / 38 tests, web 8 files / 33 tests) pass.
+  - Playwright no-scroll check passed (`scrollHeight === innerHeight` and `scrollWidth === innerWidth`) at `1920x1080`, `1440x900`, `1024x768`, `820x1180`, and `390x844` across `/app/inbox/inbox`, `/app/inbox/inbox/t1`, `/app/today`, `/app/settings/accounts`, and `/c?preview=1`.
+- Changed contracts: `GET /api/threads` now accepts optional `?handoff=client_handling|handed_to_assistant|handled` (`docs/BACKEND.md` §3.3).
+- Next: Review & merge PR for `gemini/G9.3b-inbox-client-header`.
+
 ### 2026-11-16 04:30 · claude · G9.3c Statistics and About pages
 - Done (assigned by Aryan in chat): the Client view tab is gone. The top nav is now Today, Inbox, Statistics, About, Ask AI. The phone tab bar is Today, Inbox, Stats, About, Ask. The `/c` routes still work for client logins and `/c?preview=1` (G9.3b puts the preview link in the Inbox header).
 - `/app/stats`: hero with a 7 / 30 day range, 4 KPI tiles (emails sorted, kept as the AI sorted, corrected by you, needed your call), an emails-per-day stacked bar chart by owner with legend, hover tooltip and a table view, "Who it's for", categories, AI confidence, the client's side (on it, handed back, handled) and recent activity. Built from the latest 100 threads in each of the inbox, done and archived segments; when there are more, the page says "Based on the latest N of M emails". Live updates on `thread:*` and `activity:new`.

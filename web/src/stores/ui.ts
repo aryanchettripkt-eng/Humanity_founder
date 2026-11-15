@@ -10,6 +10,7 @@ export type SeenClientCounts = {
 interface UiState {
   sidebarCollapsed: boolean;
   aiPanelOpen: boolean;
+  clientDeskCollapsed: boolean;
   theme: 'light' | 'dark';
   activeClientId: string | null;
   activeClientUserId: string | null;
@@ -20,6 +21,8 @@ interface UiState {
   setSidebarCollapsed: (v: boolean) => void;
   toggleAiPanel: () => void;
   setAiPanelOpen: (v: boolean) => void;
+  toggleClientDeskCollapsed: () => void;
+  setClientDeskCollapsed: (v: boolean) => void;
   toggleTheme: () => void;
   setActiveClientId: (id: string | null) => void;
   setActiveClientUserId: (id: string | null) => void;
@@ -34,6 +37,7 @@ export const useUiStore = create<UiState>()(
     (set) => ({
       sidebarCollapsed: false,
       aiPanelOpen: true,
+      clientDeskCollapsed: false,
       theme: 'light',
       activeClientId: null,
       activeClientUserId: null,
@@ -44,6 +48,9 @@ export const useUiStore = create<UiState>()(
       setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
       toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
       setAiPanelOpen: (v) => set({ aiPanelOpen: v }),
+      toggleClientDeskCollapsed: () =>
+        set((s) => ({ clientDeskCollapsed: !s.clientDeskCollapsed })),
+      setClientDeskCollapsed: (v) => set({ clientDeskCollapsed: v }),
       toggleTheme: () =>
         set((s) => ({
           theme: s.theme === 'light' ? 'dark' : 'light',
@@ -72,6 +79,7 @@ export const useUiStore = create<UiState>()(
       partialize: (s) => ({
         sidebarCollapsed: s.sidebarCollapsed,
         aiPanelOpen: s.aiPanelOpen,
+        clientDeskCollapsed: s.clientDeskCollapsed,
         theme: s.theme,
         activeClientId: s.activeClientId,
         activeClientUserId: s.activeClientUserId,

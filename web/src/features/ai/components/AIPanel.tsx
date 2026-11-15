@@ -12,6 +12,7 @@ import type { ThreadDetail } from '@/types/api';
 
 type AIPanelProps = {
   thread: ThreadDetail;
+  clientFirstName?: string;
   reclassifying?: boolean;
   onReclassify: () => void;
   onSuggestion: (action: 'apply' | 'dismiss') => void;
@@ -21,6 +22,7 @@ type AIPanelProps = {
 
 export function AIPanel({
   thread,
+  clientFirstName = 'Client',
   reclassifying = false,
   onReclassify,
   onSuggestion,
@@ -161,6 +163,16 @@ export function AIPanel({
         ) : null}
       </section>
 
+      {/* Why {client} (shown to client) */}
+      {thread.owner === 'client' && thread.clientReason ? (
+        <section className="space-y-1.5">
+          <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
+            Why {clientFirstName}
+          </h3>
+          <p className="text-[15px] leading-relaxed text-[var(--fg)]">{thread.clientReason}</p>
+        </section>
+      ) : null}
+
       {/* Summary */}
       <section className="space-y-2">
         <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
@@ -253,10 +265,14 @@ export function AIPanel({
 /** Compact AI Insights summary shown above messages on mobile (<768px) with a bottom sheet. */
 export function MobileAISummary({
   thread,
+  clientFirstName = 'Client',
   reclassifying = false,
   onReclassify,
   onSuggestion,
-}: Pick<AIPanelProps, 'thread' | 'reclassifying' | 'onReclassify' | 'onSuggestion'>) {
+}: Pick<
+  AIPanelProps,
+  'thread' | 'clientFirstName' | 'reclassifying' | 'onReclassify' | 'onSuggestion'
+>) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const ownerMeta = OWNER_META[thread.owner] ?? OWNER_META.review;
 
@@ -303,6 +319,7 @@ export function MobileAISummary({
           </DialogHeader>
           <AIPanel
             thread={thread}
+            clientFirstName={clientFirstName}
             reclassifying={reclassifying}
             onReclassify={onReclassify}
             onSuggestion={onSuggestion}

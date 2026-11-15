@@ -15,6 +15,7 @@ export const listThreadsSchema = {
     segment: z.enum(SEGMENT_IDS).optional().default('inbox'),
     q: z.string().trim().optional(),
     filters: z.string().optional(),
+    handoff: z.enum(['client_handling', 'handed_to_assistant', 'handled']).optional(),
     account: z.string().optional(),
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -61,7 +62,7 @@ export async function listThreads(req, res, next) {
       return res.json({ data: [], meta: { total: 0, page: 1, pageSize: req.query.pageSize } });
     }
 
-    const { segment, q, filters, account, page, pageSize } = req.query;
+    const { segment, q, filters, handoff, account, page, pageSize } = req.query;
     const query = {
       clientId: req.clientId,
       ...segmentFilter(segment),
@@ -69,6 +70,10 @@ export async function listThreads(req, res, next) {
 
     if (account) {
       query.accountId = account;
+    }
+
+    if (handoff) {
+      query['handoff.state'] = handoff;
     }
 
     if (filters) {
