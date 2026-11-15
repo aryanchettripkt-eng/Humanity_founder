@@ -30,20 +30,20 @@ export function GlassList({
       className={className}
     >
       {rows.length === 0 ? (
-        <p className="py-3 text-xs font-medium text-white/75">{emptyText}</p>
+        <p className="py-3 text-xs font-medium text-[var(--glass-muted)]">{emptyText}</p>
       ) : (
-        <div className="divide-y divide-white/25">
+        <div className="divide-y divide-[var(--glass-divider)]">
           {rows.map((row) => {
             const content = (
               <div className="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
                 <div className="flex min-w-0 items-center gap-2.5">
                   <Avatar name={row.name} initials={row.initials} size="sm" tone="glass" />
                   <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-white">{row.name}</p>
-                    <p className="truncate text-[11px] text-white/75">{row.subtitle}</p>
+                    <p className="truncate text-xs font-semibold text-[var(--glass-fg)]">{row.name}</p>
+                    <p className="truncate text-[11px] text-[var(--glass-muted)]">{row.subtitle}</p>
                   </div>
                 </div>
-                <span className="shrink-0 font-display text-xs font-semibold text-white/95 tabular-nums">
+                <span className="shrink-0 font-display text-xs font-semibold text-[var(--glass-fg)] tabular-nums">
                   {row.rightText}
                 </span>
               </div>
@@ -54,7 +54,7 @@ export function GlassList({
                 <Link
                   key={row.id}
                   to={row.href}
-                  className="block rounded-lg transition-colors hover:bg-white/10"
+                  className="block rounded-lg transition-colors hover:bg-[var(--glass-hover)]"
                 >
                   {content}
                 </Link>
@@ -67,7 +67,7 @@ export function GlassList({
                   key={row.id}
                   type="button"
                   onClick={() => (row.onClick ? row.onClick() : onRowClick?.(row))}
-                  className="block w-full rounded-lg text-left transition-colors hover:bg-white/10"
+                  className="block w-full rounded-lg text-left transition-colors hover:bg-[var(--glass-hover)]"
                 >
                   {content}
                 </button>

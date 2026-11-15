@@ -337,27 +337,27 @@ export function TodayPage() {
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex flex-wrap items-end gap-3">
-                <h1 className="font-display text-[36px] font-semibold leading-[1.06] tracking-tight text-white sm:text-[52px]">
+                <h1 className="font-display text-[36px] font-semibold leading-[1.06] tracking-tight text-[var(--hero-fg)] sm:text-[52px]">
                   {getTimeGreeting()},<br />
                   {userFirstName}!
                 </h1>
-                <span className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">
+                <span className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-3 py-1.5 text-xs font-medium text-[var(--hero-fg)] backdrop-blur-md">
                   <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
                   {dateChip}
                 </span>
               </div>
 
               {isLoading ? (
-                <Skeleton className="h-10 max-w-md rounded-xl bg-white/15" />
+                <Skeleton className="h-10 max-w-md rounded-xl bg-[var(--glass-bg)]" />
               ) : briefParts ? (
-                <div className="relative flex flex-wrap items-center gap-2 text-sm text-white/85">
+                <div className="relative flex flex-wrap items-center gap-2 text-sm text-[var(--hero-muted)]">
                   <p className="max-w-xl">{briefParts.head}</p>
                   {briefParts.rest ? (
                     <button
                       type="button"
                       onClick={() => setBriefOpen((v) => !v)}
                       aria-expanded={briefOpen}
-                      className="inline-flex min-h-[44px] items-center gap-0.5 px-1 text-xs font-semibold text-white underline underline-offset-4"
+                      className="inline-flex min-h-[44px] items-center gap-0.5 px-1 text-xs font-semibold text-[var(--hero-fg)] underline underline-offset-4"
                     >
                       more
                       <ChevronDown className="h-3.5 w-3.5" />
@@ -368,14 +368,14 @@ export function TodayPage() {
                     onClick={() => refreshBrief.mutate()}
                     disabled={refreshBrief.isPending}
                     aria-label="Refresh brief"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--nav-circle-bg)] text-[var(--hero-fg)] transition-colors hover:bg-[var(--glass-hover)] disabled:opacity-50"
                   >
                     <RefreshCw
                       className={`h-4 w-4 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
                     />
                   </button>
                   {briefOpen && briefParts.rest && data?.brief ? (
-                    <div className="w-full rounded-2xl border border-white/30 bg-black/45 p-3 text-xs leading-relaxed text-white backdrop-blur-xl">
+                    <div className="glass w-full rounded-2xl p-3 text-xs leading-relaxed text-[var(--glass-fg)]">
                       {data.brief.text}
                     </div>
                   ) : null}
@@ -384,14 +384,14 @@ export function TodayPage() {
             </div>
 
             {isLoading ? (
-              <Skeleton className="h-44 w-full rounded-[20px] bg-white/15" />
+              <Skeleton className="h-44 w-full rounded-[20px] bg-[var(--glass-bg)]" />
             ) : (
               <>
                 <button
                   type="button"
                   onClick={() => setWeekChartOpen((v) => !v)}
                   aria-expanded={weekChartOpen}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-4 text-xs font-medium text-white backdrop-blur-md md:hidden"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 text-xs font-medium text-[var(--hero-fg)] backdrop-blur-md md:hidden"
                 >
                   This week
                   <ChevronDown
@@ -415,10 +415,10 @@ export function TodayPage() {
           isLoading || isError || !data ? (
             <div className="grid grid-cols-1 gap-4">
               <div className="grid grid-cols-2 gap-4">
-                <Skeleton className="h-28 rounded-[20px] bg-white/15" />
-                <Skeleton className="h-28 rounded-[20px] bg-white/15" />
+                <Skeleton className="h-28 rounded-[20px] bg-[var(--glass-bg)]" />
+                <Skeleton className="h-28 rounded-[20px] bg-[var(--glass-bg)]" />
               </div>
-              <Skeleton className="h-40 rounded-[20px] bg-white/15" />
+              <Skeleton className="h-40 rounded-[20px] bg-[var(--glass-bg)]" />
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
@@ -439,7 +439,7 @@ export function TodayPage() {
       />
 
       {isLoading ? (
-        <div className="space-y-6 bg-surface px-4 py-6 sm:px-6 md:px-8">
+        <div className="space-y-6 px-4 py-6 sm:px-6 md:px-8">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Skeleton className="h-48 rounded-[18px]" />
             <Skeleton className="hidden h-48 rounded-[18px] md:block" />
@@ -448,11 +448,11 @@ export function TodayPage() {
           </div>
         </div>
       ) : isError || !data ? (
-        <div className="bg-surface px-4 py-6 sm:px-6 md:px-8">
+        <div className="px-4 py-6 sm:px-6 md:px-8">
           <ErrorState onRetry={() => refetch()} />
         </div>
       ) : (
-        <div className="space-y-6 bg-surface px-4 py-6 sm:px-6 md:px-8">
+        <div className="space-y-6 px-4 py-6 sm:px-6 md:px-8">
           <FilterBar
             filters={filterDefs}
             page={safePage}

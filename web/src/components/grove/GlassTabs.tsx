@@ -27,17 +27,17 @@ export function GlassTabs<T extends string = string>({
     <nav
       aria-label={ariaLabel}
       className={cn(
-        'glass inline-flex items-center gap-1 rounded-full p-1',
+        'inline-flex items-center gap-1 rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-pill-bg)] p-1 backdrop-blur-xl',
         className
       )}
     >
       {items.map((item) => {
         const isActive = item.id === activeId;
         const itemClass = cn(
-          'inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
+          'inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           isActive
-            ? 'bg-white text-[#1E1F1C] shadow-sm font-semibold'
-            : 'text-white/90 hover:bg-white/15 hover:text-white'
+            ? 'bg-[var(--nav-active-bg)] text-[var(--nav-active-fg)] shadow-sm font-semibold'
+            : 'text-[var(--hero-muted)] hover:bg-[var(--glass-hover)] hover:text-[var(--hero-fg)]'
         );
 
         const content = (
@@ -47,7 +47,9 @@ export function GlassTabs<T extends string = string>({
               <span
                 className={cn(
                   'rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
-                  isActive ? 'bg-[#1E1F1C]/10 text-[#1E1F1C]' : 'bg-white/20 text-white'
+                  isActive
+                    ? 'bg-foreground/10 text-[var(--nav-active-fg)]'
+                    : 'bg-[var(--glass-hover)] text-[var(--hero-fg)]'
                 )}
               >
                 {item.badge}

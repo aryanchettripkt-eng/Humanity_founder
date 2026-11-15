@@ -23,14 +23,49 @@
     --ink-muted: 87 6% 61%;
     --delta-down: 17 64% 92%;
     --delta-down-foreground: 17 64% 35%;
-    --grove-forest: 134 33% 27%;
-    --grove-clay: 22 16% 47%;
+    --grove-forest: 100 61% 30%;
+    --grove-clay: 22 25% 36%;
     --grove-linen: 36 20% 89%;
-    --grove-terracotta: 17 64% 46%;
+    --grove-terracotta: 17 64% 40%;
     --success: 88 73% 35%;
     --warning: 32.1 94.6% 43.7%;
     --destructive: 17 64% 46%;
     --radius: 10px;
+
+    /* Grove v2 canvas & theme tokens (DESIGN_V2 §1.0) */
+    --canvas-image: url('/bg/grove-light.webp');
+    --canvas-fallback: #F3F4EF;
+    --frame-bg: rgba(248, 248, 245, 0.92);
+    --frame-border: #ECEDE7;
+    --frame-shadow: 0 24px 60px -24px rgba(30, 31, 28, 0.18);
+    --hero-fg: #1E1F1C;
+    --hero-muted: #5B5F56;
+    --glass-bg: rgba(255, 255, 255, 0.80);
+    --glass-border: #ECEDE7;
+    --glass-fg: #1E1F1C;
+    --glass-muted: #5B5F56;
+    --glass-hover: rgba(255, 255, 255, 0.96);
+    --glass-divider: rgba(30, 31, 28, 0.10);
+    --glass-shadow: 0 12px 32px -12px rgba(30, 31, 28, 0.10);
+    --nav-pill-bg: rgba(255, 255, 255, 0.70);
+    --nav-pill-border: #ECEDE7;
+    --nav-circle-bg: #FFFFFF;
+    --nav-active-bg: #FFFFFF;
+    --nav-active-fg: #1E1F1C;
+    --card-bg: #FFFFFF;
+    --card-border: #ECEDE7;
+    --statbox-bg: #F4F4F0;
+    --chart-assistant: #6DB27A;
+    --chart-client: #E6C4AE;
+    --chart-none: #E8E2D3;
+    --chart-empty: rgba(30, 31, 28, 0.10);
+    --avatar-tile-bg: #2B2E2A;
+    --avatar-tile-fg: #FFFFFF;
+    --avatar-tile-radius: 9999px;
+    --cta-bg: #3F7A1E;
+    --cta-hover: #346618;
+    --cta-fg: #FFFFFF;
+    --delta-fg: #3F7A1E;
   }
 
   .dark {
@@ -40,7 +75,7 @@
     --card-foreground: 75 14% 95%;
     --border: 80 6% 17%;
     --foreground: 75 14% 95%;
-    --muted-foreground: 87 6% 61%;
+    --muted-foreground: 87 6% 68%;
     --primary: 86 54% 51%;
     --primary-foreground: 80 5% 12%;
     --ring: 86 54% 51%;
@@ -50,16 +85,51 @@
     --ink-foreground: 75 14% 95%;
     --ink-surface: 80 5% 16%;
     --ink-line: 80 6% 24%;
-    --ink-muted: 87 6% 61%;
+    --ink-muted: 87 6% 68%;
     --delta-down: 17 50% 20%;
     --delta-down-foreground: 17 75% 78%;
-    --grove-forest: 134 36% 45%;
-    --grove-clay: 22 20% 58%;
+    --grove-forest: 86 73% 70%;
+    --grove-clay: 25 40% 72%;
     --grove-linen: 36 12% 28%;
-    --grove-terracotta: 17 70% 58%;
+    --grove-terracotta: 17 85% 68%;
     --success: 86 54% 51%;
     --warning: 43.3 96.4% 56.3%;
     --destructive: 17 70% 58%;
+
+    /* Grove v2 canvas & theme tokens (DESIGN_V2 §1.0) */
+    --canvas-image: url('/bg/grove-dark.webp');
+    --canvas-fallback: #0A0F08;
+    --frame-bg: rgba(16, 18, 14, 0.78);
+    --frame-border: rgba(255, 255, 255, 0.10);
+    --frame-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.7);
+    --hero-fg: #FFFFFF;
+    --hero-muted: rgba(255, 255, 255, 0.78);
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-fg: #FFFFFF;
+    --glass-muted: rgba(255, 255, 255, 0.76);
+    --glass-hover: rgba(255, 255, 255, 0.12);
+    --glass-divider: rgba(255, 255, 255, 0.16);
+    --glass-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.36);
+    --nav-pill-bg: rgba(255, 255, 255, 0.08);
+    --nav-pill-border: rgba(255, 255, 255, 0.12);
+    --nav-circle-bg: rgba(255, 255, 255, 0.08);
+    --nav-active-bg: #FFFFFF;
+    --nav-active-fg: #1E1F1C;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.10);
+    --statbox-bg: rgba(0, 0, 0, 0.30);
+    --chart-assistant: #5E8F3A;
+    --chart-client: #6B5A4E;
+    --chart-none: #4A4A42;
+    --chart-empty: rgba(255, 255, 255, 0.16);
+    --avatar-tile-bg: #2A2C27;
+    --avatar-tile-fg: #FFFFFF;
+    --avatar-tile-radius: 12px;
+    --cta-bg: #8CC63F;
+    --cta-hover: #9AD34E;
+    --cta-fg: #1E1F1C;
+    --delta-fg: #B8EB78;
   }
 
   * {
@@ -78,7 +148,11 @@
 
 @layer components {
   .glass {
-    @apply border border-white/35 bg-white/[0.14] backdrop-blur-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.28)];
+    border: 1px solid var(--glass-border);
+    background-color: var(--glass-bg);
+    color: var(--glass-fg);
+    box-shadow: var(--glass-shadow);
+    @apply backdrop-blur-xl;
   }
 }
 

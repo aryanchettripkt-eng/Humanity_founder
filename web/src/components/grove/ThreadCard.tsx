@@ -32,7 +32,7 @@ export function ThreadCard({
   return (
     <article
       className={cn(
-        'flex h-full flex-col justify-between gap-4 rounded-[18px] border border-border bg-card p-4 transition-colors hover:border-foreground/20',
+        'flex h-full flex-col justify-between gap-4 rounded-[18px] border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-colors hover:border-foreground/20',
         className
       )}
     >
@@ -97,7 +97,7 @@ export function ThreadCard({
           type="button"
           disabled={actionPending}
           onClick={() => (onPrimaryAction ? onPrimaryAction(item) : onOpen?.(item))}
-          className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-[#4F8413] disabled:opacity-50 dark:hover:bg-primary/90"
+          className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-[var(--cta-bg)] px-4 py-2 text-xs font-semibold text-[var(--cta-fg)] transition-colors hover:bg-[var(--cta-hover)] disabled:opacity-50"
         >
           {item.ctaLabel}
         </button>

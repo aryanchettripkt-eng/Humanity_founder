@@ -15,7 +15,7 @@ export function ThreadListRow({ item, ownerLabel, onSelect, className }: ThreadL
   const inner = (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 transition-colors hover:border-foreground/20',
+        'flex items-center justify-between gap-3 rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3 transition-colors hover:border-foreground/20',
         className
       )}
     >

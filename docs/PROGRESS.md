@@ -27,6 +27,17 @@ _None yet._
 
 ---
 
+### 2026-11-15 21:08 · gemini · G9.1c themes and canvas
+- Done: Implemented DESIGN_V2 §1.0 (D21) light and dark themes + canvas backgrounds on `gemini/G9.1c-themes`:
+  - Added `web/public/bg/grove-light.webp` and `web/public/bg/grove-dark.webp`.
+  - Added all §1.0 theme tokens (`--canvas-image`, `--canvas-fallback`, `--frame-bg`, `--frame-border`, `--frame-shadow`, `--hero-fg`, `--hero-muted`, `--glass-*`, `--nav-*`, `--card-*`, `--statbox-bg`, `--chart-*`, `--avatar-tile-*`, `--cta-*`, `--delta-fg`) to `:root` and `.dark` in `globals.css`; updated `.glass` to read them.
+  - Updated `AppFrame` to paint the themed canvas (`cover`, `center`, `fixed`) on `≥768px` with `80px` horizontal / `40px` vertical gap, `min-h-[calc(100vh-80px)]`, `rounded-[28px]`, no `1440px` cap, gap `0` + hidden canvas `<768px`, translucent `backdrop-blur-xl` frame, and removed the two decorative CSS circles.
+  - Retired `/hero/grove.webp`, CSS gradient fallback, and dark overlay from `HeroBand`; hero and working area sit directly on the translucent frame in both themes.
+  - Wired `TopNav`, `GlassTabs`, `GlassCard`, `GlassStat`, `GlassList`, `StackedBars`, `FilterBar`, `ThreadCard`, `StatBox`, `ThreadListRow`, `Avatar`/`AvatarTile`, `TodayPage`, and `AssistantLayout` to read tokens with zero JSX theme branching (including `--avatar-tile-radius` circle in light / rounded-square in dark, pastel vs muted chart stacks, `#3F7A1E` vs `#8CC63F` CTA, and AA contrast).
+  - Updated `docs/DESIGN_SYSTEM.md` §6, `docs/FRONTEND.md` §7, and claimed `G9.1c` in `docs/ROADMAP.md`.
+- Changed contracts: none.
+- Next: Open PR `feat(grove): G9.1c themes and canvas` for Claude's review & Aryan's merge before starting `G9.1b`.
+
 ### 2026-11-15 21:00 · claude · D21 themes and canvas (docs)
 - Done: Aryan chose gap C (80px on the sides, 40px top and bottom) and gave a light and a dark mockup plus their canvas images. Wrote DESIGN_V2 §1.0 and D21, and added G9.1c to ROADMAP before G9.1b. The hero photo is retired.
 - Next: Gemini G9.1c (prompt in the project files at `prompts/gemini-G9.1c-themes.md`). Aryan copies `grove-light.webp` and `grove-dark.webp` into `web/public/bg/`.
