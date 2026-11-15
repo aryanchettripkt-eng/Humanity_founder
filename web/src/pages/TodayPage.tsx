@@ -1,70 +1,34 @@
-import { CalendarDays, ChevronDown, RefreshCw, Sparkles } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState, type TouchEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { EmptyState } from '@/components/common/EmptyState';
-import { ErrorState } from '@/components/common/ErrorState';
+import { OwnerPopover } from '@/components/common/OwnerPopover';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
-import { FilterBar, type FilterDropdownDef } from '@/components/grove/FilterBar';
-import { GlassList } from '@/components/grove/GlassList';
-import { GlassStat } from '@/components/grove/GlassStat';
 import { HeroBand } from '@/components/grove/HeroBand';
-import type { GroveThreadCardModel } from '@/components/grove/models';
-import { StackedBars } from '@/components/grove/StackedBars';
-import { ThreadCard } from '@/components/grove/ThreadCard';
-import { ThreadListRow } from '@/components/grove/ThreadListRow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMe } from '@/features/auth/api';
 import { useCreateDraft } from '@/features/composer/api';
 import { useChangeOwner, usePatchThread, useThreadCounts, useThreads } from '@/features/inbox/api';
-import { useDashboard, useRefreshBrief } from '@/features/today/api';
+import { useDashboard } from '@/features/today/api';
 import {
-  buildGroveRecentRows,
-  buildGroveStats,
-  buildGroveThreadCards,
-  buildNeedsYourCallList,
-  buildWeeklyBars,
+  buildTodaySummary,
+  confirmPillLabel,
+  ctaLabelForThread,
+  filterThreadsForTodayTab,
   getTimeGreeting,
-  splitFirstSentence,
-  type TodayGroveFilters,
+  statusChipLabel,
+  type TodayTabId,
 } from '@/features/today/mappers';
-import { getOwnerShortLabel } from '@/lib/owners';
+import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
-import type { Category, Owner } from '@/types/api';
+import type { Owner, ThreadListItem } from '@/types/api';
 
-function getResponsivePageSize(): number {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 4;
-  if (window.matchMedia('(min-width: 1280px)').matches) return 4;
-  if (window.matchMedia('(min-width: 768px)').matches) return 2;
-  return 1;
-}
-
-function useResponsivePageSize(): number {
-  const [pageSize, setPageSize] = useState<number>(getResponsivePageSize);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
-    const xlQuery = window.matchMedia('(min-width: 1280px)');
-    const mdQuery = window.matchMedia('(min-width: 768px)');
-    const sync = () => setPageSize(getResponsivePageSize());
-    xlQuery.addEventListener('change', sync);
-    mdQuery.addEventListener('change', sync);
-    return () => {
-      xlQuery.removeEventListener('change', sync);
-      mdQuery.removeEventListener('change', sync);
-    };
-  }, []);
-
-  return pageSize;
-}
+const VALID_TABS: TodayTabId[] = ['needs_action', 'assistant', 'client', 'all'];
 
 export function TodayPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: me } = useMe();
   const activeClientId = useUiStore((s) => s.activeClientId) || undefined;
-  const lastSeenCounts = useUiStore((s) => s.lastSeenCounts);
-  const setLastSeenCounts = useUiStore((s) => s.setLastSeenCounts);
 
   const activeClient =
     me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
@@ -77,61 +41,21 @@ export function TodayPage() {
     segment: 'inbox',
     clientId: activeClient?.id,
   });
-  const refreshBrief = useRefreshBrief(activeClient?.id);
+
   const createDraft = useCreateDraft();
   const patchThread = usePatchThread();
   const changeOwner = useChangeOwner();
-  const pageSize = useResponsivePageSize();
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
-  const [briefOpen, setBriefOpen] = useState(false);
-  const [weekChartOpen, setWeekChartOpen] = useState(false);
-  const [pendingCardId, setPendingCardId] = useState<string | null>(null);
-  const touchStartXRef = useRef<number | null>(null);
+  const rawTab = searchParams.get('tab') as TodayTabId | null;
+  const activeTab: TodayTabId = rawTab && VALID_TABS.includes(rawTab) ? rawTab : 'needs_action';
 
-  const filters = useMemo<TodayGroveFilters>(
-    () => ({
-      owner: (searchParams.get('owner') as TodayGroveFilters['owner']) || 'all',
-      category: (searchParams.get('category') as TodayGroveFilters['category']) || 'all',
-      date: (searchParams.get('date') as TodayGroveFilters['date']) || 'week',
-      confidence: (searchParams.get('confidence') as TodayGroveFilters['confidence']) || 'all',
-      source: (searchParams.get('source') as TodayGroveFilters['source']) || 'all',
-    }),
-    [searchParams]
-  );
-  const pageParam = Math.max(1, Number(searchParams.get('page') || '1') || 1);
-
-  const updateFilter = (key: string, value: string) => {
+  const setActiveTab = (tab: TodayTabId) => {
     const next = new URLSearchParams(searchParams);
-    const isDefault =
-      (key === 'date' && value === 'week') ||
-      (key !== 'date' && value === 'all') ||
-      (key === 'page' && value === '1');
-    if (isDefault) next.delete(key);
-    else next.set(key, value);
-    if (key !== 'page') next.delete('page');
+    if (tab === 'needs_action') next.delete('tab');
+    else next.set('tab', tab);
     setSearchParams(next, { replace: true });
   };
-
-  const clearAllFilters = () => {
-    setSearchParams(new URLSearchParams(), { replace: true });
-  };
-
-  const latestCountsRef = useRef(counts);
-  latestCountsRef.current = counts;
-
-  useEffect(() => {
-    const id = activeClient?.id;
-    return () => {
-      const c = latestCountsRef.current;
-      if (id && c) {
-        setLastSeenCounts(id, {
-          assistant: c.assistant ?? 0,
-          client: c.client ?? 0,
-          review: c.review ?? 0,
-        });
-      }
-    };
-  }, [activeClient?.id, setLastSeenCounts]);
 
   const allThreads = useMemo(() => {
     if (threadsRes?.data && threadsRes.data.length > 0) return threadsRes.data;
@@ -144,188 +68,103 @@ export function TodayPage() {
     });
   }, [threadsRes?.data, data]);
 
-  const weeklyBars = useMemo(
-    () => buildWeeklyBars(allThreads, activeClient?.timezone),
-    [allThreads, activeClient?.timezone]
+  const reviewThreads = data?.review ?? [];
+  const reviewCount = counts?.review ?? reviewThreads.length;
+  const assistantCount = counts?.assistant ?? data?.counts?.assistant ?? 0;
+  const clientCount = counts?.client ?? data?.counts?.client ?? 0;
+
+  const summaryLine = buildTodaySummary(reviewCount, clientCount, clientFirstName);
+  const visibleCards = useMemo(
+    () => filterThreadsForTodayTab(allThreads, activeTab).slice(0, 4),
+    [allThreads, activeTab]
   );
 
-  const groveStats = useMemo(
-    () =>
-      buildGroveStats(
-        counts,
-        activeClient?.id ? lastSeenCounts[activeClient.id] : undefined,
-        clientFirstName,
-        allThreads
-      ),
-    [counts, activeClient?.id, lastSeenCounts, clientFirstName, allThreads]
-  );
+  const handleConfirmSuggested = (t: ThreadListItem) => {
+    if (!t.suggestedOwner || t.suggestedOwner === 'none') return;
+    setPendingId(t.id);
+    changeOwner.mutate(
+      {
+        id: t.id,
+        owner: t.suggestedOwner,
+        previousOwner: t.owner,
+      },
+      { onSettled: () => setPendingId(null) }
+    );
+  };
 
-  const callList = useMemo(
-    () =>
-      buildNeedsYourCallList(
-        data?.review ?? [],
-        data?.upcoming ?? [],
-        activeClient?.timezone
-      ),
-    [data?.review, data?.upcoming, activeClient?.timezone]
-  );
+  const handleChooseOwner = (
+    threadId: string,
+    owner: Owner,
+    remember: 'sender' | 'domain' | null
+  ) => {
+    setPendingId(threadId);
+    changeOwner.mutate(
+      {
+        id: threadId,
+        owner,
+        remember,
+        previousOwner: 'review',
+      },
+      { onSettled: () => setPendingId(null) }
+    );
+  };
 
-  const cards = useMemo(
-    () => buildGroveThreadCards(allThreads, filters, clientFirstName, activeClient?.timezone),
-    [allThreads, filters, clientFirstName, activeClient?.timezone]
-  );
+  const handleCardAction = (t: ThreadListItem) => {
+    setPendingId(t.id);
 
-  const totalPages = Math.max(1, Math.ceil(cards.length / pageSize));
-  const safePage = Math.min(pageParam, totalPages);
-  const pageCards = cards.slice((safePage - 1) * pageSize, safePage * pageSize);
-
-  const recentRows = useMemo(
-    () => buildGroveRecentRows(data?.recent ?? allThreads),
-    [data?.recent, allThreads]
-  );
-
-  const briefParts = data?.brief?.text ? splitFirstSentence(data.brief.text) : null;
-  const dateChip = new Date().toLocaleDateString([], {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-    timeZone: activeClient?.timezone || undefined,
-  });
-
-  const handlePrimaryAction = (card: GroveThreadCardModel) => {
-    const thread = allThreads.find((t) => t.id === card.id);
-    setPendingCardId(card.id);
-
-    if (card.owner === 'assistant') {
+    if (t.owner === 'assistant') {
       createDraft.mutate(
-        { threadId: card.id, tone: 'formal' },
+        { threadId: t.id, tone: 'formal' },
         {
           onSuccess: () => {
             toast.success('Draft ready');
-            navigate(`/app/inbox/inbox/${card.id}`);
+            navigate(`/app/inbox/inbox/${t.id}`);
           },
-          onSettled: () => setPendingCardId(null),
+          onSettled: () => setPendingId(null),
         }
       );
       return;
     }
 
-    if (card.owner === 'client') {
-      if (!thread?.important && thread?.handoff?.state !== 'client_handling') {
+    if (t.owner === 'client') {
+      if (!t.important && t.handoff?.state !== 'client_handling') {
         patchThread.mutate(
           {
-            id: card.id,
+            id: t.id,
             patch: { important: true },
             undoPatch: { important: false },
             label: `Moved to the top of ${clientFirstName}'s queue`,
           },
-          { onSettled: () => setPendingCardId(null) }
+          { onSettled: () => setPendingId(null) }
         );
       } else {
-        setPendingCardId(null);
+        setPendingId(null);
         navigate('/c?preview=1');
       }
       return;
     }
 
-    if (card.owner === 'review') {
+    if (t.owner === 'review') {
       changeOwner.mutate(
         {
-          id: card.id,
-          owner: thread?.suggestedOwner ?? 'assistant',
+          id: t.id,
+          owner: t.suggestedOwner ?? 'assistant',
           previousOwner: 'review',
         },
-        { onSettled: () => setPendingCardId(null) }
+        { onSettled: () => setPendingId(null) }
       );
       return;
     }
 
-    setPendingCardId(null);
-    if (card.href) navigate(card.href);
+    setPendingId(null);
+    navigate(`/app/inbox/inbox/${t.id}`);
   };
 
-  const handleCardTouchStart = (e: TouchEvent<HTMLDivElement>) => {
-    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
-  };
-
-  const handleCardTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
-    if (touchStartXRef.current === null || totalPages <= 1) return;
-    const endX = e.changedTouches[0]?.clientX;
-    if (typeof endX !== 'number') return;
-    const deltaX = endX - touchStartXRef.current;
-    touchStartXRef.current = null;
-    if (deltaX < -48 && safePage < totalPages) {
-      updateFilter('page', String(safePage + 1));
-    } else if (deltaX > 48 && safePage > 1) {
-      updateFilter('page', String(safePage - 1));
-    }
-  };
-
-  const filterDefs: FilterDropdownDef[] = [
-    {
-      id: 'owner',
-      label: 'Owner',
-      value: filters.owner,
-      onChange: (v) => updateFilter('owner', v),
-      options: [
-        { value: 'all', label: 'Owner: All' },
-        { value: 'assistant' as Owner, label: 'Owner: For you' },
-        { value: 'client' as Owner, label: `Owner: For ${clientFirstName}` },
-        { value: 'review' as Owner, label: 'Owner: Needs your call' },
-        { value: 'none' as Owner, label: 'Owner: No reply' },
-      ],
-    },
-    {
-      id: 'category',
-      label: 'Category',
-      value: filters.category,
-      onChange: (v) => updateFilter('category', v),
-      options: [
-        { value: 'all', label: 'Category: All' },
-        { value: 'meeting' as Category, label: 'Meeting' },
-        { value: 'action' as Category, label: 'Action' },
-        { value: 'finance' as Category, label: 'Finance' },
-        { value: 'legal' as Category, label: 'Legal' },
-        { value: 'update' as Category, label: 'Update' },
-        { value: 'newsletter' as Category, label: 'Newsletter' },
-        { value: 'personal' as Category, label: 'Personal' },
-        { value: 'general' as Category, label: 'General' },
-      ],
-    },
-    {
-      id: 'date',
-      label: 'Date',
-      value: filters.date,
-      onChange: (v) => updateFilter('date', v),
-      options: [
-        { value: 'all', label: 'Date: Any time' },
-        { value: 'week', label: 'Date: This week' },
-        { value: 'today', label: 'Date: Today' },
-      ],
-    },
-    {
-      id: 'confidence',
-      label: 'Confidence',
-      value: filters.confidence,
-      onChange: (v) => updateFilter('confidence', v),
-      options: [
-        { value: 'all', label: 'Confidence: Any' },
-        { value: 'high', label: 'High (80%+)' },
-        { value: 'medium', label: 'Medium (60–79%)' },
-        { value: 'low', label: 'Needs review (<60%)' },
-      ],
-    },
-    {
-      id: 'source',
-      label: 'Source',
-      value: filters.source,
-      onChange: (v) => updateFilter('source', v),
-      options: [
-        { value: 'all', label: 'Source: All' },
-        { value: 'gmail', label: 'Gmail' },
-        { value: 'demo', label: 'Demo workspace' },
-      ],
-    },
+  const tabs: { id: TodayTabId; label: string }[] = [
+    { id: 'needs_action', label: 'Needs action' },
+    { id: 'assistant', label: 'You' },
+    { id: 'client', label: clientFirstName },
+    { id: 'all', label: 'All' },
   ];
 
   return (
@@ -333,203 +172,284 @@ export function TodayPage() {
       <HeroBand
         size="tall"
         nav={<AssistantTopNav />}
-        left={
-          <div className="space-y-4">
+        bottom={
+          <div className="space-y-6">
             <div className="space-y-2">
-              <div className="flex flex-wrap items-end gap-3">
-                <h1
-                  style={{ textShadow: 'var(--hero-text-shadow)' }}
-                  className="font-display text-[36px] font-semibold leading-[1.06] tracking-tight text-[var(--hero-fg)] sm:text-[52px]"
-                >
-                  {getTimeGreeting()},<br />
-                  {userFirstName}!
-                </h1>
-                <span className="glass mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium">
-                  <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
-                  {dateChip}
-                </span>
-              </div>
-
+              <h1
+                style={{ textShadow: 'var(--hero-text-shadow)' }}
+                className="font-display text-[clamp(36px,4.4vw,64px)] font-semibold leading-[1.05] tracking-tight text-[var(--hero-fg)]"
+              >
+                {getTimeGreeting()}, {userFirstName}
+              </h1>
               {isLoading ? (
-                <Skeleton className="h-10 max-w-md rounded-xl bg-[var(--hero-card-bg)]" />
-              ) : briefParts ? (
-                <div className="relative space-y-2 text-sm text-[var(--hero-fg)]">
-                  <div className="flex items-center gap-2">
-                    <div className="min-w-0 max-w-xl rounded-2xl border border-[var(--hero-card-border)] bg-[var(--hero-card-bg)] px-4 py-2 text-[var(--hero-fg)] sm:rounded-full">
-                      <p className="inline">
-                        {briefParts.head}
-                        {briefParts.rest ? (
-                          <>
-                            {' '}
-                            <button
-                              type="button"
-                              onClick={() => setBriefOpen((v) => !v)}
-                              aria-expanded={briefOpen}
-                              className="inline-flex items-center gap-0.5 text-xs font-semibold text-[var(--hero-fg)] underline underline-offset-4"
-                            >
-                              more
-                              <ChevronDown className="h-3.5 w-3.5" />
-                            </button>
-                          </>
-                        ) : null}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => refreshBrief.mutate()}
-                      disabled={refreshBrief.isPending}
-                      aria-label="Refresh brief"
-                      className="glass inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] disabled:opacity-50"
-                    >
-                      <RefreshCw
-                        className={`h-4 w-4 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
-                      />
-                    </button>
-                  </div>
-                  {briefOpen && briefParts.rest && data?.brief ? (
-                    <div className="glass w-full max-w-xl rounded-2xl p-3 text-xs leading-relaxed text-[var(--glass-fg)]">
-                      {data.brief.text}
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
+                <Skeleton className="h-6 w-72 rounded-lg bg-[var(--hero-card-bg)]" />
+              ) : (
+                <p className="text-base text-[var(--hero-muted)] md:text-[18px]">
+                  {summaryLine}
+                </p>
+              )}
             </div>
 
-            {isLoading ? (
-              <Skeleton className="h-44 w-full rounded-[20px] bg-[var(--glass-bg)]" />
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setWeekChartOpen((v) => !v)}
-                  aria-expanded={weekChartOpen}
-                  className="glass inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-medium md:hidden"
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
+              <section
+                aria-labelledby="needs-your-call-heading"
+                className="glass rounded-[20px] p-6"
+              >
+                <h2
+                  id="needs-your-call-heading"
+                  className="font-display text-[32px] font-semibold leading-tight tracking-tight text-[var(--hero-fg)]"
                 >
-                  This week
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 transition-transform ${weekChartOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                <div className={weekChartOpen ? 'block' : 'hidden md:block'}>
-                  <StackedBars
-                    title="This week"
-                    days={weeklyBars}
-                    clientName={clientFirstName}
-                    actionHref="/app/inbox/inbox"
-                    onSelectOwner={(owner) => updateFilter('owner', owner)}
-                  />
-                </div>
-              </>
-            )}
+                  Needs your call
+                </h2>
+
+                {isLoading ? (
+                  <div className="mt-4 space-y-3">
+                    <Skeleton className="h-14 w-full rounded-xl bg-[var(--hero-card-bg)]" />
+                    <Skeleton className="h-14 w-full rounded-xl bg-[var(--hero-card-bg)]" />
+                    <Skeleton className="h-14 w-full rounded-xl bg-[var(--hero-card-bg)]" />
+                  </div>
+                ) : reviewThreads.length === 0 ? (
+                  <p className="mt-3 text-base text-[var(--hero-muted)]">
+                    Nothing needs your call.
+                  </p>
+                ) : (
+                  <>
+                    <div className="mt-4 divide-y divide-[var(--glass-divider)]">
+                      {reviewThreads.slice(0, 3).map((t) => {
+                        const sender =
+                          t.participants?.[0]?.name ||
+                          t.participants?.[0]?.email ||
+                          'Contact';
+                        const hasSuggestion =
+                          Boolean(t.suggestedOwner) && t.suggestedOwner !== 'none';
+                        const pillText = confirmPillLabel(
+                          t.suggestedOwner,
+                          clientFirstName
+                        );
+
+                        return (
+                          <div
+                            key={t.id}
+                            className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
+                          >
+                            <Link
+                              to={`/app/inbox/review/${t.id}`}
+                              className="min-w-0 flex-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            >
+                              <p className="truncate font-display text-[20px] font-semibold leading-snug text-[var(--hero-fg)]">
+                                {sender}
+                              </p>
+                              <p className="truncate text-base text-[var(--hero-muted)]">
+                                {t.subject}
+                              </p>
+                            </Link>
+
+                            {hasSuggestion ? (
+                              <button
+                                type="button"
+                                onClick={() => handleConfirmSuggested(t)}
+                                disabled={pendingId === t.id}
+                                className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-[var(--cta-lime-bg)] px-4 py-2 text-base font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] disabled:opacity-50"
+                              >
+                                {pillText}
+                              </button>
+                            ) : (
+                              <OwnerPopover
+                                current={t.owner}
+                                senderEmail={t.participants?.[0]?.email}
+                                onSelect={(owner, remember) =>
+                                  handleChooseOwner(t.id, owner, remember)
+                                }
+                              >
+                                <button
+                                  type="button"
+                                  disabled={pendingId === t.id}
+                                  className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-[var(--cta-lime-bg)] px-4 py-2 text-base font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] disabled:opacity-50"
+                                >
+                                  Choose
+                                </button>
+                              </OwnerPopover>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {reviewThreads.length > 3 ? (
+                      <Link
+                        to="/app/inbox/review"
+                        className="mt-4 inline-flex items-center text-base font-medium text-[var(--hero-muted)] transition-colors hover:text-[var(--hero-fg)]"
+                      >
+                        +{reviewThreads.length - 3} more
+                      </Link>
+                    ) : null}
+                  </>
+                )}
+              </section>
+
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-1 lg:gap-6">
+                <Link
+                  to="/app/inbox/assistant"
+                  className="glass flex flex-col justify-between rounded-[20px] p-5 transition-colors hover:bg-[var(--glass-hover)] sm:p-6"
+                >
+                  <span className="font-display text-[20px] font-semibold leading-snug text-[var(--hero-fg)] sm:text-[24px]">
+                    You reply
+                  </span>
+                  {isLoading ? (
+                    <Skeleton className="mt-3 h-12 w-20 rounded-xl bg-[var(--hero-card-bg)]" />
+                  ) : (
+                    <span className="mt-2 font-display text-[40px] font-bold leading-none tracking-tight text-[var(--hero-fg)] tabular-nums md:text-[56px]">
+                      {assistantCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
+                  to="/app/inbox/client"
+                  className="glass flex flex-col justify-between rounded-[20px] p-5 transition-colors hover:bg-[var(--glass-hover)] sm:p-6"
+                >
+                  <span className="font-display text-[20px] font-semibold leading-snug text-[var(--hero-fg)] sm:text-[24px]">
+                    Waiting on {clientFirstName}
+                  </span>
+                  {isLoading ? (
+                    <Skeleton className="mt-3 h-12 w-20 rounded-xl bg-[var(--hero-card-bg)]" />
+                  ) : (
+                    <span className="mt-2 font-display text-[40px] font-bold leading-none tracking-tight text-[var(--hero-fg)] tabular-nums md:text-[56px]">
+                      {clientCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            </div>
           </div>
-        }
-        right={
-          isLoading || isError || !data ? (
-            <div className="grid grid-cols-1 gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Skeleton className="h-28 rounded-[20px] bg-[var(--glass-bg)]" />
-                <Skeleton className="h-28 rounded-[20px] bg-[var(--glass-bg)]" />
-              </div>
-              <Skeleton className="h-40 rounded-[20px] bg-[var(--glass-bg)]" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                {groveStats.map((stat) => (
-                  <GlassStat key={stat.id} stat={stat} />
-                ))}
-              </div>
-              <GlassList
-                title={callList.title}
-                actionHref={callList.actionHref}
-                rows={callList.rows}
-                emptyText={callList.emptyText}
-              />
-            </div>
-          )
         }
       />
 
-      {isLoading ? (
-        <div className="working-panel space-y-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <Skeleton className="h-48 rounded-[18px]" />
-            <Skeleton className="hidden h-48 rounded-[18px] md:block" />
-            <Skeleton className="hidden h-48 rounded-[18px] xl:block" />
-            <Skeleton className="hidden h-48 rounded-[18px] xl:block" />
-          </div>
-        </div>
-      ) : isError || !data ? (
-        <div className="working-panel">
-          <ErrorState onRetry={() => refetch()} />
-        </div>
-      ) : (
-        <div className="working-panel space-y-6">
-          <FilterBar
-            filters={filterDefs}
-            page={safePage}
-            totalPages={totalPages}
-            onPageChange={(p) => updateFilter('page', String(p))}
-            onClearAll={clearAllFilters}
-          />
-
-          {pageCards.length === 0 ? (
-            <EmptyState
-              icon={Sparkles}
-              title="No threads match these filters"
-              description="Try clearing a filter or switching to All."
-            />
-          ) : (
-            <div
-              onTouchStart={handleCardTouchStart}
-              onTouchEnd={handleCardTouchEnd}
-              className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
-            >
-              {pageCards.map((card) => (
-                <ThreadCard
-                  key={card.id}
-                  item={card}
-                  actionPending={pendingCardId === card.id}
-                  onOpen={(item) => item.href && navigate(item.href)}
-                  onPrimaryAction={handlePrimaryAction}
+      <div className="working-panel space-y-6">
+        <div
+          role="tablist"
+          aria-label="Filter threads"
+          className="no-scrollbar flex items-center gap-6 overflow-x-auto"
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'min-h-[44px] shrink-0 whitespace-nowrap pb-1 text-[20px] leading-snug transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  isActive
+                    ? 'font-semibold text-foreground'
+                    : 'font-medium text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <span>{tab.label}</span>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'mt-2 block h-1 w-full rounded-[2px] transition-colors',
+                    isActive ? 'bg-[var(--cta-lime-bg)]' : 'bg-transparent'
+                  )}
                 />
-              ))}
-            </div>
-          )}
+              </button>
+            );
+          })}
+        </div>
 
-          <section aria-label="Recently sorted" className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">
-                Recently sorted
-              </h2>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Skeleton className="h-48 rounded-[20px]" />
+            <Skeleton className="h-48 rounded-[20px]" />
+            <Skeleton className="h-48 rounded-[20px]" />
+            <Skeleton className="h-48 rounded-[20px]" />
+          </div>
+        ) : isError || !data ? (
+          <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+            <p className="text-base text-muted-foreground">
+              Couldn&apos;t load your workspace.
+            </p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="inline-flex min-h-[44px] items-center rounded-full border-[1.5px] border-[var(--btn-outline-border)] px-5 py-2 text-base font-semibold text-[var(--btn-outline-fg)] transition-colors hover:bg-[var(--btn-outline-hover)]"
+            >
+              Retry
+            </button>
+          </div>
+        ) : visibleCards.length === 0 ? (
+          <div className="space-y-3 py-4">
+            <p className="text-base text-muted-foreground">Nothing here.</p>
+            <Link
+              to="/app/inbox/inbox"
+              className="inline-flex items-center gap-1 text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              View all in Inbox →
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {visibleCards.map((t) => {
+                const sender =
+                  t.participants?.[0]?.name ||
+                  t.participants?.[0]?.email ||
+                  'Contact';
+                const href = `/app/inbox/${t.owner === 'review' ? 'review' : 'inbox'}/${t.id}`;
+                const ctaLabel = ctaLabelForThread(t, clientFirstName);
+                const isReview = t.owner === 'review';
+
+                return (
+                  <article
+                    key={t.id}
+                    className="flex flex-col justify-between gap-5 rounded-[20px] border border-[var(--card-border)] bg-[var(--card-bg)] p-6"
+                  >
+                    <div className="min-w-0">
+                      <Link to={href} className="block min-w-0">
+                        <h3 className="truncate font-display text-[24px] font-semibold leading-snug text-foreground">
+                          {sender}
+                        </h3>
+                        <p className="mt-1 truncate text-base text-muted-foreground">
+                          {t.subject}
+                        </p>
+                      </Link>
+                      <span className="mt-3 inline-flex w-fit items-center rounded-full bg-[var(--chip-bg)] px-3 py-1 text-base font-medium text-[var(--chip-fg)]">
+                        {statusChipLabel(t.owner, clientFirstName)}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCardAction(t)}
+                      disabled={pendingId === t.id}
+                      className={cn(
+                        'min-h-[44px] w-full rounded-full px-4 py-2.5 text-base font-semibold transition-colors disabled:opacity-50',
+                        isReview
+                          ? 'bg-[var(--cta-lime-bg)] text-[var(--cta-lime-fg)] hover:bg-[var(--cta-lime-hover)]'
+                          : 'border-[1.5px] border-[var(--btn-outline-border)] bg-transparent text-[var(--btn-outline-fg)] hover:bg-[var(--btn-outline-hover)]'
+                      )}
+                    >
+                      {ctaLabel}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+
+            <div>
               <Link
                 to="/app/inbox/inbox"
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                View inbox
+                View all in Inbox →
               </Link>
             </div>
-
-            {recentRows.length === 0 ? (
-              <EmptyState
-                icon={Sparkles}
-                title="Inbox is clear"
-                description="No recent conversations yet for this client."
-              />
-            ) : (
-              <div className="space-y-2">
-                {recentRows.map((row) => (
-                  <ThreadListRow
-                    key={row.id}
-                    item={row}
-                    ownerLabel={getOwnerShortLabel(row.owner, clientFirstName)}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

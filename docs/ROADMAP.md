@@ -92,6 +92,7 @@
 - [x] **G9.1c** Composition (DESIGN_V2 §1.0, D22): full-bleed background, transparent glass hero, solid working panel; Today built to target — @gemini (on main @ bab156a)
 - [x] **G9.1c-fixes** Hero contrast, StatBox truncation, one-row nav and filters <1024, offline toast, fixed background layer, phone rows, chart height (review 2026-11-15) — @gemini (PR #30)
 - [x] **G9.1d** Floating glass frame (one centred frame with frosted glass hero + solid working panel) — @gemini (gemini/G9.1d-floating-glass-frame)
+- [x] **G9.1e** Simplified Today page (counts summary, Needs your call confirm pills, 2 stat cards, 4-tab working panel + 4 simple cards) — @gemini (gemini/G9.1e-today-simple)
 - [ ] **G9.1b** Public site (DESIGN_V2 §1.0 composition + §6, D19/D20): 5 one-screen pages `/`, `/sorting`, `/client-app`, `/ask`, `/how-it-works`, public nav, shared `tourStore`, `/health` warm-up, product copy — @gemini
 - [ ] **G9.2** Inbox (short hero + segment glass tabs + search pill, list / reading pane / AI column in the panel), composer with truthful send copy, real .ics download, ⌘K glass dialog — @gemini
 - [ ] **G9.3** Settings and client view (work-page shape, preview banner), then login, signup, onboarding, 404, auth callback (focus-page shape); all "simulated"/"prototype" copy removed — @gemini

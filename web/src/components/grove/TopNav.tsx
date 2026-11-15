@@ -167,10 +167,9 @@ export function TopNav({
                   type="button"
                   aria-haspopup="menu"
                   aria-expanded={clientOpen}
-                  className="glass inline-flex h-11 items-center gap-2 rounded-full pl-2 pr-3.5 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)]"
+                  className="glass inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)]"
                 >
-                  <Avatar name={activeClient.name} initials={activeClient.initials} size="sm" />
-                  <span className="hidden lg:inline">{clientFirstName}</span>
+                  <span>{clientFirstName}</span>
                   <ChevronDown className="h-3.5 w-3.5 text-[var(--hero-muted)]" />
                 </button>
               </PopoverTrigger>

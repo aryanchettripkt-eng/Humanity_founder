@@ -348,4 +348,55 @@ export function collapseActivity(activity: ActivityItem[]): CollapsedActivity[] 
   return [...clientItems, ...otherItems].slice(0, 6);
 }
 
+export type TodayTabId = 'needs_action' | 'assistant' | 'client' | 'all';
+
+export function buildTodaySummary(
+  reviewCount: number,
+  clientCount: number,
+  clientFirstName: string
+): string {
+  const parts: string[] = [];
+  if (reviewCount > 0) {
+    parts.push(
+      reviewCount === 1
+        ? '1 email needs your call.'
+        : `${reviewCount} emails need your call.`
+    );
+  }
+  if (clientCount > 0) {
+    parts.push(`${clientFirstName} has ${clientCount} waiting.`);
+  }
+  return parts.length > 0 ? parts.join(' ') : "You're all caught up.";
+}
+
+export function confirmPillLabel(
+  suggestedOwner: ThreadListItem['suggestedOwner'],
+  clientFirstName: string
+): string {
+  if (suggestedOwner === 'assistant') return '✓ You';
+  if (suggestedOwner === 'client') return `✓ ${clientFirstName}`;
+  return 'Choose';
+}
+
+export function statusChipLabel(owner: Owner, clientFirstName: string): string {
+  if (owner === 'review') return 'Needs your call';
+  if (owner === 'assistant') return 'You reply';
+  if (owner === 'client') return `Waiting on ${clientFirstName}`;
+  return 'No reply';
+}
+
+export function filterThreadsForTodayTab(
+  threads: ThreadListItem[],
+  tab: TodayTabId
+): ThreadListItem[] {
+  if (tab === 'needs_action') {
+    const review = threads.filter((t) => t.owner === 'review');
+    const assistant = threads.filter((t) => t.owner === 'assistant');
+    return [...review, ...assistant];
+  }
+  if (tab === 'assistant') return threads.filter((t) => t.owner === 'assistant');
+  if (tab === 'client') return threads.filter((t) => t.owner === 'client');
+  return threads;
+}
+
 export type DashboardUnused = DashboardSummary;

@@ -40,6 +40,7 @@ const mockDashboardState = {
         participants: [{ name: 'Samir Patel', email: 'samir@example.com' }],
         owner: 'review',
         ownerSource: 'ai',
+        suggestedOwner: 'assistant' as 'assistant' | 'client' | 'none' | undefined,
         confidence: 0.55,
         reason: 'Ambiguous sender',
         category: 'general',
@@ -161,21 +162,25 @@ describe('TodayPage', () => {
     mockDashboardState.isLoading = false;
   });
 
-  it('renders Grove hero, stats, weekly chart, and filters ThreadCards', () => {
+  it('renders simplified hero summary, Needs your call confirm pills, stat cards, and 4 tabs', () => {
     renderToday();
-    expect(screen.getAllByText('This week').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('For you').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('For Priya').length).toBeGreaterThan(0);
+    expect(screen.getByText('1 email needs your call. Priya has 1 waiting.')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Needs your call' })).toBeInTheDocument();
-    expect(screen.getByText('Recently sorted')).toBeInTheDocument();
+    expect(screen.getAllByText('You reply').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Waiting on Priya').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Connect emails/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Remind Priya/i)).not.toBeInTheDocument();
 
-    const ownerSelect = screen.getByLabelText('Owner');
-    fireEvent.change(ownerSelect, { target: { value: 'client' } });
-    expect(screen.getAllByText('James Chen').length).toBeGreaterThan(0);
-  });
+    // Confirm pill in Needs your call calls change-owner with suggestedOwner
+    fireEvent.click(screen.getByRole('button', { name: '✓ You' }));
+    expect(mockChangeOwner).toHaveBeenCalledWith(
+      { id: 'rev-1', owner: 'assistant', previousOwner: 'review' },
+      expect.any(Object)
+    );
 
-  it('triggers real CTA mutations when clicking card action buttons', () => {
-    renderToday();
+    // Tab filtering switches to Priya's cards and renders truthful CTA
+    fireEvent.click(screen.getByRole('tab', { name: 'Priya' }));
+    expect(screen.getByRole('button', { name: 'Move up for Priya' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Move up for Priya' }));
     expect(mockPatchThread).toHaveBeenCalledWith(
       {
@@ -186,9 +191,14 @@ describe('TodayPage', () => {
       },
       expect.any(Object)
     );
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-    expect(mockChangeOwner).toHaveBeenCalledTimes(1);
+  it('shows Choose fallback when suggestedOwner is missing or none', () => {
+    const prev = mockDashboardState.data.review[0].suggestedOwner;
+    mockDashboardState.data.review[0].suggestedOwner = undefined;
+    renderToday();
+    expect(screen.getByRole('button', { name: 'Choose' })).toBeInTheDocument();
+    mockDashboardState.data.review[0].suggestedOwner = prev;
   });
 
   it('keeps HeroBand and navigation visible in error state', () => {
