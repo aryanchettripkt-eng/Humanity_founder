@@ -85,6 +85,14 @@
     --cta-bg: #4E7A1A;
     --cta-hover: #3F6414;
     --cta-fg: #FFFFFF;
+    --cta-lime-bg: #4E7A1A;
+    --cta-lime-hover: #3F6414;
+    --cta-lime-fg: #FFFFFF;
+    --chip-bg: rgba(78, 122, 26, 0.10);
+    --chip-fg: #3F6A12;
+    --btn-outline-border: #1E1F1C;
+    --btn-outline-fg: #1E1F1C;
+    --btn-outline-hover: rgba(30, 31, 28, 0.06);
     --delta-fg: #B8EB78;
   }
 
@@ -148,10 +156,10 @@
     --nav-active-fg: #1E1F1C;
     --logo-bg: #B7E36A;
     --logo-fg: #1E1F1C;
-    --panel-bg: rgba(21, 22, 20, 0.94);
+    --panel-bg: #1B1B1B;
     --panel-border: rgba(255, 255, 255, 0.08);
     --panel-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.65);
-    --card-bg: #1D1E1B;
+    --card-bg: #252425;
     --card-border: rgba(255, 255, 255, 0.08);
     --statbox-bg: rgba(0, 0, 0, 0.30);
     --chart-assistant: rgba(127, 161, 74, 0.85);
@@ -164,6 +172,14 @@
     --cta-bg: #8CC63F;
     --cta-hover: #9AD34E;
     --cta-fg: #1E1F1C;
+    --cta-lime-bg: #C6E455;
+    --cta-lime-hover: #D2EE66;
+    --cta-lime-fg: #141512;
+    --chip-bg: rgba(198, 228, 85, 0.14);
+    --chip-fg: #D6E54A;
+    --btn-outline-border: rgba(255, 255, 255, 0.85);
+    --btn-outline-fg: #FFFFFF;
+    --btn-outline-hover: rgba(255, 255, 255, 0.08);
     --delta-fg: #B8EB78;
   }
 

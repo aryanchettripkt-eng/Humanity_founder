@@ -7,6 +7,7 @@
 - [x] AI provider for the deployed demo → **Groq** (D9). Gemini/Anthropic/mock still supported.
 - [ ] Should agents commit directly to `main` for ROADMAP/PROGRESS updates, or always via branches?
 - [ ] Real Gmail (Phase 6): which Google account owns the Cloud project, and which Gmail goes in the demo video? (G6.1)
+- [ ] Does Aryan want a real `Remind {client}` endpoint + notification flow on the backend (so Today's client cards can show "Remind {client}" truthfully instead of "Move up for {client}")?
 
 ## Open issues
 - [ ] Sync events reach an assistant twice (in both `assistants:` and `user:` rooms). Harmless if FE handlers are idempotent (FRONTEND §6). Optional server fix: emit with `io.to(a).to(b)` so Socket.io dedupes. — owner: @gemini
@@ -26,6 +27,17 @@
 _None yet._
 
 ---
+
+### 2026-11-16 02:20 · gemini · G9.1e simplified Today
+- Done: Rebuilt Today (`TodayPage.tsx`) inside the floating glass frame to match `today-simple-target.png`:
+  - Nav (`TopNav`): client switcher now shows first name only (`Priya ⌄`), no avatar circle.
+  - Hero: single-line greeting (`Good morning/afternoon/evening, Alex`), counts-based summary line (`buildTodaySummary` with singular/plural/zero clauses/all caught up), `"Needs your call"` glass card (up to 3 review rows with `✓ You` / `✓ {client}` lime confirm pills calling `useChangeOwner`, `"Choose"` fallback opening `OwnerPopover`, `+{N} more` link, or `"Nothing needs your call."`), and two stacked stat cards (`"You reply"`, `"Waiting on {client}"`).
+  - Working panel: 4 text tabs (`Needs action`, `You`, `{client}`, `All`) with lime underline, 4-column responsive thread cards (sender, subject, lime-tinted status chip, full-width lime Confirm or outline action button), and `"View all in Inbox →"` link.
+  - Added `--cta-lime-*`, `--chip-*`, `--btn-outline-*` tokens in `globals.css` (`:root` and `.dark`), plus dark panel `#1B1B1B` and dark card `#252425`.
+  - Updated `mappers.ts`, `mappers.test.ts`, and `TodayPage.test.tsx` (all 21 web tests passing).
+  - Verified in Playwright at 1920, 1440, 820, 390, 320 (light & dark) + empty `"Needs your call"` state with zero horizontal overflow.
+- Changed contracts: none.
+- Next: Open PR for `gemini/G9.1e-today-simple` and proceed to `G9.2` after review/merge.
 
 ### 2026-11-16 02:02 · gemini · G9.1d floating glass frame
 - Done: Wrapped app views in one centred floating glass frame (`gemini/G9.1d-floating-glass-frame`):

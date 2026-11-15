@@ -4,9 +4,13 @@ import {
   buildGroveStats,
   buildGroveThreadCards,
   buildNeedsYourCallList,
+  buildTodaySummary,
   buildWeeklyBars,
   collapseActivity,
+  confirmPillLabel,
   ctaLabelForThread,
+  filterThreadsForTodayTab,
+  statusChipLabel,
 } from '@/features/today/mappers';
 import type { ActivityItem, ThreadListItem, UpcomingItem } from '@/types/api';
 
@@ -179,5 +183,47 @@ describe('today grove mappers', () => {
     );
     expect(bars).toHaveLength(7);
     expect(bars[6].assistant).toBe(1);
+  });
+
+  it('builds counts-based summary sentence with singular, plural, zero clauses, and all caught up', () => {
+    expect(buildTodaySummary(2, 10, 'Priya')).toBe(
+      '2 emails need your call. Priya has 10 waiting.'
+    );
+    expect(buildTodaySummary(1, 3, 'Priya')).toBe(
+      '1 email needs your call. Priya has 3 waiting.'
+    );
+    expect(buildTodaySummary(0, 4, 'Priya')).toBe('Priya has 4 waiting.');
+    expect(buildTodaySummary(2, 0, 'Priya')).toBe('2 emails need your call.');
+    expect(buildTodaySummary(0, 0, 'Priya')).toBe("You're all caught up.");
+  });
+
+  it('builds confirm pill and status chip labels truthfully', () => {
+    expect(confirmPillLabel('assistant', 'Priya')).toBe('✓ You');
+    expect(confirmPillLabel('client', 'Priya')).toBe('✓ Priya');
+    expect(confirmPillLabel('none', 'Priya')).toBe('Choose');
+    expect(confirmPillLabel(undefined, 'Priya')).toBe('Choose');
+
+    expect(statusChipLabel('review', 'Priya')).toBe('Needs your call');
+    expect(statusChipLabel('assistant', 'Priya')).toBe('You reply');
+    expect(statusChipLabel('client', 'Priya')).toBe('Waiting on Priya');
+    expect(statusChipLabel('none', 'Priya')).toBe('No reply');
+  });
+
+  it('filters threads by Today tab with review first in needs_action', () => {
+    const threads = [
+      makeThread({ id: 'a1', owner: 'assistant' }),
+      makeThread({ id: 'c1', owner: 'client' }),
+      makeThread({ id: 'r1', owner: 'review' }),
+      makeThread({ id: 'n1', owner: 'none' }),
+    ];
+    expect(filterThreadsForTodayTab(threads, 'needs_action').map((t) => t.id)).toEqual(['r1', 'a1']);
+    expect(filterThreadsForTodayTab(threads, 'assistant').map((t) => t.id)).toEqual(['a1']);
+    expect(filterThreadsForTodayTab(threads, 'client').map((t) => t.id)).toEqual(['c1']);
+    expect(filterThreadsForTodayTab(threads, 'all').map((t) => t.id)).toEqual([
+      'a1',
+      'c1',
+      'r1',
+      'n1',
+    ]);
   });
 });
