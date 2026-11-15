@@ -30,7 +30,7 @@ _None yet._
 ### 2026-11-15 20:05 · claude · G9.1 review (PR #21) + filter order fix
 - Done: Reviewed PR #21 three times against DESIGN_V2 §1–3, §8, §9 at 1440/820/390/320, light + dark (review and shots in the project files, `reviews/2026-11-15-G9.1-pr21-review.md`). All blockers are fixed in db73551. Fixed one regression from db73551 at Aryan's request: on ≥640px the Owner filter had moved to the end of the filter row (`order-1` vs `sm:order-none`); now Owner · other filters · filter circle. DESIGN_V2 §3.2 CTA labels amended to `Move up for Priya` / `Open in Priya's view` (D20).
 - Changed contracts: none.
-- Next: Aryan merges this into `gemini/G9.1-grove-foundation`, then merges PR #21. Then Gemini G9.1b.
+- Next: #21 merged before #22 landed, so this fix goes to main in a follow-up PR. Then Gemini G9.1b.
 - Notes/risks: A real "Nudge Priya" needs a backend notification endpoint (new scope). Prototype wording remains in AIPanel, DraftComposer, ConnectProviderCard, OnboardingPage and SettingsAccountsPage, to be cleaned up in G9.2/G9.3.
 
 ### 2026-11-15 19:54 · gemini · G9.1 PR #21 re-review blocker fix
