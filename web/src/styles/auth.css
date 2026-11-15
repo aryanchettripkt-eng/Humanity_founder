@@ -1,0 +1,261 @@
+/*
+ * Auth pages (login, signup): type and spacing (G9.3e, DESIGN_SYSTEM §9.4).
+ *
+ * The reference mockup is a 1440×900 layout. Every size below is written in
+ * "reference pixels": calc(var(--k) * N) is N px at 1440×900 and scales with
+ * the smaller of the viewport's width and height, so the whole composition
+ * grows on big screens and shrinks on short or narrow ones instead of
+ * clipping. Phones (<768px) switch to fixed sizes at the bottom of the file.
+ *
+ *   Headline + brand: Urbanist 500 (font-display)
+ *   Everything else:  Inter (font-sans)
+ */
+
+.auth-shell {
+  /* 1 reference px. 14.4px = 1vw at 1440 = 1.6vh at 900. */
+  --au: clamp(12px, min(1vw, 1.6vh), 18.5px);
+  --k: calc(var(--au) / 14.4);
+  --auth-ctl-h: max(46px, calc(var(--k) * 52));
+  --auth-btn-h: max(46px, calc(var(--k) * 50));
+}
+
+.auth-container {
+  /* Centres a 1168-reference-px composition (136px gutters at 1440). */
+  padding-inline: max(40px, calc((100vw - var(--k) * 1168) / 2));
+  padding-block: calc(var(--k) * 40);
+}
+
+.auth-grid {
+  grid-template-columns: minmax(0, 1fr) calc(var(--k) * 568);
+  column-gap: calc(var(--k) * 96);
+}
+
+/* The reference sits the copy a little above the card's centre line. */
+.auth-hero {
+  margin-bottom: calc(var(--k) * 120);
+  max-width: calc(var(--k) * 520);
+}
+
+/* ------------------------------------------------------------- left column */
+
+.auth-brand {
+  gap: calc(var(--k) * 14);
+}
+
+.auth-brand-tile {
+  width: calc(var(--k) * 44);
+  height: calc(var(--k) * 44);
+  border-radius: calc(var(--k) * 12);
+}
+
+.auth-brand-tile svg {
+  width: calc(var(--k) * 24);
+  height: calc(var(--k) * 24);
+}
+
+.auth-brand-name {
+  font-size: calc(var(--k) * 28);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.auth-headline {
+  margin-top: calc(var(--k) * 44);
+  font-size: calc(var(--k) * 66);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: 0.01em;
+}
+
+.auth-subline {
+  margin-top: calc(var(--k) * 26);
+  font-size: calc(var(--k) * 21);
+  line-height: 1.48;
+  letter-spacing: 0.005em;
+  max-width: calc(var(--k) * 430);
+}
+
+/* ------------------------------------------------------------------- card */
+
+.auth-card {
+  border-radius: calc(var(--k) * 30);
+  padding: calc(var(--k) * 52) calc(var(--k) * 56) calc(var(--k) * 46);
+}
+
+.auth-title {
+  font-size: calc(var(--k) * 36);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+
+.auth-form {
+  margin-top: calc(var(--k) * 40);
+}
+
+.auth-form > * + * {
+  margin-top: calc(var(--k) * 24);
+}
+
+.auth-label {
+  display: block;
+  margin-bottom: calc(var(--k) * 10);
+  font-size: max(14px, calc(var(--k) * 15));
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.auth-card .auth-input {
+  height: var(--auth-ctl-h);
+  padding-inline: calc(var(--k) * 26);
+  font-size: max(15px, calc(var(--k) * 17));
+}
+
+.auth-field-error {
+  margin-top: calc(var(--k) * 6);
+  font-size: max(12px, calc(var(--k) * 13));
+}
+
+.auth-check {
+  font-size: max(14px, calc(var(--k) * 15));
+}
+
+.auth-check input {
+  width: calc(var(--k) * 20);
+  height: calc(var(--k) * 20);
+}
+
+.auth-check label {
+  margin-left: calc(var(--k) * 12);
+}
+
+.auth-form > .auth-submit {
+  margin-top: calc(var(--k) * 28);
+}
+
+.auth-submit {
+  height: var(--auth-btn-h);
+  font-size: max(15px, calc(var(--k) * 17));
+}
+
+.auth-divider {
+  margin-block: calc(var(--k) * 32) calc(var(--k) * 28);
+  gap: calc(var(--k) * 18);
+  font-size: max(12px, calc(var(--k) * 13));
+  letter-spacing: 0.08em;
+}
+
+.auth-alt > * + * {
+  margin-top: calc(var(--k) * 14);
+}
+
+.auth-alt-grid {
+  gap: calc(var(--k) * 14);
+}
+
+.auth-card .auth-alt-btn,
+.auth-card .auth-alt-google > button {
+  height: var(--auth-btn-h);
+  font-size: max(15px, calc(var(--k) * 16));
+}
+
+.auth-card .auth-alt-btn svg,
+.auth-card .auth-alt-google > button svg {
+  width: calc(var(--k) * 18);
+  height: calc(var(--k) * 18);
+}
+
+.auth-eyebrow {
+  font-size: max(11px, calc(var(--k) * 12));
+  letter-spacing: 0.08em;
+}
+
+.auth-footer {
+  margin-top: calc(var(--k) * 38);
+  font-size: max(14px, calc(var(--k) * 15));
+}
+
+/* ------------------------------------------------- tablet: tighter columns */
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .auth-shell {
+    --k: 0.84px;
+  }
+
+  .auth-container {
+    padding-inline: 40px;
+  }
+
+  .auth-grid {
+    grid-template-columns: minmax(0, 1fr) clamp(400px, 52vw, 460px);
+    column-gap: 40px;
+  }
+
+  .auth-hero {
+    margin-bottom: 0;
+  }
+
+  .auth-card {
+    padding: 40px 36px 36px;
+  }
+}
+
+/* ------------------------------------------------------- phone: fixed sizes */
+
+@media (max-width: 767.98px) {
+  .auth-shell {
+    --k: 1px;
+    --auth-ctl-h: 50px;
+    --auth-btn-h: 50px;
+  }
+
+  .auth-container {
+    padding-inline: 16px;
+    padding-block: 32px;
+  }
+
+  .auth-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 32px;
+  }
+
+  .auth-hero {
+    margin-bottom: 0;
+  }
+
+  .auth-headline {
+    margin-top: 28px;
+    font-size: 40px;
+  }
+
+  .auth-subline {
+    margin-top: 14px;
+    font-size: 17px;
+  }
+
+  .auth-card {
+    border-radius: 24px;
+    padding: 32px 22px 28px;
+  }
+
+  .auth-title {
+    font-size: 30px;
+  }
+
+  .auth-form {
+    margin-top: 28px;
+  }
+
+  .auth-form > * + * {
+    margin-top: 20px;
+  }
+
+  .auth-divider {
+    margin-block: 26px 22px;
+  }
+
+  .auth-footer {
+    margin-top: 28px;
+  }
+}

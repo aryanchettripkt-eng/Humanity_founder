@@ -69,6 +69,7 @@ Removed in R1: the public landing page and the signed-in app now share the same 
 
 - Numbers in tiles use `tabular-nums`. Max line length in email body: 72ch.
 - Unread rows: sender + subject weight 600; read rows: 400 + muted subject.
+- **Auth pages (G9.3e):** type and spacing match the sign-in mockup, measured from it as a 1440×900 layout. Headline and the "Relay" wordmark: Urbanist 500 (headline 66px, LH 1.04, +0.01em). Card title "Sign in": Inter 500 36px. Subline Inter 400 21px/1.48; labels Inter 500 15px; inputs 17px; buttons 17px. All sizes and gaps live in `web/src/styles/auth.css` as reference px (`calc(var(--k) * N)`), where `--k` follows `min(1vw, 1.6vh)` so the page scales with the smaller of width and height (×0.83 to ×1.28); 768–1023 uses fixed tighter sizes and <768 a fixed phone scale. Small text never drops below 14px, controls never below 46px.
 
 ## 4. Spacing, radius, elevation
 - 4px grid. Common: 4, 8, 12, 16, 20, 24, 32, 48.

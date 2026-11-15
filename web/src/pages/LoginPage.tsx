@@ -39,7 +39,9 @@ export function LoginPage() {
     try {
       const res = await loginApi(values);
       queryClient.clear();
-      navigate(res.user.role === 'client' ? '/c' : '/app/today', { replace: true });
+      navigate(res.user.role === 'client' ? '/c' : '/app/today', {
+        replace: true,
+      });
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : 'Login failed');
     }
@@ -55,24 +57,23 @@ export function LoginPage() {
       headline="Welcome back."
       subline="Get to replies faster. One place for you, your client, and every conversation."
     >
-      <h2 className="font-display text-[32px] font-medium leading-tight text-[var(--fg)] sm:text-[36px]">
-        Sign in
-      </h2>
+      <h2 className="auth-title text-[var(--fg)]">Sign in</h2>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
         aria-describedby={formErrorIds}
-        className="mt-6 space-y-4"
+        className="auth-form"
       >
         <div>
-          <label className="mb-2 block text-[14px] font-medium text-[var(--fg)]" htmlFor="email">
+          <label className="auth-label text-[var(--fg)]" htmlFor="email">
             Email
           </label>
           <Input
             id="email"
             type="email"
             variant="pill"
+            className="auth-input"
             autoComplete="email"
             placeholder="alex@example.com"
             aria-invalid={Boolean(errors.email)}
@@ -80,23 +81,21 @@ export function LoginPage() {
             {...register('email')}
           />
           {errors.email ? (
-            <p id="login-email-error" className="mt-1.5 text-[13px] text-destructive">
+            <p id="login-email-error" className="auth-field-error text-destructive">
               {errors.email.message}
             </p>
           ) : null}
         </div>
 
         <div>
-          <label
-            className="mb-2 block text-[14px] font-medium text-[var(--fg)]"
-            htmlFor="password"
-          >
+          <label className="auth-label text-[var(--fg)]" htmlFor="password">
             Password
           </label>
           <Input
             id="password"
             type="password"
             variant="pill"
+            className="auth-input"
             autoComplete="current-password"
             placeholder="••••••••"
             aria-invalid={Boolean(errors.password)}
@@ -104,23 +103,20 @@ export function LoginPage() {
             {...register('password')}
           />
           {errors.password ? (
-            <p id="login-password-error" className="mt-1.5 text-[13px] text-destructive">
+            <p id="login-password-error" className="auth-field-error text-destructive">
               {errors.password.message}
             </p>
           ) : null}
         </div>
 
-        <div className="flex items-center pt-0.5">
+        <div className="auth-check flex items-center">
           <input
             id="remember"
             type="checkbox"
             {...register('remember')}
-            className="h-4 w-4 cursor-pointer rounded border border-[var(--card-glass-border)] accent-[var(--cta-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] dark:accent-[var(--grove-lime)] dark:focus-visible:ring-[var(--grove-lime)]"
+            className="cursor-pointer rounded border border-[var(--card-glass-border)] accent-[var(--cta-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] dark:accent-[var(--grove-lime)] dark:focus-visible:ring-[var(--grove-lime)]"
           />
-          <label
-            htmlFor="remember"
-            className="ml-2.5 cursor-pointer select-none text-[14px] text-[var(--fg-muted)]"
-          >
+          <label htmlFor="remember" className="cursor-pointer select-none text-[var(--fg-muted)]">
             Remember me
           </label>
         </div>
@@ -128,41 +124,41 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 flex h-[52px] w-full items-center justify-center rounded-full bg-[var(--cta-lime-bg)] text-[16px] font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
+          className="auth-submit flex w-full items-center justify-center rounded-full bg-[var(--cta-lime-bg)] font-semibold text-[var(--cta-lime-fg)] transition-colors hover:bg-[var(--cta-lime-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
         >
           {isSubmitting ? 'Signing in…' : 'Sign in'}
         </button>
       </form>
 
-      <div className="my-5 flex items-center gap-3">
+      <div className="auth-divider flex items-center">
         <span className="h-px flex-1 bg-[var(--glass-divider)]" aria-hidden="true" />
-        <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--fg-subtle)]">
+        <span className="font-medium uppercase text-[var(--fg-subtle)]">
           OR CONTINUE WITH
         </span>
         <span className="h-px flex-1 bg-[var(--glass-divider)]" aria-hidden="true" />
       </div>
 
-      <div className="space-y-3">
+      <div className="auth-alt">
         {health?.googleLogin ? (
-          <GoogleButton
-            variant="glass"
-            label="Google"
-            onClick={() => {
-              window.location.href = getGoogleLoginUrl();
-            }}
-          />
+          <div className="auth-alt-google">
+            <GoogleButton
+              variant="glass"
+              label="Google"
+              onClick={() => {
+                window.location.href = getGoogleLoginUrl();
+              }}
+            />
+          </div>
         ) : null}
 
         <div className="space-y-2">
-          <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--fg-subtle)]">
-            Try the demo
-          </p>
-          <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
+          <p className="auth-eyebrow font-medium uppercase text-[var(--fg-subtle)]">Try the demo</p>
+          <div className="auth-alt-grid grid grid-cols-1 min-[400px]:grid-cols-2">
             <button
               type="button"
               disabled={demoLoading !== null}
               onClick={() => handleDemo('assistant')}
-              className="flex h-[52px] items-center justify-center gap-2 rounded-full border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] px-4 text-[14px] font-medium text-[var(--fg)] transition-colors hover:bg-[var(--glass-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
+              className="auth-alt-btn flex items-center justify-center gap-2 rounded-full border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] px-4 font-medium text-[var(--fg)] transition-colors hover:bg-[var(--glass-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
             >
               <UserRoundCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="truncate">
@@ -173,7 +169,7 @@ export function LoginPage() {
               type="button"
               disabled={demoLoading !== null}
               onClick={() => handleDemo('client')}
-              className="flex h-[52px] items-center justify-center gap-2 rounded-full border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] px-4 text-[14px] font-medium text-[var(--fg)] transition-colors hover:bg-[var(--glass-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
+              className="auth-alt-btn flex items-center justify-center gap-2 rounded-full border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] px-4 font-medium text-[var(--fg)] transition-colors hover:bg-[var(--glass-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cta-bg)] disabled:cursor-not-allowed disabled:opacity-50 dark:focus-visible:ring-[var(--grove-lime)]"
             >
               <Crown className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="truncate">
@@ -184,7 +180,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      <p className="mt-6 text-center text-[14px] text-[var(--fg-muted)]">
+      <p className="auth-footer text-center text-[var(--fg-muted)]">
         New to Relay?{' '}
         <Link
           to="/signup"

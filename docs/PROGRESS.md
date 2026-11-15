@@ -28,6 +28,11 @@ _None yet._
 
 ---
 
+
+### 2026-11-15 23:40 · claude · G9.3e sign-in type and spacing
+- Done: identified the mockup's fonts by fitting rendered candidates against it (headline/wordmark Urbanist 500, everything else Inter; the mockup is a 1440×900 layout at 1.1×). New `web/src/styles/auth.css` holds every auth size and gap in reference px that scale with `min(1vw, 1.6vh)`; `AuthLayout`, `LoginPage`, `SignupPage` use its classes instead of fixed Tailwind sizes. Copy, Remember me, demo buttons, background and the no-Microsoft/no-Forgot-password choices unchanged.
+- Changed contracts: DESIGN_SYSTEM §3 auth typography note.
+- Next: none.
 ### 2026-11-16 04:45 · gemini · G9.3d glass sign-in and sign-up
 - Done:
   - Rebuilt `AuthLayout.tsx` as a split-screen layout over the full-bleed canvas (`data-canvas` + `data-canvas-overlay` outside `.grove-scroll` so the 24px scroll mask never fades the background edges; no `.floating-frame`), keeping PR #40's `data-reveal=""` and `revealDelay` hooks on both columns.
