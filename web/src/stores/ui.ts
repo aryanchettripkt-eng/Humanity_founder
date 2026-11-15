@@ -10,19 +10,19 @@ export type SeenClientCounts = {
 interface UiState {
   sidebarCollapsed: boolean;
   aiPanelOpen: boolean;
-  clientDeskCollapsed: boolean;
   theme: 'light' | 'dark';
   activeClientId: string | null;
   activeClientUserId: string | null;
   newThreadIds: string[];
   lastSeenCounts: Record<string, SeenClientCounts>;
   lastSeenActivityAt: string | null;
+  /** Inbox client's desk strip. null = not chosen yet (collapsed on phones, open elsewhere). */
+  clientDeskCollapsed: boolean | null;
+  setClientDeskCollapsed: (v: boolean) => void;
   toggleSidebar: () => void;
   setSidebarCollapsed: (v: boolean) => void;
   toggleAiPanel: () => void;
   setAiPanelOpen: (v: boolean) => void;
-  toggleClientDeskCollapsed: () => void;
-  setClientDeskCollapsed: (v: boolean) => void;
   toggleTheme: () => void;
   setActiveClientId: (id: string | null) => void;
   setActiveClientUserId: (id: string | null) => void;
@@ -37,20 +37,18 @@ export const useUiStore = create<UiState>()(
     (set) => ({
       sidebarCollapsed: false,
       aiPanelOpen: true,
-      clientDeskCollapsed: false,
       theme: 'light',
       activeClientId: null,
       activeClientUserId: null,
       newThreadIds: [],
       lastSeenCounts: {},
       lastSeenActivityAt: null,
+      clientDeskCollapsed: null,
+      setClientDeskCollapsed: (v) => set({ clientDeskCollapsed: v }),
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
       toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
       setAiPanelOpen: (v) => set({ aiPanelOpen: v }),
-      toggleClientDeskCollapsed: () =>
-        set((s) => ({ clientDeskCollapsed: !s.clientDeskCollapsed })),
-      setClientDeskCollapsed: (v) => set({ clientDeskCollapsed: v }),
       toggleTheme: () =>
         set((s) => ({
           theme: s.theme === 'light' ? 'dark' : 'light',
@@ -79,12 +77,12 @@ export const useUiStore = create<UiState>()(
       partialize: (s) => ({
         sidebarCollapsed: s.sidebarCollapsed,
         aiPanelOpen: s.aiPanelOpen,
-        clientDeskCollapsed: s.clientDeskCollapsed,
         theme: s.theme,
         activeClientId: s.activeClientId,
         activeClientUserId: s.activeClientUserId,
         lastSeenCounts: s.lastSeenCounts,
         lastSeenActivityAt: s.lastSeenActivityAt,
+        clientDeskCollapsed: s.clientDeskCollapsed,
       }),
     }
   )

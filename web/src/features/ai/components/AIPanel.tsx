@@ -2,6 +2,7 @@ import { AlertTriangle, CalendarPlus, History, RefreshCw, Sparkles, X } from 'lu
 import { useState } from 'react';
 import { ConfidenceMeter } from '@/components/common/ConfidenceMeter';
 import { OwnerPill } from '@/components/common/OwnerPill';
+import { useActiveClient } from '@/features/client-desk/useActiveClient';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatRelativeTime, formatUpcomingDate } from '@/lib/format';
@@ -12,7 +13,6 @@ import type { ThreadDetail } from '@/types/api';
 
 type AIPanelProps = {
   thread: ThreadDetail;
-  clientFirstName?: string;
   reclassifying?: boolean;
   onReclassify: () => void;
   onSuggestion: (action: 'apply' | 'dismiss') => void;
@@ -22,13 +22,13 @@ type AIPanelProps = {
 
 export function AIPanel({
   thread,
-  clientFirstName = 'Client',
   reclassifying = false,
   onReclassify,
   onSuggestion,
   onClose,
   className,
 }: AIPanelProps) {
+  const { firstName } = useActiveClient();
   const ownerMeta = OWNER_META[thread.owner] ?? OWNER_META.review;
   const suggestedMeta = thread.suggestedOwner ? OWNER_META[thread.suggestedOwner] : null;
 
@@ -163,13 +163,14 @@ export function AIPanel({
         ) : null}
       </section>
 
-      {/* Why {client} (shown to client) */}
+      {/* Why {client}: the reason the client sees in their queue */}
       {thread.owner === 'client' && thread.clientReason ? (
-        <section className="space-y-1.5">
+        <section className="space-y-2">
           <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[var(--fg-muted)]">
-            Why {clientFirstName}
+            Why {firstName}
           </h3>
           <p className="text-[15px] leading-relaxed text-[var(--fg)]">{thread.clientReason}</p>
+          <p className="text-xs text-[var(--fg-subtle)]">This is what {firstName} sees.</p>
         </section>
       ) : null}
 
@@ -265,14 +266,10 @@ export function AIPanel({
 /** Compact AI Insights summary shown above messages on mobile (<768px) with a bottom sheet. */
 export function MobileAISummary({
   thread,
-  clientFirstName = 'Client',
   reclassifying = false,
   onReclassify,
   onSuggestion,
-}: Pick<
-  AIPanelProps,
-  'thread' | 'clientFirstName' | 'reclassifying' | 'onReclassify' | 'onSuggestion'
->) {
+}: Pick<AIPanelProps, 'thread' | 'reclassifying' | 'onReclassify' | 'onSuggestion'>) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const ownerMeta = OWNER_META[thread.owner] ?? OWNER_META.review;
 
@@ -319,7 +316,6 @@ export function MobileAISummary({
           </DialogHeader>
           <AIPanel
             thread={thread}
-            clientFirstName={clientFirstName}
             reclassifying={reclassifying}
             onReclassify={onReclassify}
             onSuggestion={onSuggestion}

@@ -6,16 +6,22 @@ import { Thread } from '../models/Thread.js';
 import { emitCountsChanged, emitThreadUpdated } from '../realtime/socket.js';
 import { recordActivity } from '../services/activity.service.js';
 import { classifyThread } from '../services/classification.service.js';
-import { computeSegmentCounts, SEGMENT_IDS, segmentFilter } from '../services/segments.js';
+import {
+  computeSegmentCounts,
+  HANDOFF_STATES,
+  handoffFilter,
+  SEGMENT_IDS,
+  segmentFilter,
+} from '../services/segments.js';
 import { badRequest, notFound } from '../utils/errors.js';
 
 export const listThreadsSchema = {
   query: z.object({
     clientId: z.string().optional(),
     segment: z.enum(SEGMENT_IDS).optional().default('inbox'),
+    handoff: z.enum(HANDOFF_STATES).optional(),
     q: z.string().trim().optional(),
     filters: z.string().optional(),
-    handoff: z.enum(['client_handling', 'handed_to_assistant', 'handled']).optional(),
     account: z.string().optional(),
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(100).default(50),
@@ -62,18 +68,15 @@ export async function listThreads(req, res, next) {
       return res.json({ data: [], meta: { total: 0, page: 1, pageSize: req.query.pageSize } });
     }
 
-    const { segment, q, filters, handoff, account, page, pageSize } = req.query;
+    const { segment, handoff, q, filters, account, page, pageSize } = req.query;
     const query = {
       clientId: req.clientId,
       ...segmentFilter(segment),
+      ...handoffFilter(handoff),
     };
 
     if (account) {
       query.accountId = account;
-    }
-
-    if (handoff) {
-      query['handoff.state'] = handoff;
     }
 
     if (filters) {

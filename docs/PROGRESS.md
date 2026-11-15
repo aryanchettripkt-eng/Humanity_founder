@@ -40,16 +40,16 @@ _None yet._
 - Contract changes (additive): `TopNav.onToggleTheme` receives the click position; `GlassTabs` takes `viewTransitionScope` (page nav only).
 - Checked: lint, typecheck, tests. No page scroll at 1920, 1440, 1024, 820 and 390, light and dark, on Today, Inbox, a thread, Statistics, About and Settings. Nav fits at 1024, 1280 and 1366. No console errors. Recording and stills in project files `reviews/shots-motion/`.
 
-### 2026-11-16 03:51 · gemini · G9.3b client desk header in Inbox
-- Done:
-  - **1. Server `handoff` filter:** Added zod-validated `handoff` query param (`client_handling | handed_to_assistant | handled`) to `GET /api/threads` in `server/src/controllers/threads.controller.js`, updated `docs/BACKEND.md`, and added `server/tests/threads-handoff.test.js`.
-  - **2. `ClientDeskHeader` in Inbox:** Built `web/src/components/grove/ClientDeskHeader.tsx` above the 4 columns in `InboxPage.tsx` with client avatar + `"{Client}'s desk"`, 4 clickable stat chips (`Waiting on {client}`, `{Client}'s on it`, `Handed back to you`, `Handled by {client} · 7d`), latest `client_note` quote via `useActivity` (`qk.activity.list`), `"See what {client} sees"` link (`/c?preview=1`), and persisted collapse (`clientDeskCollapsed` in `relay-ui` store; collapsed by default on `<768px`). Invalidates `activity` alongside `threads` and `dashboard` on socket events in `AssistantLayout.tsx`.
-  - **3. Client's side on rows, reading pane, and AI insights:** Added handoff chips (`{Client}'s on it`, `Handed back` with `↩`, `Handled by {client}`) to `ThreadRow.tsx`, upgraded reading-pane handoff card with title, relative time, quoted note, and `"Open draft"` button in `InboxPage.tsx`, and added `"WHY {CLIENT}"` above `SUMMARY` in `AIPanel.tsx` when `owner === 'client'` and `clientReason` exists.
-- Verification:
-  - `npm run lint`, `npm run typecheck --workspace=web`, `npm test` (server 8 files / 38 tests, web 8 files / 33 tests) pass.
-  - Playwright no-scroll check passed (`scrollHeight === innerHeight` and `scrollWidth === innerWidth`) at `1920x1080`, `1440x900`, `1024x768`, `820x1180`, and `390x844` across `/app/inbox/inbox`, `/app/inbox/inbox/t1`, `/app/today`, `/app/settings/accounts`, and `/c?preview=1`.
-- Changed contracts: `GET /api/threads` now accepts optional `?handoff=client_handling|handed_to_assistant|handled` (`docs/BACKEND.md` §3.3).
-- Next: Review & merge PR for `gemini/G9.3b-inbox-client-header`.
+### 2026-11-16 04:15 · claude · G9.3b client's desk in the Inbox
+- Done (Aryan asked me to build it instead of handing it to Gemini): the client view's features now live in the Inbox.
+- **"{Client}'s desk" strip** above the Inbox columns: 4 chips (Waiting on {client}, {Client}'s on it, Handed back to you, Handled by {client} · 7d) that open the matching segment with `?handoff=` (clicking the active chip clears it), the latest client note (opens its thread), "See what {client} sees" (`/c?preview=1`) and a collapse toggle remembered in `relay-ui` (`clientDeskCollapsed`; collapsed by default under 768). One row from 1600px, two rows below that, short chip labels on phones. Hidden on phones while a thread is open.
+- **Rows:** handoff chip after the owner pill ({Client}'s on it / Handed back / Handled by {client}).
+- **Reading pane:** the old "Client status" line is now a glass card with the crown, "{Client} is handling this / handed this back to you / marked this handled", the time, the note, and "Open draft" when a draft was made from the note.
+- **AI insights:** "WHY {CLIENT}" (the `clientReason` the client sees) above Summary for client-owned threads.
+- **Server:** `GET /threads` takes `handoff` (zod enum), filtering on `handoff.state`; `handoffFilter` in `services/segments.js` + tests. BACKEND.md updated.
+- **Data:** waiting = `/threads/counts`.client; on it, handed back = `meta.total` of the filtered list; handled 7d = done + handled with `handoff.at` in the last 7 days; note = newest `client_note`/`client_handoff` with a note from `/activity`. The layout now also invalidates `activity` on `activity:new`.
+- Checked: lint, typecheck, tests (server 38, web 37). No page scroll at 1903, 1440, 1024 and 390, light and dark, expanded and collapsed. Screenshots in project files `reviews/shots-inbox-client-desk/`.
+- Open issue: at 900px tall with a draft open, the docked composer leaves little room for messages; the expanded desk makes that tighter. Collapsing the desk helps; the composer height is worth a look.
 
 ### 2026-11-16 04:30 · claude · G9.3c Statistics and About pages
 - Done (assigned by Aryan in chat): the Client view tab is gone. The top nav is now Today, Inbox, Statistics, About, Ask AI. The phone tab bar is Today, Inbox, Stats, About, Ask. The `/c` routes still work for client logins and `/c?preview=1` (G9.3b puts the preview link in the Inbox header).

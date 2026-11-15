@@ -11,10 +11,9 @@ export const qk = {
       segment?: string;
       q?: string;
       filters?: string;
-      handoff?: string;
       account?: string;
       clientId?: string;
-      pageSize?: number;
+      handoff?: string;
     }) => ['threads', 'list', params] as const,
     counts: (clientId?: string) => ['threads', 'counts', { clientId: clientId ?? null }] as const,
     detail: (id: string) => ['threads', 'detail', id] as const,

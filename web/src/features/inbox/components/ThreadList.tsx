@@ -11,7 +11,6 @@ import { ThreadRow } from './ThreadRow';
 
 type ThreadListProps = {
   segment: SegmentId;
-  clientFirstName?: string;
   threads: ThreadListItem[];
   isLoading: boolean;
   isError: boolean;
@@ -36,7 +35,6 @@ const FILTER_CHIPS = [
 
 export function ThreadList({
   segment,
-  clientFirstName = 'Client',
   threads,
   isLoading,
   isError,
@@ -155,7 +153,6 @@ export function ThreadList({
               >
               <ThreadRow
                 thread={t}
-                clientFirstName={clientFirstName}
                 selected={t.id === selectedId}
                 focused={idx === focusedIndex}
                 isNew={newThreadIds.includes(t.id)}

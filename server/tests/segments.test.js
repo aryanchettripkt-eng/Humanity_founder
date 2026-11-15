@@ -48,3 +48,18 @@ describe('segmentFilter', () => {
   });
 });
 
+
+describe('handoff filter (G9.3b)', () => {
+  it('filters by a known handoff state and ignores anything else', async () => {
+    const { handoffFilter, HANDOFF_STATES } = await import('../src/services/segments.js');
+    for (const s of HANDOFF_STATES) expect(handoffFilter(s)).toEqual({ 'handoff.state': s });
+    expect(handoffFilter(undefined)).toEqual({});
+    expect(handoffFilter('none')).toEqual({});
+  });
+
+  it('validates the handoff query param', async () => {
+    const { listThreadsSchema } = await import('../src/controllers/threads.controller.js');
+    expect(listThreadsSchema.query.parse({ handoff: 'client_handling' }).handoff).toBe('client_handling');
+    expect(listThreadsSchema.query.safeParse({ handoff: 'bogus' }).success).toBe(false);
+  });
+});
