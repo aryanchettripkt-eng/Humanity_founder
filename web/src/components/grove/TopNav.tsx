@@ -39,7 +39,8 @@ export type TopNavProps = {
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
   onOpenSearch?: () => void;
-  settingsHref?: string;
+  /** Pass null to hide the settings button (e.g. the client view). */
+  settingsHref?: string | null;
   showSendTestEmail?: boolean;
   onSendTestEmail?: () => void;
   onSignOut?: () => void;
@@ -91,23 +92,27 @@ export function TopNav({
           </span>
         </Link>
 
-        <GlassTabs
-          items={tabs}
-          activeId={activeTabId}
-          onChange={onTabChange}
-          className="hidden lg:inline-flex"
-        />
+        {tabs.length > 0 ? (
+          <GlassTabs
+            items={tabs}
+            activeId={activeTabId}
+            onChange={onTabChange}
+            className="hidden lg:inline-flex"
+          />
+        ) : null}
 
-        <button
-          type="button"
-          onClick={() => setMenuOpen(true)}
-          aria-label="Open navigation menu"
-          aria-expanded={menuOpen}
-          className="glass hidden min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)] md:inline-flex lg:hidden"
-        >
-          <Menu className="h-4 w-4" aria-hidden="true" />
-          <span>Menu</span>
-        </button>
+        {tabs.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open navigation menu"
+            aria-expanded={menuOpen}
+            className="glass hidden min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)] md:inline-flex lg:hidden"
+          >
+            <Menu className="h-4 w-4" aria-hidden="true" />
+            <span>Menu</span>
+          </button>
+        ) : null}
       </div>
 
       <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
@@ -211,13 +216,15 @@ export function TopNav({
             </button>
           ) : null}
 
-          <Link
-            to={settingsHref}
-            aria-label="Settings"
-            className="glass hidden h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] sm:flex"
-          >
-            <Settings className="h-4 w-4" />
-          </Link>
+          {settingsHref ? (
+            <Link
+              to={settingsHref}
+              aria-label="Settings"
+              className="glass hidden h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] sm:flex"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
+          ) : null}
 
           <Popover open={userOpen} onOpenChange={setUserOpen}>
             <PopoverTrigger asChild>
@@ -256,15 +263,17 @@ export function TopNav({
                   {theme === 'light' ? 'Dark mode' : 'Light mode'}
                 </button>
               ) : null}
-              <Link
-                to={settingsHref}
-                role="menuitem"
-                onClick={() => setUserOpen(false)}
-                className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface sm:hidden"
-              >
-                <Settings className="h-3.5 w-3.5" />
-                Settings
-              </Link>
+              {settingsHref ? (
+                <Link
+                  to={settingsHref}
+                  role="menuitem"
+                  onClick={() => setUserOpen(false)}
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface sm:hidden"
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                  Settings
+                </Link>
+              ) : null}
               {showSendTestEmail && onSendTestEmail ? (
                 <button
                   type="button"
