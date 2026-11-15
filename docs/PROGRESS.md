@@ -28,6 +28,11 @@ _None yet._
 
 ---
 
+### 2026-11-16 04:58 · gemini · About page generic copy and one-word steps
+- Done: Updated `web/src/pages/AboutPage.tsx` to use generic `"your client"` copy (removed `useMe`, `useUiStore`, `getOwnerShortLabel`, and `OwnerPill` `label` override) and replaced the four "How it works" steps with `Read`, `Sort`, `Reply`, `Hand off`.
+- Changed contracts: none.
+- Verification: `npm run lint`, `npm run typecheck --workspace=web`, `npm test --workspace=web`.
+
 ### 2026-11-16 04:45 · gemini · G9.3d glass sign-in and sign-up
 - Done:
   - Rebuilt `AuthLayout.tsx` as a split-screen layout over the full-bleed canvas (`data-canvas` + `data-canvas-overlay` outside `.grove-scroll` so the 24px scroll mask never fades the background edges; no `.floating-frame`), keeping PR #40's `data-reveal=""` and `revealDelay` hooks on both columns.
