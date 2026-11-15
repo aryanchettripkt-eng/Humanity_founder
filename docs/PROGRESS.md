@@ -27,6 +27,12 @@ _None yet._
 
 ---
 
+### 2026-11-15 18:35 · claude · Workspace UX spec (docs)
+- Done: wrote `docs/WORKSPACE_UX.md`, a screen-by-screen layout mapping the reference to Relay features, approved by Aryan (D14 nav rail + chips, D15 Priya phone preview in the floating panel, D16 Urbanist display font, D17 build-once shared components). Linked from DESIGN_SYSTEM §6/§11, reuse rule added to AGENTS §7, Phase 8 tasks W8.1–W8.4 added.
+- Audits behind it: `reviews/2026-11-15-site-audit.md` (project files).
+- Changed contracts: design only. No API changes; the brief prompt must format dates in the client's timezone (live brief still prints UTC).
+- Next: Gemini W8.1.
+
 ### 2026-11-15 18:14 · gemini · R1 lime workspace tokens, shell and Today
 - Done:
   - Updated `:root` and `.dark` tokens in `web/src/styles/globals.css`, `web/tailwind.config.ts`, `docs/DESIGN_SYSTEM.md`, and `docs/DECISIONS.md` (D13): zinc-200 / zinc-950 canvas, white / zinc-900 cards, ink / lime primary, sky `assistant` owner color (`web/src/lib/owners.ts`), and removed `.theme-landing`.

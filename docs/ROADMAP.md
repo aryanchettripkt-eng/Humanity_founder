@@ -81,6 +81,12 @@
 ## Phase 7 — Landing page
 - [x] **L7.1** Public landing page — @gemini (gemini/L7.1-landing-page)
 
+## Phase 8 — Workspace layout (spec: `docs/WORKSPACE_UX.md`, D14–D17)
+- [ ] **W8.1** Shared workspace components (§8) + frame (AppTopBar, NavRail, MobileTabBar, client switcher, 🔔, avatar menu) + Today (§2), Urbanist font, brief prompt formats times in client timezone — @gemini
+- [ ] **W8.2** Inbox (§3): ChipRow segments, rounded list, thread card, AI panel on `FocusPanel`, composer sheet — @gemini
+- [ ] **W8.3** Client view (§4), landing on `WorkspaceGrid` + `/welcome` (§5), auth/onboarding/settings/404 (§6) — @gemini
+- [ ] **W8.4** Review each W8 PR against WORKSPACE_UX + reference at 1440/820/390/320, light + dark — @claude
+
 ## Backlog (P2, do not start without Aryan's OK)
 - [ ] Keyboard help overlay (`?`)
 - [ ] Mobile swipe actions
