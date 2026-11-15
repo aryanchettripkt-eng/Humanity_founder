@@ -17,8 +17,8 @@ export function MessageItem({ message, defaultCollapsed = false }: MessageItemPr
   return (
     <div
       className={cn(
-        'rounded-xl border border-border bg-card p-4 transition-colors',
-        isOutbound && 'border-l-4 border-l-primary'
+        'glass-card rounded-[20px] px-6 py-5 transition-colors',
+        isOutbound && 'border-l-4 border-l-[var(--grove-lime)]'
       )}
     >
       <div
@@ -33,24 +33,26 @@ export function MessageItem({ message, defaultCollapsed = false }: MessageItemPr
         }}
         className="flex cursor-pointer items-center justify-between gap-3"
       >
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface text-xs font-semibold text-foreground border border-border">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--pane-border)] bg-[var(--pane-bg)] text-xs font-semibold text-[var(--fg)]">
             {getInitials(senderName)}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="truncate text-sm font-medium text-foreground">{senderName}</span>
-              {isOutbound && (
-                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+              <span className="truncate text-[17px] font-semibold text-[var(--fg)]">
+                {senderName}
+              </span>
+              {isOutbound ? (
+                <span className="rounded-full bg-[var(--chip-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--chip-fg)]">
                   Sent
                 </span>
-              )}
+              ) : null}
             </div>
-            <p className="truncate text-xs text-muted-foreground">{message.from?.email}</p>
+            <p className="truncate text-[13px] text-[var(--fg-muted)]">{message.from?.email}</p>
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex shrink-0 items-center gap-2 text-xs text-[var(--fg-subtle)]">
           <span title={formatFullDateTime(message.sentAt)}>
             {formatRelativeTime(message.sentAt)}
           </span>
@@ -58,12 +60,11 @@ export function MessageItem({ message, defaultCollapsed = false }: MessageItemPr
         </div>
       </div>
 
-      {!collapsed && (
-        <div className="mt-3 max-w-[72ch] whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+      {!collapsed ? (
+        <div className="mt-4 max-w-[72ch] whitespace-pre-wrap text-[16px] leading-[1.6] text-[var(--fg)]">
           {message.bodyText}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
-

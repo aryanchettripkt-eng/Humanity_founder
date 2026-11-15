@@ -83,10 +83,10 @@ export function TopNav({
           to={logoHref}
           className="inline-flex min-h-[44px] shrink-0 items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--logo-bg)] text-[var(--logo-fg)] shadow-sm">
-            <MailCheck className="h-4 w-4" aria-hidden="true" />
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--logo-bg)] text-[var(--logo-fg)] shadow-sm">
+            <MailCheck className="h-5 w-5" aria-hidden="true" />
           </span>
-          <span className="font-display text-base font-semibold tracking-tight text-[var(--hero-fg)]">
+          <span className="font-display text-[20px] font-semibold tracking-tight text-[var(--fg)]">
             Relay
           </span>
         </Link>
@@ -111,9 +111,9 @@ export function TopNav({
       </div>
 
       <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-        <DialogContent className="max-w-xs border-[var(--panel-border)] bg-[var(--panel-bg)] text-foreground">
+        <DialogContent className="max-w-xs border-[var(--frame-border)] bg-[var(--frame-glass-bg)] text-[var(--fg)] backdrop-blur-2xl">
           <DialogHeader>
-            <DialogTitle className="font-display text-base font-semibold text-foreground">
+            <DialogTitle className="font-display text-base font-semibold text-[var(--fg)]">
               Navigation
             </DialogTitle>
           </DialogHeader>
