@@ -52,6 +52,7 @@ Category icons (muted, no color): meeting `CalendarDays`, action `CircleAlert`, 
 Removed in R1: the public landing page and the signed-in app now share the same `:root` and `.dark` tokens in §2.1.
 
 ## 3. Typography
+- Display font (D16): **Urbanist** via `@fontsource-variable/urbanist` for page titles, section titles, stat numbers and card names; body stays Inter.
 - Font: **Inter** (variable, `font-feature-settings: "cv11","ss01"`), fallback system‑ui. Mono: JetBrains Mono for keyboard hints only.
 - Scale (px / line-height / weight):
 
@@ -79,6 +80,8 @@ Removed in R1: the public landing page and the signed-in app now share the same 
 - Respect `prefers-reduced-motion`: disable transforms, keep opacity fades ≤ 100ms.
 
 ## 6. Components (build in `web/src/components`)
+
+> **Reuse rule (D17):** every screen, including the landing page, is assembled from the shared workspace components listed in [WORKSPACE_UX.md §8](./WORKSPACE_UX.md). Components take view models; pages only map data. If a screen needs a variation, add a prop to the shared component instead of copying it.
 
 Each component must support the listed states. "✓" = required.
 
@@ -168,3 +171,6 @@ shadcn primitives to install: button, input, textarea, badge, card, dialog, shee
 - [ ] Global states: loading, empty, error, offline, toast
 - [ ] Dark mode pass (P1)
 - [ ] Landing: public `/` workspace showcase (320 / 390 / 820 / 1440)
+
+## 11. Workspace layout (D14–D17)
+The layout of every assistant screen, the client view and the landing page follows **[WORKSPACE_UX.md](./WORKSPACE_UX.md)**: an icon rail, the top bar with the schedule `PillBar`, the uppercase workspace header, person and task cards, and the dark floating `FocusPanel` with Priya's live phone preview. It wins over older layout notes in §4 and §8 where they disagree (sidebar 240px → `NavRail` 64px; segments → `ChipRow` in Inbox).
