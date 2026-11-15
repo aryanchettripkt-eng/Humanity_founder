@@ -120,7 +120,10 @@ export function AboutPage() {
               <ul className="space-y-3">
                 {OWNER_ORDER.map((o) => (
                   <li key={o} className="flex items-start gap-3">
-                    <OwnerPill owner={o} className="shrink-0" />
+                    <OwnerPill
+                      owner={o}
+                      className="shrink-0"
+                    />
                     <span className="pt-0.5 text-[15px] text-[var(--fg-muted)]">
                       {ownerText[o]}
                     </span>
