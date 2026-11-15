@@ -13,9 +13,7 @@ import { Link } from 'react-router-dom';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
 import { HeroBand } from '@/components/grove/HeroBand';
 import { OwnerPill } from '@/components/common/OwnerPill';
-import { useMe } from '@/features/auth/api';
-import { getOwnerShortLabel, OWNER_ORDER } from '@/lib/owners';
-import { useUiStore } from '@/stores/ui';
+import { OWNER_ORDER } from '@/lib/owners';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -41,15 +39,9 @@ const SHORTCUTS: { keys: string[]; label: string }[] = [
 
 /** About (/app/about): what Relay is, how it works, and what is and isn't live yet. */
 export function AboutPage() {
-  const { data: me } = useMe();
-  const activeClientId = useUiStore((s) => s.activeClientId) || undefined;
-  const activeClient = me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
-  const client = activeClient?.name.split(' ')[0] || 'your client';
-  const Client = `${client[0].toUpperCase()}${client.slice(1)}`;
-
   const ownerText: Record<(typeof OWNER_ORDER)[number], string> = {
     assistant: 'Routine emails you can answer yourself, like scheduling, vendors and confirmations.',
-    client: `Needs ${client}’s own decision, approval or personal reply.`,
+    client: 'Needs your client’s own decision, approval or personal reply.',
     none: 'Nothing to reply to: newsletters, receipts, updates, or threads that are already settled.',
     review: 'The AI wasn’t sure. Take a quick look and pick who should reply.',
   };
@@ -57,23 +49,23 @@ export function AboutPage() {
   const steps: { icon: typeof Mail; title: string; body: string }[] = [
     {
       icon: Mail,
-      title: 'Relay reads the inbox',
-      body: `Connect ${client}’s email. Relay reads each new message. It never sends, deletes or moves anything in Gmail.`,
+      title: 'Read',
+      body: 'Relay reads every new email in your client’s inbox. It never sends, deletes or moves anything.',
     },
     {
       icon: Sparkles,
-      title: 'AI decides who should reply',
-      body: `Each email is marked For you, For ${client}, or No reply, with a one-line reason why. If the AI isn’t sure, it goes to Needs your call and you decide.`,
+      title: 'Sort',
+      body: 'AI marks who should reply, you or your client, and says why. If it isn’t sure, it asks you.',
     },
     {
       icon: UserRoundCheck,
-      title: 'You reply to yours',
-      body: 'Open an email, let AI write a draft, edit it and save it. If the AI picked wrong, change it, and Relay can remember that sender or domain next time.',
+      title: 'Reply',
+      body: 'You get an AI draft for yours. Edit it and save it.',
     },
     {
       icon: Crown,
-      title: `${Client} sees only theirs`,
-      body: `${Client} gets a short list of just the emails that need them. They can say they’ll handle it, mark it handled, hand it back to you, or leave you a note.`,
+      title: 'Hand off',
+      body: 'Your client gets a short list of only what needs them, and can take it, hand it back or leave you a note.',
     },
   ];
 
@@ -91,7 +83,7 @@ export function AboutPage() {
               About Relay
             </h1>
             <p className="max-w-[60ch] text-base text-[var(--fg-muted)] md:text-lg">
-              Relay reads {client}’s email and answers one question for each message: who needs to reply? You, {client}, or nobody.
+              Relay reads your client’s email and answers one question for each message: who needs to reply? You, your client, or nobody.
             </p>
           </div>
         }
@@ -130,7 +122,6 @@ export function AboutPage() {
                   <li key={o} className="flex items-start gap-3">
                     <OwnerPill
                       owner={o}
-                      label={activeClient ? getOwnerShortLabel(o, client) : undefined}
                       className="shrink-0"
                     />
                     <span className="pt-0.5 text-[15px] text-[var(--fg-muted)]">
@@ -177,8 +168,8 @@ export function AboutPage() {
                 },
                 {
                   icon: Crown,
-                  title: `${Client} isn’t notified`,
-                  body: `Emails wait in ${client}’s list until they open Relay.`,
+                  title: 'Your client isn’t notified',
+                  body: 'Emails wait in your client’s list until they open Relay.',
                 },
                 {
                   icon: CalendarPlus,
@@ -188,7 +179,7 @@ export function AboutPage() {
                 {
                   icon: MessageSquareQuote,
                   title: 'Notes turn into drafts',
-                  body: `When ${client} leaves a note on an email, you can turn it into a reply draft.`,
+                  body: 'When your client leaves a note on an email, you can turn it into a reply draft.',
                 },
               ].map((f) => (
                 <li key={f.title} className="flex items-start gap-3">
