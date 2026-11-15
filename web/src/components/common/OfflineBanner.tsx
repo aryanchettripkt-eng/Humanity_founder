@@ -8,10 +8,11 @@ export function OfflineBanner() {
   return (
     <div
       role="status"
-      className="flex items-center justify-center gap-2 border-b border-warning/30 bg-warning/10 px-3 py-1.5 text-xs font-medium text-warning"
+      style={{ backgroundColor: 'var(--toast-bg)', color: 'var(--toast-fg)' }}
+      className="fixed bottom-[calc(env(safe-area-inset-bottom)+88px)] left-1/2 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-[var(--glass-border)] px-4 py-2 text-xs font-medium shadow-lg backdrop-blur-md md:bottom-6"
     >
-      <WifiOff className="h-3.5 w-3.5" />
-      <span>Realtime connection paused — reconnecting automatically…</span>
+      <WifiOff className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      <span>You&apos;re offline. Changes will sync when you&apos;re back.</span>
     </div>
   );
 }

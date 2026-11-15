@@ -73,9 +73,11 @@ export function ThreadCard({
             label: 'Owner',
             value: item.ownerLabel,
             toneClass: OWNER_TEXT_CLASS[item.owner],
+            allowWrap: true,
           },
           {
-            label: 'Confidence',
+            label: 'CONF.',
+            labelTitle: 'Confidence',
             value: `${item.confidence}%`,
           },
           {

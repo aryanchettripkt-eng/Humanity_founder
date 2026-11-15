@@ -27,10 +27,35 @@ _None yet._
 
 ---
 
+### 2026-11-16 00:00 · gemini · G9.1c-fixes review fixes
+- Done: Fixed all 8 items from the G9.1c review on `gemini/G9.1c-fixes`:
+  1. Hero contrast: added `--hero-scrim` (`<768px` full-width gradient scrim in `HeroBand`) and `--hero-text-shadow` (greeting `h1`) tokens in `:root` and `.dark`; wrapped `TodayPage` brief line in a `.glass`-token pill (`rounded-full px-4 py-2`).
+  2. StatBox truncation: changed `StatBox` grid to `grid-cols-[1.1fr_0.9fr_1.1fr]`, shortened `Confidence` label to `CONF.` (`title="Confidence"` + `aria-label="Confidence"`), allowed 2-line wrapping on `Owner`, and set `.working-panel` padding to `32px` below `1600px` and `40px` at `1600px+`.
+  3. Nav single-row (`768–1023`): set `TopNav` header `flex-nowrap`, hid client name text below `lg`, and added a glass `"Menu"` pill + `Dialog` sheet for `md..lg` (`768–1023`).
+  4. Filters single-row (`<1024`): hid secondary filter dropdowns below `lg` (`hidden lg:block`), keeping only `Owner` + `"All filters"` circle button visible in one row.
+  5. Offline banner: replaced the amber strip in `OfflineBanner` with a fixed top-center `.glass` toast pill (`top-4 md:top-20`, `role="status"`, `"You're offline. Changes will sync when you're back."`).
+  6. Mobile background: removed `bg-fixed` from `AppFrame` and rendered the background and overlay as dedicated `fixed inset-0 -z-10` layers.
+  7. Recently sorted on phones: moved `OwnerPill` under the subject line below `640px` (`sm:hidden` / `hidden sm:inline-flex`) in `ThreadListRow`.
+  8. Chart bars: tightened `StackedBars` spacing (`p-3.5`, `gap-1`) and expanded SVG height (`h-40`, `maxH = 112`) so bars fill ~70% of the card height.
+  - Restored the `2026-11-15 23:30` UX subtraction PROGRESS entry with a revert note for `8f7d12b`.
+  - Round 2 fixes: made `TopNav` Menu sheet solid (`--panel-bg` / `--cta-bg`), added `--toast-bg` / `--toast-fg` and moved `OfflineBanner` to bottom-center (`bottom-[calc(env(safe-area-inset-bottom)+88px)] md:bottom-6`), extended hero scrim to `<1024px` (`lg:hidden`), added `--hero-pill-bg` (`rgba(0,0,0,0.38)`) with `rounded-2xl sm:rounded-full` and inline `more` for the brief pill, fixed `ThreadListRow` time `min-w-16 whitespace-nowrap`, aligned `StatBox` values with `min-h-[2lh]`, and rendered `CONF.` with `<abbr title="Confidence">`.
+- Changed contracts: none.
+- Next: Open PR for `gemini/G9.1c-fixes` and wait for Aryan's merge before starting `G9.2`.
+
 ### 2026-11-16 00:30 · claude · G9.1c review + docs to match the build
 - Reviewed G9.1c on main @ bab156a: composition correct, Today matches target, lint/typecheck/tests green. 8 fixes listed in ROADMAP G9.1c-fixes (hero contrast, StatBox truncation, nav/filter wrap <1024, offline toast, iOS background, phone rows, chart height).
 - DESIGN_V2 §1.0 rewritten for what was built; D22 supersedes D21. ROADMAP G9.2/G9.3 specs expanded.
 - Process: 8f7d12b and bab156a were pushed to main directly and #25 to #28 merged unreviewed; 8f7d12b reverted the UX subtraction work and removed its PROGRESS entry. Please use PRs.
+
+### 2026-11-15 23:30 · gemini · G9.1c UX subtraction and label polish
+- Done: Applied targeted UX subtractions & label swaps on `gemini/G9.1c-themes`:
+  - `ThreadCard`: replaced the 3-column `StatBox` (`OWNER`, `CONFIDENCE`, `NEXT DATE`) with a 1-line truncated email subject, removed the green CTA button, made the whole card clickable with top-right `↗`, and moved `OwnerPill` (`size="sm"`) next to `DeltaChip` in the footer.
+  - Renamed `"For you"` → `"Assistant queue"` and `"For {client}"` → `"{client}'s desk"` in `owners.ts`, `mappers.ts`, `TodayPage.tsx`, and `StackedBars` legend.
+  - Removed the duplicate far-right user avatar circle from `TopNav` and merged user info, theme toggle, Send test email, and Sign out into the client switcher menu.
+  - Added a subtle dashed horizontal reference line at the top of `StackedBars` with the `maxTotal` scale label on the left.
+  - Updated `mappers.test.ts` and `TodayPage.test.tsx`.
+- Changed contracts: none.
+- Reverted: This UX subtraction work was reverted in `8f7d12b` (merged to `main` in `bab156a`) at Aryan's request after local issues, restoring the `StatBox` + CTA pill `ThreadCard` and separate user menu.
 
 ### 2026-11-15 23:12 · gemini · G9.1c glass hero over full-bleed background
 - Done: Updated `gemini/G9.1c-themes` to match the full-bleed background + smoky glass hero + floating working panel composition:
