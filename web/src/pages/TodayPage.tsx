@@ -211,26 +211,19 @@ export function TodayPage() {
     }
 
     if (card.owner === 'client') {
-      if (thread?.handoff?.state === 'client_handling') {
-        patchThread.mutate(
-          {
-            id: card.id,
-            patch: { unread: true },
-            undoPatch: { unread: Boolean(thread?.unread) },
-            label: `Reminder sent to ${clientFirstName}`,
-          },
-          { onSettled: () => setPendingCardId(null) }
-        );
-      } else {
+      if (!thread?.important && thread?.handoff?.state !== 'client_handling') {
         patchThread.mutate(
           {
             id: card.id,
             patch: { important: true },
-            undoPatch: { important: Boolean(thread?.important) },
-            label: `Sent to ${clientFirstName}`,
+            undoPatch: { important: false },
+            label: `Moved to the top of ${clientFirstName}'s queue`,
           },
           { onSettled: () => setPendingCardId(null) }
         );
+      } else {
+        setPendingCardId(null);
+        navigate('/c?preview=1');
       }
       return;
     }
@@ -419,7 +412,7 @@ export function TodayPage() {
           </div>
         }
         right={
-          isLoading ? (
+          isLoading || isError || !data ? (
             <div className="grid grid-cols-1 gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <Skeleton className="h-28 rounded-[20px] bg-white/15" />

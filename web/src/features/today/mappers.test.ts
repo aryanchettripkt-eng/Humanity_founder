@@ -102,7 +102,7 @@ describe('today grove mappers', () => {
     );
     expect(filtered).toHaveLength(1);
     expect(filtered[0].domain).toBe('northstar.io');
-    expect(filtered[0].ctaLabel).toBe('Send to Priya');
+    expect(filtered[0].ctaLabel).toBe("Open in Priya's view");
 
     const recent = buildGroveRecentRows(threads);
     expect(recent).toHaveLength(2);
@@ -132,17 +132,30 @@ describe('today grove mappers', () => {
     expect(collapsed[0].count).toBe(2);
   });
 
-  it('computes all 4 CTA labels from owner and handoff state', () => {
+  it('computes all CTA labels from owner, importance, and handoff state', () => {
     expect(ctaLabelForThread(makeThread({ owner: 'assistant' }), 'Priya')).toBe('Draft reply');
     expect(
-      ctaLabelForThread(makeThread({ owner: 'client', handoff: { state: 'none' } }), 'Priya')
-    ).toBe('Send to Priya');
-    expect(
       ctaLabelForThread(
-        makeThread({ owner: 'client', handoff: { state: 'client_handling' } }),
+        makeThread({ owner: 'client', important: false, handoff: { state: 'none' } }),
         'Priya'
       )
-    ).toBe('Nudge Priya');
+    ).toBe('Move up for Priya');
+    expect(
+      ctaLabelForThread(
+        makeThread({ owner: 'client', important: true, handoff: { state: 'none' } }),
+        'Priya'
+      )
+    ).toBe("Open in Priya's view");
+    expect(
+      ctaLabelForThread(
+        makeThread({
+          owner: 'client',
+          important: false,
+          handoff: { state: 'client_handling' },
+        }),
+        'Priya'
+      )
+    ).toBe("Open in Priya's view");
     expect(ctaLabelForThread(makeThread({ owner: 'review' }), 'Priya')).toBe('Confirm');
   });
 

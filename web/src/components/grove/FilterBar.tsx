@@ -44,8 +44,11 @@ export function FilterBar({
   return (
     <div className={cn('flex flex-wrap items-center justify-between gap-3', className)}>
       <div className="no-scrollbar flex min-w-0 flex-1 flex-nowrap items-center gap-2 overflow-x-auto py-0.5 sm:flex-wrap sm:overflow-visible">
-        {filters.map((filter) => (
-          <div key={filter.id} className="relative shrink-0">
+        {filters.map((filter, idx) => (
+          <div
+            key={filter.id}
+            className={cn('relative shrink-0', idx === 0 ? 'order-1' : 'order-3 sm:order-none')}
+          >
             <select
               aria-label={filter.label}
               value={filter.value}
@@ -69,7 +72,7 @@ export function FilterBar({
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label="All filters"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-ink-foreground transition-opacity hover:opacity-90"
+          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink text-ink-foreground transition-opacity hover:opacity-90 sm:order-last"
         >
           <SlidersHorizontal className="h-4 w-4" />
         </button>

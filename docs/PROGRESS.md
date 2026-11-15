@@ -27,6 +27,14 @@ _None yet._
 
 ---
 
+### 2026-11-15 19:54 · gemini · G9.1 PR #21 re-review blocker fix
+- Done: Fixed remaining D20 truthfulness blocker on client-owned Today card CTAs:
+  - `ctaLabelForThread` + `TodayPage.handlePrimaryAction` now use `"Move up for {client}"` (sets `important: true`, toast `"Moved to the top of {client}'s queue"` with Undo) when `!important && handoff?.state !== 'client_handling'`, and `"Open in {client}'s view"` (navigates to `/c?preview=1`) otherwise. Removed fake `"Sent to {client}"` / `"Reminder sent to {client}"` toasts and `unread: true` patch.
+  - Pinned `"All filters"` circle button next to `Owner` on phones in `FilterBar`, and showed `Skeleton` in `HeroBand` right column during `isError` instead of empty `"No upcoming dates extracted."`.
+  - Updated `mappers.test.ts` and `TodayPage.test.tsx`.
+- Changed contracts: none.
+- Next: Push to `gemini/G9.1-grove-foundation` for PR #21 merge.
+
 ### 2026-11-15 19:50 · gemini · G9.1 PR #21 review fixes
 - Done: Addressed all Blockers (1–5) and Should-fix/Nits (6–14) from PR #21 review:
   - Wired real Today card CTAs (`useCreateDraft`, `usePatchThread`, `useChangeOwner`) with pending state and Undo/toast feedback.

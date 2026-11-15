@@ -213,7 +213,10 @@ function formatCompactCardDate(iso: string, timeZone?: string): string {
 export function ctaLabelForThread(t: ThreadListItem, clientFirstName: string): string {
   if (t.owner === 'assistant') return 'Draft reply';
   if (t.owner === 'client') {
-    return t.handoff?.state === 'client_handling' ? `Nudge ${clientFirstName}` : `Send to ${clientFirstName}`;
+    if (!t.important && t.handoff?.state !== 'client_handling') {
+      return `Move up for ${clientFirstName}`;
+    }
+    return `Open in ${clientFirstName}'s view`;
   }
   if (t.owner === 'review') return 'Confirm';
   return 'Open';

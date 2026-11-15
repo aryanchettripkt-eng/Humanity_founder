@@ -89,6 +89,34 @@ const mockDashboardState = {
         lastMessageAt: new Date().toISOString(),
         messageCount: 2,
       },
+      {
+        id: 'rec-2',
+        clientId: 'c1',
+        accountId: 'a1',
+        subject: 'Vendor invoice',
+        snippet: 'Needs approval.',
+        participants: [{ name: 'Nadia Patel', email: 'nadia@acme.com' }],
+        owner: 'client',
+        ownerSource: 'ai',
+        confidence: 0.88,
+        reason: 'Client approval required',
+        category: 'finance',
+        actionRequired: true,
+        waitingOnOthers: false,
+        summary: 'Invoice approval.',
+        keyPoints: [],
+        entities: [],
+        aiStatus: 'done',
+        history: [],
+        handoff: { state: 'none' },
+        status: 'open',
+        important: false,
+        unread: true,
+        archived: false,
+        lastSender: 'them',
+        lastMessageAt: new Date().toISOString(),
+        messageCount: 1,
+      },
     ],
     nudges: [],
     upcoming: [],
@@ -148,8 +176,16 @@ describe('TodayPage', () => {
 
   it('triggers real CTA mutations when clicking card action buttons', () => {
     renderToday();
-    fireEvent.click(screen.getByRole('button', { name: 'Send to Priya' }));
-    expect(mockPatchThread).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Move up for Priya' }));
+    expect(mockPatchThread).toHaveBeenCalledWith(
+      {
+        id: 'rec-2',
+        patch: { important: true },
+        undoPatch: { important: false },
+        label: "Moved to the top of Priya's queue",
+      },
+      expect.any(Object)
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     expect(mockChangeOwner).toHaveBeenCalledTimes(1);
