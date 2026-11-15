@@ -164,8 +164,8 @@ describe('TodayPage', () => {
   it('renders Grove hero, stats, weekly chart, and filters ThreadCards', () => {
     renderToday();
     expect(screen.getAllByText('This week').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('For you').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('For Priya').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Assistant queue').length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Priya's desk").length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: 'Needs your call' })).toBeInTheDocument();
     expect(screen.getByText('Recently sorted')).toBeInTheDocument();
 
@@ -174,21 +174,12 @@ describe('TodayPage', () => {
     expect(screen.getAllByText('James Chen').length).toBeGreaterThan(0);
   });
 
-  it('triggers real CTA mutations when clicking card action buttons', () => {
+  it('renders subject line and owner pill on clickable ThreadCards without CTA buttons', () => {
     renderToday();
-    fireEvent.click(screen.getByRole('button', { name: 'Move up for Priya' }));
-    expect(mockPatchThread).toHaveBeenCalledWith(
-      {
-        id: 'rec-2',
-        patch: { important: true },
-        undoPatch: { important: false },
-        label: "Moved to the top of Priya's queue",
-      },
-      expect.any(Object)
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-    expect(mockChangeOwner).toHaveBeenCalledTimes(1);
+    expect(screen.getAllByText('Q3 Board Deck').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: 'Move up for Priya' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Confirm' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open James Chen' })).toBeInTheDocument();
   });
 
   it('keeps HeroBand and navigation visible in error state', () => {

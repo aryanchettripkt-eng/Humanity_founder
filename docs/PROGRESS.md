@@ -27,6 +27,16 @@ _None yet._
 
 ---
 
+### 2026-11-15 23:30 · gemini · G9.1c UX subtraction and label polish
+- Done: Applied targeted UX subtractions & label swaps on `gemini/G9.1c-themes`:
+  - `ThreadCard`: replaced the 3-column `StatBox` (`OWNER`, `CONFIDENCE`, `NEXT DATE`) with a 1-line truncated email subject, removed the green CTA button, made the whole card clickable with top-right `↗`, and moved `OwnerPill` (`size="sm"`) next to `DeltaChip` in the footer.
+  - Renamed `"For you"` → `"Assistant queue"` and `"For {client}"` → `"{client}'s desk"` in `owners.ts`, `mappers.ts`, `TodayPage.tsx`, and `StackedBars` legend.
+  - Removed the duplicate far-right user avatar circle from `TopNav` and merged user info, theme toggle, Send test email, and Sign out into the client switcher menu.
+  - Added a subtle dashed horizontal reference line at the top of `StackedBars` with the `maxTotal` scale label on the left.
+  - Updated `mappers.test.ts` and `TodayPage.test.tsx`.
+- Changed contracts: none.
+- Next: Push to `gemini/G9.1c-themes` to update PR #25.
+
 ### 2026-11-15 23:12 · gemini · G9.1c glass hero over full-bleed background
 - Done: Updated `gemini/G9.1c-themes` to match the full-bleed background + smoky glass hero + floating working panel composition:
   - Placed `web/public/bg/app-bg.webp` (`cover`, `center`, `fixed`, `#1A1B19` fallback, `20%` dark overlay in `.dark` via `--canvas-overlay`).
