@@ -43,7 +43,8 @@ web/
     components/
       ui/                    # shadcn generated — do not hand-edit except via shadcn CLI
       common/                # OwnerPill, EmptyState, ErrorState, KbdHint, NotchedCard, PillBar, ChipRow, ...
-      workspace/             # AppTopBar, NavRail, MobileTabBar, WorkspaceHeader, WorkspaceGrid, PersonCard, TaskCard, FocusPanel, Avatar, models.ts
+      grove/                 # AppFrame, HeroBand, TopNav, BottomTabBar, GlassCard, GlassTabs, GlassStat, GlassList, StackedBars, FilterBar, ThreadCard, ThreadListRow, StatBox, Sparkline, DeltaChip, Avatar, AvatarTile, models.ts
+      workspace/             # Transitional for LandingPage until G9.1b (NavRail & MobileTabBar deleted in G9.1)
     lib/
       api.ts                 # fetch wrapper, auth header, error normalisation
       socket.ts              # singleton socket + useSocketEvent hook
@@ -119,7 +120,7 @@ Route guards: `RequireAuth role="assistant"|"client"`. Assistant without any con
 
 ## 7. Screen composition (what each page uses)
 - **LandingPage**: `AppTopBar` · `WorkspaceHeader` · `WorkspaceGrid` (`PersonCard`, `TaskCard`, `FocusPanel` mapped from `sampleData.ts`) · `HowItWorks` · `FeatureStrip` · `LandingFooter`.
-- **TodayPage**: `AppTopBar` + `NavRail` + `MobileTabBar` (in `AssistantLayout`) · `WorkspaceHeader` (greeting, `CLIENT'S INBOX`, Ask AI `⌘K`, 3 `StatWithBadge`s w/ `lastSeenCounts` deltas, 1-line brief + `more ▾`) · `WorkspaceGrid` (`PersonCard` w/ 1/2/3 quick-assign on `review`, `TaskCard` w/ status menu, sticky `FocusPanel`) · recent `ThreadRow×5`.
+- **TodayPage**: `AppFrame` + `BottomTabBar` (in `AssistantLayout`) · `HeroBand` (`AssistantTopNav`, greeting + date chip + 1-line brief w/ `more`, `StackedBars` "This week", `GlassStat×2` For you / For Priya, `GlassList` "Needs your call" / "Next up") · `FilterBar` (URL-synced + all-filters sheet + pager) · `ThreadCard×4` · `ThreadListRow×5` ("Recently sorted").
 - **InboxPage**: `SegmentNav` (in layout) · `ThreadList` (+ search/filter bar) · `ThreadView` (`ThreadHeader`, `MessageItem[]`, `DraftComposer`) · `AIPanel`.
 - **ClientHomePage**: greeting, count, `ClientCard[]` with AnimatePresence, all‑caught‑up `EmptyState`.
 - **OnboardingPage**: `Stepper`, `ConnectProviderCard×2`, `SimulatedOAuthModal`, `SyncProgress` (driven by `sync:progress` socket events). Gmail card has two actions: primary **Use demo inbox** (simulated) and secondary **Connect real Gmail (beta)** (when enabled). Handles `?error=` from the OAuth redirect with an inline `ErrorState` + "Use demo inbox instead".

@@ -27,6 +27,36 @@ _None yet._
 
 ---
 
+### 2026-11-15 19:54 · gemini · G9.1 PR #21 re-review blocker fix
+- Done: Fixed remaining D20 truthfulness blocker on client-owned Today card CTAs:
+  - `ctaLabelForThread` + `TodayPage.handlePrimaryAction` now use `"Move up for {client}"` (sets `important: true`, toast `"Moved to the top of {client}'s queue"` with Undo) when `!important && handoff?.state !== 'client_handling'`, and `"Open in {client}'s view"` (navigates to `/c?preview=1`) otherwise. Removed fake `"Sent to {client}"` / `"Reminder sent to {client}"` toasts and `unread: true` patch.
+  - Pinned `"All filters"` circle button next to `Owner` on phones in `FilterBar`, and showed `Skeleton` in `HeroBand` right column during `isError` instead of empty `"No upcoming dates extracted."`.
+  - Updated `mappers.test.ts` and `TodayPage.test.tsx`.
+- Changed contracts: none.
+- Next: Push to `gemini/G9.1-grove-foundation` for PR #21 merge.
+
+### 2026-11-15 19:50 · gemini · G9.1 PR #21 review fixes
+- Done: Addressed all Blockers (1–5) and Should-fix/Nits (6–14) from PR #21 review:
+  - Wired real Today card CTAs (`useCreateDraft`, `usePatchThread`, `useChangeOwner`) with pending state and Undo/toast feedback.
+  - Removed fabricated sparkline data (`series: []` until real 14-day series exists), fixed singular/plural `deltaText` (`1 msg` / `N msgs`), formatted compact `nextDateLabel` (`Mon 6:30 pm`), and changed delta label to `since your last visit`.
+  - Kept `HeroBand` + `AssistantTopNav` visible during loading/error states; added responsive `PAGE_SIZE` (`1/2/4`) + mobile touch swipe + `<768px` `"This week ▾"` chart toggle; replaced dark bar on non-Today pages in `AssistantLayout` with short `HeroBand` and `flex-1 min-h-0` `<main>` so `InboxPage` fills frame height.
+  - Upgraded `TopNav` menus to Radix `Popover` (`role="menu"`, `Esc` + outside-click + `aria-expanded`), added `.glass` utility, `h-11`/`min-h-[44px]` tap targets across Grove controls, CSS-var `StackedBars` + `getOwnerShortLabel` (`For Priya` / `For client`), fixed `AvatarTile` dark mode contrast, `HeroBand` `fetchpriority="high"`, and untracked `tsconfig.tsbuildinfo`.
+  - Set `G9.1` back to `[~]` in `docs/ROADMAP.md` until PR #21 is merged.
+- Changed contracts: none.
+- Next: Push to `gemini/G9.1-grove-foundation` to update PR #21; wait for Claude re-review & Aryan merge before starting `G9.1b`.
+
+### 2026-11-15 19:33 · gemini · G9.1 Grove foundation, frame and Today
+- Done:
+  - Updated `:root` and `.dark` tokens in `web/src/styles/globals.css`, `web/tailwind.config.ts`, and `web/src/lib/owners.ts` to the Grove earthy palette (sage `#DDE1D5` canvas, `#F4F4F2` surface, olive `#5E9A18`/`#8CC63F`, forest `#2F5D3A`, clay `#8C7466`, linen `#E8E4DE`, terracotta `#C2562A`).
+  - Built shared Grove components in `web/src/components/grove/`: `models.ts`, `Avatar.tsx` (`Avatar`, `AvatarTile`), `AppFrame.tsx`, `HeroBand.tsx` (with `/hero/grove.webp` + layered CSS radial fallback), `GlassCard.tsx`, `GlassTabs.tsx`, `GlassStat.tsx`, `GlassList.tsx`, `StackedBars.tsx`, `DeltaChip.tsx`, `Sparkline.tsx`, `StatBox.tsx`, `FilterBar.tsx` (dropdowns + all-filters dialog + pager), `ThreadCard.tsx`, `ThreadListRow.tsx`, `BottomTabBar.tsx`, `TopNav.tsx`, and `AssistantTopNav.tsx`.
+  - Migrated `AssistantLayout.tsx` onto `AppFrame` + `BottomTabBar` + `AssistantTopNav` (with `"Send test email"` D20 copy in the user menu).
+  - Rebuilt `TodayPage.tsx` and `features/today/mappers.ts` onto `HeroBand` (`StackedBars` "This week", `GlassStat×2`, `GlassList` "Needs your call" / "Next up"), URL-synced `FilterBar`, 4-column `ThreadCard` pager, and 5 `ThreadListRow`s ("Recently sorted").
+  - Deleted `NavRail.tsx` and `MobileTabBar.tsx` (left `AppTopBar`, `WorkspaceGrid`, `WorkspaceHeader`, `PersonCard`, `TaskCard`, `FocusPanel` in `components/workspace/` solely so `LandingPage` stays working until G9.1b).
+  - Updated `features/today/mappers.test.ts` and `pages/TodayPage.test.tsx`.
+- Changed contracts: none (all client-side view models; weekly chart computed from thread list).
+- Next: Open PR `feat(grove): G9.1 foundation, frame and Today` for Claude review; after Aryan merges it, start G9.1b.
+- Notes/risks: `web/public/hero/grove.webp` is not yet committed, so `HeroBand` renders its layered moss/stone/mist CSS gradient fallback cleanly.
+
 ### 2026-11-15 19:20 · claude · Public site + product copy (docs)
 - Done: DESIGN_V2 §6 rewritten as a 5-page public site (D19) with per-page functionality and a shared `tourStore`; §6.8 product copy with no prototype labels (D20). AGENTS §7, DESIGN_SYSTEM §7 and PRD AC14 amended (struck, not deleted).
 - Next: Gemini G9.1, then G9.1b.

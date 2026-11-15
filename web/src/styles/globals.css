@@ -4,54 +4,62 @@
 
 @layer base {
   :root {
-    --background: 240 5.9% 90%;
-    --surface: 0 0% 100%;
+    --background: 80 14% 86%;
+    --surface: 60 11% 95%;
     --card: 0 0% 100%;
-    --card-foreground: 240 4% 5%;
-    --border: 240 5.9% 84%;
-    --foreground: 240 4% 5%;
-    --muted-foreground: 240 4.5% 36%;
-    --primary: 240 4% 5%;
-    --primary-foreground: 0 0% 98%;
-    --ring: 240 4% 5%;
-    --accent-lime: 80 85% 69%;
-    --accent-lime-foreground: 240 4% 5%;
-    --ink: 240 4% 5%;
+    --card-foreground: 80 5% 12%;
+    --border: 60 10% 90%;
+    --foreground: 80 5% 12%;
+    --muted-foreground: 87 4% 42%;
+    --primary: 88 73% 35%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 88 73% 35%;
+    --accent-lime: 88 73% 35%;
+    --accent-lime-foreground: 0 0% 100%;
+    --ink: 80 5% 12%;
     --ink-foreground: 0 0% 98%;
-    --ink-surface: 240 4% 12%;
-    --ink-line: 240 4% 20%;
-    --ink-muted: 240 5% 65%;
-    --delta-down: 351 95% 86%;
-    --delta-down-foreground: 345 85% 20%;
-    --success: 142.1 76.2% 36.3%;
+    --ink-surface: 80 5% 18%;
+    --ink-line: 80 4% 26%;
+    --ink-muted: 87 6% 61%;
+    --delta-down: 17 64% 92%;
+    --delta-down-foreground: 17 64% 35%;
+    --grove-forest: 134 33% 27%;
+    --grove-clay: 22 16% 47%;
+    --grove-linen: 36 20% 89%;
+    --grove-terracotta: 17 64% 46%;
+    --success: 88 73% 35%;
     --warning: 32.1 94.6% 43.7%;
-    --destructive: 0 72.2% 50.6%;
+    --destructive: 17 64% 46%;
     --radius: 10px;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --surface: 240 5.9% 10%;
-    --card: 240 5.9% 10%;
-    --card-foreground: 0 0% 98%;
-    --border: 240 3.7% 18%;
-    --foreground: 0 0% 98%;
-    --muted-foreground: 240 5% 65%;
-    --primary: 80 85% 69%;
-    --primary-foreground: 240 4% 5%;
-    --ring: 80 85% 69%;
-    --accent-lime: 80 85% 69%;
-    --accent-lime-foreground: 240 4% 5%;
-    --ink: 240 5.9% 10%;
-    --ink-foreground: 0 0% 98%;
-    --ink-surface: 240 4.5% 14%;
-    --ink-line: 240 3.7% 22%;
-    --ink-muted: 240 5% 65%;
-    --delta-down: 351 95% 86%;
-    --delta-down-foreground: 345 85% 20%;
-    --success: 142.1 70.6% 45.3%;
+    --background: 100 10% 6%;
+    --surface: 90 5% 8%;
+    --card: 80 5% 11%;
+    --card-foreground: 75 14% 95%;
+    --border: 80 6% 17%;
+    --foreground: 75 14% 95%;
+    --muted-foreground: 87 6% 61%;
+    --primary: 86 54% 51%;
+    --primary-foreground: 80 5% 12%;
+    --ring: 86 54% 51%;
+    --accent-lime: 86 54% 51%;
+    --accent-lime-foreground: 80 5% 12%;
+    --ink: 80 5% 11%;
+    --ink-foreground: 75 14% 95%;
+    --ink-surface: 80 5% 16%;
+    --ink-line: 80 6% 24%;
+    --ink-muted: 87 6% 61%;
+    --delta-down: 17 50% 20%;
+    --delta-down-foreground: 17 75% 78%;
+    --grove-forest: 134 36% 45%;
+    --grove-clay: 22 20% 58%;
+    --grove-linen: 36 12% 28%;
+    --grove-terracotta: 17 70% 58%;
+    --success: 86 54% 51%;
     --warning: 43.3 96.4% 56.3%;
-    --destructive: 0 90.6% 70.8%;
+    --destructive: 17 70% 58%;
   }
 
   * {
@@ -68,11 +76,26 @@
   font-variant-numeric: tabular-nums;
 }
 
+@layer components {
+  .glass {
+    @apply border border-white/35 bg-white/[0.14] backdrop-blur-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.28)];
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@keyframes heroZoom {
+  from {
+    transform: scale(1.03);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

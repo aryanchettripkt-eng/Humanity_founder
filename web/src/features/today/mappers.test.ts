@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildFocusPanelModel,
-  buildPersonCards,
-  buildTaskCards,
-  buildWorkspaceStats,
+  buildGroveRecentRows,
+  buildGroveStats,
+  buildGroveThreadCards,
+  buildNeedsYourCallList,
+  buildWeeklyBars,
   collapseActivity,
+  ctaLabelForThread,
 } from '@/features/today/mappers';
-import type { ActivityItem, DashboardSummary, ThreadListItem } from '@/types/api';
+import type { ActivityItem, ThreadListItem, UpcomingItem } from '@/types/api';
 
 const makeThread = (overrides: Partial<ThreadListItem>): ThreadListItem => ({
   id: 't1',
@@ -38,67 +40,72 @@ const makeThread = (overrides: Partial<ThreadListItem>): ThreadListItem => ({
   ...overrides,
 });
 
-const SAMPLE_DASHBOARD: DashboardSummary = {
-  counts: { assistant: 1, client: 1, review: 1, none: 0 },
-  brief: {
-    text: 'Priya has one board deck sign-off. Alex has two drafts.',
-    generatedAt: new Date().toISOString(),
-    fallback: false,
-  },
-  review: [makeThread({ id: 'rev-1', owner: 'review', subject: 'Quick question', confidence: 0.52 })],
-  recent: [
-    makeThread({ id: 'rec-1', owner: 'client', subject: 'Board deck sign-off' }),
-    makeThread({ id: 'rec-2', owner: 'assistant', subject: 'Reschedule Tuesday coffee' }),
-  ],
-  nudges: [makeThread({ id: 'nudge-1', owner: 'assistant', subject: 'Follow up with Acme' })],
-  upcoming: [
-    {
-      threadId: 'rec-1',
-      subject: 'Board deck sign-off',
-      title: 'Board deck sign-off',
-      type: 'meeting',
-      startsAt: new Date(Date.now() + 3600_000).toISOString(),
-    },
-  ],
-  activity: [],
-};
+describe('today grove mappers', () => {
+  it('computes 7-day weekly stacked bars from threads', () => {
+    const nowIso = new Date().toISOString();
+    const bars = buildWeeklyBars([
+      makeThread({ id: '1', owner: 'assistant', lastMessageAt: nowIso }),
+      makeThread({ id: '2', owner: 'client', lastMessageAt: nowIso }),
+      makeThread({ id: '3', owner: 'none', lastMessageAt: nowIso }),
+    ]);
+    expect(bars).toHaveLength(7);
+    const todayBar = bars[6];
+    expect(todayBar.assistant).toBe(1);
+    expect(todayBar.client).toBe(1);
+    expect(todayBar.none).toBe(1);
+  });
 
-describe('today mappers', () => {
-  it('computes workspace stats with deltas from lastSeenCounts', () => {
-    const stats = buildWorkspaceStats(
-      { assistant: 5, client: 2, review: 1 },
-      { assistant: 3, client: 4, review: 1 }
+  it('builds For you and For client glass stats with deltas', () => {
+    const stats = buildGroveStats(
+      { assistant: 5, client: 2 },
+      { assistant: 3, client: 2, review: 0 },
+      'Priya',
+      [makeThread({ id: '1', owner: 'client' })]
     );
-    expect(stats[0]).toMatchObject({ id: 'assistant', value: 5, delta: '+2', deltaTone: 'up' });
-    expect(stats[1]).toMatchObject({ id: 'client', value: 2, delta: '-2', deltaTone: 'down' });
-    expect(stats[2]).toMatchObject({ id: 'review', value: 1, delta: undefined });
+    expect(stats[0]).toMatchObject({ label: 'For you', value: 5, delta: '+2 since your last visit' });
+    expect(stats[1]).toMatchObject({ label: 'For Priya', value: 2, delta: '1 waiting on Priya' });
   });
 
-  it('maps person cards and filters by owner', () => {
-    const all = buildPersonCards(SAMPLE_DASHBOARD, 'all');
-    expect(all).toHaveLength(3);
-    expect(all[0].showQuickAssign).toBe(true);
+  it('builds Needs your call list or falls back to Next up', () => {
+    const reviewList = buildNeedsYourCallList(
+      [makeThread({ id: 'r1', owner: 'review', confidence: 0.55 })],
+      [],
+      'Asia/Kolkata'
+    );
+    expect(reviewList.title).toBe('Needs your call');
+    expect(reviewList.rows).toHaveLength(1);
+    expect(reviewList.rows[0].rightText).toBe('55%');
 
-    const clientOnly = buildPersonCards(SAMPLE_DASHBOARD, 'client');
-    expect(clientOnly).toHaveLength(1);
-    expect(clientOnly[0].id).toBe('rec-1');
+    const upcoming: UpcomingItem[] = [
+      {
+        threadId: 'u1',
+        subject: 'Board deck',
+        title: 'Board sign-off',
+        type: 'meeting',
+        startsAt: new Date(Date.now() + 3600_000).toISOString(),
+      },
+    ];
+    const nextUp = buildNeedsYourCallList([], upcoming, 'Asia/Kolkata');
+    expect(nextUp.title).toBe('Next up');
+    expect(nextUp.rows).toHaveLength(1);
   });
 
-  it('builds task cards with highlighted next date and filters by chip', () => {
-    const allTasks = buildTaskCards(SAMPLE_DASHBOARD, 'Asia/Kolkata', 'all');
-    expect(allTasks[0].highlighted).toBe(true);
-    expect(allTasks.some((t) => t.threadId === 'nudge-1')).toBe(true);
+  it('filters grove thread cards by owner and builds recent rows', () => {
+    const threads = [
+      makeThread({ id: 'a1', owner: 'assistant', participants: [{ name: 'Alex', email: 'a@acme.com' }] }),
+      makeThread({ id: 'c1', owner: 'client', participants: [{ name: 'Maya', email: 'm@northstar.io' }] }),
+    ];
+    const filtered = buildGroveThreadCards(
+      threads,
+      { owner: 'client', category: 'all', date: 'all', confidence: 'all', source: 'all' },
+      'Priya'
+    );
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].domain).toBe('northstar.io');
+    expect(filtered[0].ctaLabel).toBe("Open in Priya's view");
 
-    const datesOnly = buildTaskCards(SAMPLE_DASHBOARD, 'Asia/Kolkata', 'dates');
-    expect(datesOnly).toHaveLength(1);
-    expect(datesOnly[0].iconKind).toBe('calendar');
-  });
-
-  it('builds focus panel model for selected thread', () => {
-    const model = buildFocusPanelModel('rec-1', SAMPLE_DASHBOARD, 'Asia/Kolkata');
-    expect(model?.id).toBe('rec-1');
-    expect(model?.phonePreview.isClientQueue).toBe(true);
-    expect(model?.dates).toHaveLength(1);
+    const recent = buildGroveRecentRows(threads);
+    expect(recent).toHaveLength(2);
   });
 
   it('collapses repeated system activity entries', () => {
@@ -124,5 +131,53 @@ describe('today mappers', () => {
     expect(collapsed).toHaveLength(1);
     expect(collapsed[0].count).toBe(2);
   });
-});
 
+  it('computes all CTA labels from owner, importance, and handoff state', () => {
+    expect(ctaLabelForThread(makeThread({ owner: 'assistant' }), 'Priya')).toBe('Draft reply');
+    expect(
+      ctaLabelForThread(
+        makeThread({ owner: 'client', important: false, handoff: { state: 'none' } }),
+        'Priya'
+      )
+    ).toBe('Move up for Priya');
+    expect(
+      ctaLabelForThread(
+        makeThread({ owner: 'client', important: true, handoff: { state: 'none' } }),
+        'Priya'
+      )
+    ).toBe("Open in Priya's view");
+    expect(
+      ctaLabelForThread(
+        makeThread({
+          owner: 'client',
+          important: false,
+          handoff: { state: 'client_handling' },
+        }),
+        'Priya'
+      )
+    ).toBe("Open in Priya's view");
+    expect(ctaLabelForThread(makeThread({ owner: 'review' }), 'Priya')).toBe('Confirm');
+  });
+
+  it('omits fabricated sparklines and formats singular message count', () => {
+    const cards = buildGroveThreadCards(
+      [makeThread({ id: 's1', owner: 'assistant', messageCount: 1 })],
+      { owner: 'all', category: 'all', date: 'week', confidence: 'all', source: 'all' },
+      'Priya',
+      'Asia/Kolkata'
+    );
+    expect(cards).toHaveLength(1);
+    expect(cards[0].series).toEqual([]);
+    expect(cards[0].deltaText).toBe('1 msg');
+  });
+
+  it('buckets weekly bars using the client timezone', () => {
+    const nowIso = new Date().toISOString();
+    const bars = buildWeeklyBars(
+      [makeThread({ id: 'tz1', owner: 'assistant', lastMessageAt: nowIso })],
+      'Asia/Kolkata'
+    );
+    expect(bars).toHaveLength(7);
+    expect(bars[6].assistant).toBe(1);
+  });
+});
