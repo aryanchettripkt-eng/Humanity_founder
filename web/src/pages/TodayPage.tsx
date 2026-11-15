@@ -335,7 +335,7 @@ export function TodayPage() {
         nav={<AssistantTopNav />}
         left={
           <div className="space-y-4">
-            <div className="relative space-y-2 rounded-3xl bg-[radial-gradient(ellipse_at_25%_45%,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.12)_55%,transparent_78%)] py-1">
+            <div className="space-y-2">
               <div className="flex flex-wrap items-end gap-3">
                 <h1
                   style={{ textShadow: 'var(--hero-text-shadow)' }}
@@ -351,11 +351,11 @@ export function TodayPage() {
               </div>
 
               {isLoading ? (
-                <Skeleton className="h-10 max-w-md rounded-xl bg-[var(--glass-bg)]" />
+                <Skeleton className="h-10 max-w-md rounded-xl bg-[var(--hero-card-bg)]" />
               ) : briefParts ? (
                 <div className="relative space-y-2 text-sm text-[var(--hero-fg)]">
                   <div className="flex items-center gap-2">
-                    <div className="min-w-0 max-w-xl rounded-2xl border border-[var(--glass-border)] bg-[var(--hero-pill-bg)] px-4 py-2 text-[var(--hero-fg)] backdrop-blur-md sm:rounded-full">
+                    <div className="min-w-0 max-w-xl rounded-2xl border border-[var(--hero-card-border)] bg-[var(--hero-card-bg)] px-4 py-2 text-[var(--hero-fg)] sm:rounded-full">
                       <p className="inline">
                         {briefParts.head}
                         {briefParts.rest ? (

@@ -27,18 +27,19 @@ export function HeroBand({
 
   return (
     <section
+      style={{
+        background: 'var(--hero-glass-bg)',
+        backdropFilter: 'var(--hero-glass-blur)',
+        WebkitBackdropFilter: 'var(--hero-glass-blur)',
+        boxShadow: 'var(--hero-glass-highlight)',
+      }}
       className={cn(
         'relative w-full overflow-hidden text-[var(--hero-fg)]',
         heightClass,
         className
       )}
     >
-      <div
-        aria-hidden="true"
-        style={{ background: 'var(--hero-scrim)' }}
-        className="pointer-events-none absolute inset-0 z-0 lg:hidden"
-      />
-      <div className="relative z-10 flex h-full flex-col justify-between gap-6 px-[clamp(16px,8.5vw,160px)] pb-7 pt-4">
+      <div className="relative z-10 flex h-full flex-col justify-between gap-6 p-[clamp(16px,2.5vw,32px)]">
         {nav ? <div>{nav}</div> : null}
 
         {(left || right) ? (

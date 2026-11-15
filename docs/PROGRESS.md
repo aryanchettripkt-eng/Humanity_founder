@@ -27,6 +27,18 @@ _None yet._
 
 ---
 
+### 2026-11-16 02:02 · gemini · G9.1d floating glass frame
+- Done: Wrapped app views in one centred floating glass frame (`gemini/G9.1d-floating-glass-frame`):
+  - Added `--frame-gap-x`, `--frame-gap-top`, `--frame-gap-bottom`, `--frame-max-w`, `--frame-radius` (`24px` `<768px`, `32px` `≥768px`), `--frame-border`, `--frame-shadow`, `--hero-glass-bg`, `--hero-glass-blur`, `--hero-glass-highlight`, `--hero-card-bg`, and `--hero-card-border` in `globals.css` (`:root` and `.dark`).
+  - Updated `AppFrame` with `.floating-frame` (`width: min(var(--frame-max-w), calc(100% - 2 * var(--frame-gap-x)))`, `overflow: hidden; overflow: clip;`, `isolation: isolate`) while keeping the fixed background and overlay layers unchanged.
+  - Updated `HeroBand` to use `var(--hero-glass-bg)` + `var(--hero-glass-blur)` + `var(--hero-glass-highlight)` with `p-[clamp(16px,2.5vw,32px)]`, removing the `<1024px` hero scrim and radial greeting scrims in `TodayPage` and `AssistantLayout`.
+  - Dropped nested `backdrop-filter` from `.glass` and the brief pill in `TodayPage`, reading `--hero-card-bg` and `--hero-card-border`.
+  - Flattened `.working-panel` (removed side margins, outer radius, border, shadow, and blur; `padding: clamp(16px, 2.5vw, 32px)`) for a seamless join under the hero.
+  - Updated `BottomTabBar` on phones to `left/right: var(--frame-gap-x)`, `bottom-[calc(env(safe-area-inset-bottom)+12px)]`, `rounded-[24px]`.
+  - Verified layout (`0` horizontal overflow at 2560, 1920, 1440, 1280, 1024, 820, 390, 320) and WCAG AA contrast on all hero text in Playwright (light & dark).
+- Changed contracts: none.
+- Next: Open PR for `gemini/G9.1d-floating-glass-frame` and proceed to `G9.2` after review/merge.
+
 ### 2026-11-16 00:00 · gemini · G9.1c-fixes review fixes
 - Done: Fixed all 8 items from the G9.1c review on `gemini/G9.1c-fixes`:
   1. Hero contrast: added `--hero-scrim` (`<768px` full-width gradient scrim in `HeroBand`) and `--hero-text-shadow` (greeting `h1`) tokens in `:root` and `.dark`; wrapped `TodayPage` brief line in a `.glass`-token pill (`rounded-full px-4 py-2`).
