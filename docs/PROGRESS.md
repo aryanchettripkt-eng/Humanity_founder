@@ -27,6 +27,15 @@ _None yet._
 
 ---
 
+### 2026-11-15 18:14 · gemini · R1 lime workspace tokens, shell and Today
+- Done:
+  - Updated `:root` and `.dark` tokens in `web/src/styles/globals.css`, `web/tailwind.config.ts`, `docs/DESIGN_SYSTEM.md`, and `docs/DECISIONS.md` (D13): zinc-200 / zinc-950 canvas, white / zinc-900 cards, ink / lime primary, sky `assistant` owner color (`web/src/lib/owners.ts`), and removed `.theme-landing`.
+  - Moved shared primitives into `web/src/components/common/` (`PillBar`, `ChipRow`, `NotchedCard`, `StatWithBadge`, `SectionHeader`) and updated `LandingPage` to use them.
+  - Restyled `AssistantLayout.tsx`: canvas sidebar with ink/lime active pill, pill client switcher, pill search trigger, black/lime Simulate button, circular theme/settings buttons, and floating mobile ink pill tab bar with lime active state.
+  - Rebuilt `TodayPage.tsx` (`web/src/features/today/mappers.ts`, `TodaySummaryPanel.tsx`, `docs/FRONTEND.md` §7) as an app page with time-of-day greeting, `PillBar` in `client.timezone` (`formatUpcomingDate` updated in `web/src/lib/format.ts`), 3 real `StatWithBadge` counts, `"Needs your call"` review `NotchedCard`s, `"Your day"` tasks with lime highlight + `ChipRow`, collapsed `Activity` + dark summary panel, and last 5 `ThreadRow`s.
+- Changed contracts: none.
+- Next: review R0 (`gemini/R0-merge-q52`) and R1 (`gemini/R1-lime-shell-today`) PRs, then proceed to R2.
+
 ### 2026-11-15 17:53 · gemini · L7.1 full-bleed landing + replace TodayPage with lime workspace
 - Done:
   - Extended `LandingPage` edge-to-edge (`w-full`, removed outer grey frame and `max-w-[1400px]` box) and stretched `LandingTopBar` schedule bar across wide screens.

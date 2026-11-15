@@ -1,15 +1,15 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { CalendarDays, Flame, Inbox, Layers, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { ChipRow, type ChipRowItem } from '@/components/common/ChipRow';
+import { SectionHeader } from '@/components/common/SectionHeader';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDemoLogin } from '@/features/auth/useDemoLogin';
 import { FeatureStrip } from '@/features/landing/components/FeatureStrip';
-import { FilterChips, type FilterChipItem } from '@/features/landing/components/FilterChips';
 import { LandingFooter } from '@/features/landing/components/LandingFooter';
 import { LandingHero } from '@/features/landing/components/LandingHero';
 import { LandingTopBar } from '@/features/landing/components/LandingTopBar';
 import { ReplyCard } from '@/features/landing/components/ReplyCard';
-import { SectionHeader } from '@/features/landing/components/SectionHeader';
 import { SummaryPanel } from '@/features/landing/components/SummaryPanel';
 import { TaskCard } from '@/features/landing/components/TaskCard';
 import {
@@ -26,7 +26,7 @@ import type { Owner } from '@/types/api';
 
 type OwnerFilter = 'all' | Owner;
 
-const OWNER_CHIPS: FilterChipItem<OwnerFilter>[] = [
+const OWNER_CHIPS: ChipRowItem<OwnerFilter>[] = [
   { id: 'all', label: 'All' },
   { id: 'assistant', label: OWNER_META.assistant.label, icon: OWNER_META.assistant.icon },
   { id: 'client', label: OWNER_META.client.label, icon: OWNER_META.client.icon },
@@ -34,7 +34,7 @@ const OWNER_CHIPS: FilterChipItem<OwnerFilter>[] = [
   { id: 'review', label: OWNER_META.review.label, icon: OWNER_META.review.icon },
 ];
 
-const TASK_CHIPS: FilterChipItem<TaskFilterId>[] = [
+const TASK_CHIPS: ChipRowItem<TaskFilterId>[] = [
   { id: 'all', label: 'All' },
   { id: 'urgent', label: 'Urgent', icon: Flame },
   { id: 'due-today', label: 'Due today' },
@@ -57,15 +57,6 @@ export function LandingPage() {
   const [taskFilter, setTaskFilter] = useState<TaskFilterId>('all');
   const [selectedThread, setSelectedThread] = useState<SampleReplyThread>(SAMPLE_THREADS[0]);
   const [activeSection, setActiveSection] = useState<string>('who-replies');
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const hadDark = root.classList.contains('dark');
-    if (hadDark) root.classList.remove('dark');
-    return () => {
-      if (hadDark) root.classList.add('dark');
-    };
-  }, []);
 
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
@@ -104,7 +95,7 @@ export function LandingPage() {
   const taskCountLabel = `${visibleTasks.length} ${visibleTasks.length === 1 ? 'task' : 'tasks'}`;
 
   return (
-    <div className="theme-landing min-h-screen w-full overflow-x-clip bg-landing-surface text-landing-ink antialiased selection:bg-landing-accent selection:text-landing-accent-foreground">
+    <div className="min-h-screen w-full overflow-x-clip bg-background text-foreground antialiased selection:bg-accent-lime selection:text-accent-lime-foreground">
       <div className="relative w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-10 lg:py-8">
         <LandingTopBar demoLoading={demoLoading} onDemoLogin={handleDemo} />
 
@@ -127,10 +118,10 @@ export function LandingPage() {
                         aria-label={item.label}
                         aria-current={isActive ? 'true' : undefined}
                         className={cn(
-                          'flex h-11 w-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-landing-ink focus-visible:ring-offset-2',
+                          'flex h-11 w-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                           isActive
-                            ? 'bg-landing-ink text-landing-ink-foreground'
-                            : 'border border-landing-line bg-landing-card text-landing-muted hover:text-landing-ink'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'border border-border bg-card text-muted-foreground hover:text-foreground'
                         )}
                       >
                         <Icon className="h-4 w-4" aria-hidden="true" />
@@ -150,7 +141,7 @@ export function LandingPage() {
                   countLabel={threadCountLabel}
                   liveText={`Showing ${visibleThreads.length} ${visibleThreads.length === 1 ? 'thread' : 'threads'}`}
                 />
-                <FilterChips items={OWNER_CHIPS} value={ownerFilter} onChange={setOwnerFilter} />
+                <ChipRow items={OWNER_CHIPS} value={ownerFilter} onChange={setOwnerFilter} />
 
                 <AnimatePresence mode="wait">
                   {visibleThreads.length === 0 ? (
@@ -159,7 +150,7 @@ export function LandingPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="rounded-[24px] border border-landing-line bg-landing-card/75 px-5 py-6 text-sm text-landing-muted"
+                      className="rounded-[24px] border border-border bg-card/75 px-5 py-6 text-sm text-muted-foreground"
                     >
                       {THREAD_EMPTY_COPY[ownerFilter]}
                     </motion.p>
@@ -170,7 +161,7 @@ export function LandingPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                      className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4"
+                      className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4"
                     >
                       {visibleThreads.map((thread, index) => (
                         <motion.div
@@ -203,7 +194,7 @@ export function LandingPage() {
                   countLabel={taskCountLabel}
                   liveText={`Showing ${visibleTasks.length} ${visibleTasks.length === 1 ? 'task' : 'tasks'}`}
                 />
-                <FilterChips items={TASK_CHIPS} value={taskFilter} onChange={setTaskFilter} />
+                <ChipRow items={TASK_CHIPS} value={taskFilter} onChange={setTaskFilter} />
 
                 <AnimatePresence mode="wait">
                   {visibleTasks.length === 0 ? (
@@ -212,7 +203,7 @@ export function LandingPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="rounded-[24px] border border-landing-line bg-landing-card px-5 py-6 text-sm text-landing-muted"
+                      className="rounded-[24px] border border-border bg-card px-5 py-6 text-sm text-muted-foreground"
                     >
                       {TASK_EMPTY_COPY[taskFilter]}
                     </motion.p>
@@ -223,7 +214,7 @@ export function LandingPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                      className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0"
+                      className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-4 md:overflow-visible md:px-0 md:pb-0"
                     >
                       {visibleTasks.map((task, index) => (
                         <motion.div

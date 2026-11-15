@@ -46,6 +46,7 @@ export interface ClientSummary {
   firstName: string;
   email: string;
   title?: string;
+  timezone?: string;
   assistantId: string;
   profile: {
     delegation: string;

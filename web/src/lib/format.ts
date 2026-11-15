@@ -1,4 +1,4 @@
-import { format, formatDistanceToNowStrict, isToday, isTomorrow, isYesterday } from 'date-fns';
+import { format, formatDistanceToNowStrict, isToday, isYesterday } from 'date-fns';
 
 export function formatShortDate(iso: string | Date): string {
   const d = new Date(iso);
@@ -20,12 +20,38 @@ export function formatFullDateTime(iso: string | Date): string {
   return format(d, 'EEE, MMM d, yyyy · h:mm a');
 }
 
-export function formatUpcomingDate(iso: string | Date): string {
+export function formatUpcomingDate(iso: string | Date, timeZone?: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  if (isToday(d)) return `Today, ${format(d, 'h:mm a')}`;
-  if (isTomorrow(d)) return `Tomorrow, ${format(d, 'h:mm a')}`;
-  return format(d, 'EEE MMM d, h:mm a');
+
+  const tz = timeZone || undefined;
+  const dayKey = (date: Date) =>
+    new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+
+  const now = new Date();
+  const tomorrow = new Date(now.getTime() + 86_400_000);
+  const timeStr = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(d);
+
+  const targetKey = dayKey(d);
+  if (targetKey === dayKey(now)) return `Today, ${timeStr}`;
+  if (targetKey === dayKey(tomorrow)) return `Tomorrow, ${timeStr}`;
+
+  const dateStr = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  }).format(d);
+  return `${dateStr}, ${timeStr}`;
 }
 
 export function getInitials(nameOrEmail: string): string {

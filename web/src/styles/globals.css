@@ -4,16 +4,25 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --surface: 0 0% 98%;
+    --background: 240 5.9% 90%;
+    --surface: 0 0% 100%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --border: 240 5.9% 90%;
-    --foreground: 240 5.9% 10%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --primary: 243.4 75.4% 58.6%;
-    --primary-foreground: 0 0% 100%;
-    --ring: 238.7 83.5% 66.7%;
+    --card-foreground: 240 4% 5%;
+    --border: 240 5.9% 84%;
+    --foreground: 240 4% 5%;
+    --muted-foreground: 240 4.5% 36%;
+    --primary: 240 4% 5%;
+    --primary-foreground: 0 0% 98%;
+    --ring: 240 4% 5%;
+    --accent-lime: 80 85% 69%;
+    --accent-lime-foreground: 240 4% 5%;
+    --ink: 240 4% 5%;
+    --ink-foreground: 0 0% 98%;
+    --ink-surface: 240 4% 12%;
+    --ink-line: 240 4% 20%;
+    --ink-muted: 240 5% 65%;
+    --delta-down: 351 95% 86%;
+    --delta-down-foreground: 345 85% 20%;
     --success: 142.1 76.2% 36.3%;
     --warning: 32.1 94.6% 43.7%;
     --destructive: 0 72.2% 50.6%;
@@ -25,42 +34,24 @@
     --surface: 240 5.9% 10%;
     --card: 240 5.9% 10%;
     --card-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
+    --border: 240 3.7% 18%;
     --foreground: 0 0% 98%;
-    --muted-foreground: 240 5% 64.9%;
-    --primary: 234.5 89.5% 73.9%;
-    --primary-foreground: 240 10% 3.9%;
-    --ring: 234.5 89.5% 73.9%;
+    --muted-foreground: 240 5% 65%;
+    --primary: 80 85% 69%;
+    --primary-foreground: 240 4% 5%;
+    --ring: 80 85% 69%;
+    --accent-lime: 80 85% 69%;
+    --accent-lime-foreground: 240 4% 5%;
+    --ink: 240 5.9% 10%;
+    --ink-foreground: 0 0% 98%;
+    --ink-surface: 240 4.5% 14%;
+    --ink-line: 240 3.7% 22%;
+    --ink-muted: 240 5% 65%;
+    --delta-down: 351 95% 86%;
+    --delta-down-foreground: 345 85% 20%;
     --success: 142.1 70.6% 45.3%;
     --warning: 43.3 96.4% 56.3%;
     --destructive: 0 90.6% 70.8%;
-  }
-
-  .theme-landing {
-    --landing-canvas: 240 5.9% 88%;
-    --landing-surface: 240 6% 92%;
-    --landing-card: 0 0% 100%;
-    --landing-card-soft: 0 0% 97%;
-    --landing-line: 240 5.9% 84%;
-    --landing-muted: 240 4.5% 36%;
-    --landing-ink: 240 4% 5%;
-    --landing-ink-foreground: 0 0% 98%;
-    --landing-ink-surface: 240 4% 12%;
-    --landing-ink-line: 240 4% 20%;
-    --landing-ink-muted: 240 5% 65%;
-    --landing-accent: 80 85% 69%;
-    --landing-accent-foreground: 240 4% 5%;
-    --landing-delta-up: 80 85% 69%;
-    --landing-delta-down: 351 95% 86%;
-    --landing-delta-down-foreground: 345 85% 20%;
-    --background: 0 0% 100%;
-    --surface: 240 4.8% 95.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 4% 5%;
-    --border: 240 5.9% 90%;
-    --foreground: 240 4% 5%;
-    --muted-foreground: 240 3.8% 46.1%;
-    color-scheme: light;
   }
 
   * {
@@ -77,6 +68,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -86,4 +84,3 @@
     transition-duration: 0.01ms !important;
   }
 }
-

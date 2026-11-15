@@ -116,7 +116,7 @@ Route guards: `RequireAuth role="assistant"|"client"`. Assistant without any con
 - Lint/format: ESLint (typescript-eslint, react-hooks) + Prettier (2 spaces, single quotes, semi, width 100). Run `npm run lint && npm run typecheck` before committing.
 
 ## 7. Screen composition (what each page uses)
-- **TodayPage**: `BriefCard`, `StatTile×4`, secondary counts, `ReviewStrip`, `UpcomingRail`, `ActivityFeed`, recent `ThreadRow×5`.
+- **TodayPage**: greeting + `RefreshCw`, `PillBar` (upcoming dates in client timezone), `StatWithBadge×3`, `NotchedCard` ("Needs your call" review + "Your day" tasks with `ChipRow`), dark `TodaySummaryPanel` (selected thread + collapsed `ActivityFeed`), recent `ThreadRow×5`.
 - **InboxPage**: `SegmentNav` (in layout) · `ThreadList` (+ search/filter bar) · `ThreadView` (`ThreadHeader`, `MessageItem[]`, `DraftComposer`) · `AIPanel`.
 - **ClientHomePage**: greeting, count, `ClientCard[]` with AnimatePresence, all‑caught‑up `EmptyState`.
 - **OnboardingPage**: `Stepper`, `ConnectProviderCard×2`, `SimulatedOAuthModal`, `SyncProgress` (driven by `sync:progress` socket events). Gmail card has two actions: primary **Use demo inbox** (simulated) and secondary **Connect real Gmail (beta)** (when enabled). Handles `?error=` from the OAuth redirect with an inline `ErrorState` + "Use demo inbox instead".

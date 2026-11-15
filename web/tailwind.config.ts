@@ -37,41 +37,57 @@ const config: Config = {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
         },
+        'accent-lime': {
+          DEFAULT: 'hsl(var(--accent-lime))',
+          foreground: 'hsl(var(--accent-lime-foreground))',
+        },
+        ink: {
+          DEFAULT: 'hsl(var(--ink))',
+          foreground: 'hsl(var(--ink-foreground))',
+          surface: 'hsl(var(--ink-surface))',
+          line: 'hsl(var(--ink-line))',
+          muted: 'hsl(var(--ink-muted))',
+        },
+        'delta-down': {
+          DEFAULT: 'hsl(var(--delta-down))',
+          foreground: 'hsl(var(--delta-down-foreground))',
+        },
         success: 'hsl(var(--success))',
         warning: 'hsl(var(--warning))',
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--primary-foreground))',
         },
+        // Transitional aliases for R1–R2 (removed in R3)
         landing: {
-          canvas: 'hsl(var(--landing-canvas))',
-          surface: 'hsl(var(--landing-surface))',
-          card: 'hsl(var(--landing-card))',
-          'card-soft': 'hsl(var(--landing-card-soft))',
-          line: 'hsl(var(--landing-line))',
-          muted: 'hsl(var(--landing-muted))',
+          canvas: 'hsl(var(--background))',
+          surface: 'hsl(var(--background))',
+          card: 'hsl(var(--card))',
+          'card-soft': 'hsl(var(--card))',
+          line: 'hsl(var(--border))',
+          muted: 'hsl(var(--muted-foreground))',
           ink: {
-            DEFAULT: 'hsl(var(--landing-ink))',
-            foreground: 'hsl(var(--landing-ink-foreground))',
-            surface: 'hsl(var(--landing-ink-surface))',
-            line: 'hsl(var(--landing-ink-line))',
-            muted: 'hsl(var(--landing-ink-muted))',
+            DEFAULT: 'hsl(var(--ink))',
+            foreground: 'hsl(var(--ink-foreground))',
+            surface: 'hsl(var(--ink-surface))',
+            line: 'hsl(var(--ink-line))',
+            muted: 'hsl(var(--ink-muted))',
           },
           accent: {
-            DEFAULT: 'hsl(var(--landing-accent))',
-            foreground: 'hsl(var(--landing-accent-foreground))',
+            DEFAULT: 'hsl(var(--accent-lime))',
+            foreground: 'hsl(var(--accent-lime-foreground))',
           },
           delta: {
-            up: 'hsl(var(--landing-delta-up))',
+            up: 'hsl(var(--accent-lime))',
             down: {
-              DEFAULT: 'hsl(var(--landing-delta-down))',
-              foreground: 'hsl(var(--landing-delta-down-foreground))',
+              DEFAULT: 'hsl(var(--delta-down))',
+              foreground: 'hsl(var(--delta-down-foreground))',
             },
           },
         },
       },
       boxShadow: {
-        landing: '0 24px 80px -24px hsl(var(--landing-ink) / 0.14)',
+        landing: '0 24px 80px -24px hsl(var(--ink) / 0.14)',
       },
     },
   },
@@ -79,4 +95,3 @@ const config: Config = {
 };
 
 export default config;
-
