@@ -42,6 +42,11 @@ _None yet._
 - Changed contracts: none.
 - Next: Open PR for `gemini/G9.1c-fixes` and wait for Aryan's merge before starting `G9.2`.
 
+### 2026-11-16 00:30 · claude · G9.1c review + docs to match the build
+- Reviewed G9.1c on main @ bab156a: composition correct, Today matches target, lint/typecheck/tests green. 8 fixes listed in ROADMAP G9.1c-fixes (hero contrast, StatBox truncation, nav/filter wrap <1024, offline toast, iOS background, phone rows, chart height).
+- DESIGN_V2 §1.0 rewritten for what was built; D22 supersedes D21. ROADMAP G9.2/G9.3 specs expanded.
+- Process: 8f7d12b and bab156a were pushed to main directly and #25 to #28 merged unreviewed; 8f7d12b reverted the UX subtraction work and removed its PROGRESS entry. Please use PRs.
+
 ### 2026-11-15 23:30 · gemini · G9.1c UX subtraction and label polish
 - Done: Applied targeted UX subtractions & label swaps on `gemini/G9.1c-themes`:
   - `ThreadCard`: replaced the 3-column `StatBox` (`OWNER`, `CONFIDENCE`, `NEXT DATE`) with a 1-line truncated email subject, removed the green CTA button, made the whole card clickable with top-right `↗`, and moved `OwnerPill` (`size="sm"`) next to `DeltaChip` in the footer.
