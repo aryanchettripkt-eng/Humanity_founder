@@ -55,15 +55,15 @@ describe('today grove mappers', () => {
     expect(todayBar.none).toBe(1);
   });
 
-  it('builds For you and For client glass stats with deltas', () => {
+  it('builds Assistant queue and client desk glass stats with deltas', () => {
     const stats = buildGroveStats(
       { assistant: 5, client: 2 },
       { assistant: 3, client: 2, review: 0 },
       'Priya',
       [makeThread({ id: '1', owner: 'client' })]
     );
-    expect(stats[0]).toMatchObject({ label: 'For you', value: 5, delta: '+2 since your last visit' });
-    expect(stats[1]).toMatchObject({ label: 'For Priya', value: 2, delta: '1 waiting on Priya' });
+    expect(stats[0]).toMatchObject({ label: 'Assistant queue', value: 5, delta: '+2 since your last visit' });
+    expect(stats[1]).toMatchObject({ label: "Priya's desk", value: 2, delta: '1 waiting on Priya' });
   });
 
   it('builds Needs your call list or falls back to Next up', () => {
