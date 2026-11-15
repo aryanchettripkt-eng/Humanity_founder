@@ -335,13 +335,13 @@ export function TodayPage() {
         nav={<AssistantTopNav />}
         left={
           <div className="space-y-4">
-            <div className="space-y-2">
+            <div className="relative space-y-2 rounded-3xl bg-[radial-gradient(ellipse_at_25%_45%,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.12)_55%,transparent_78%)] py-1">
               <div className="flex flex-wrap items-end gap-3">
                 <h1 className="font-display text-[36px] font-semibold leading-[1.06] tracking-tight text-[var(--hero-fg)] sm:text-[52px]">
                   {getTimeGreeting()},<br />
                   {userFirstName}!
                 </h1>
-                <span className="mb-1 inline-flex items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-3 py-1.5 text-xs font-medium text-[var(--hero-fg)] backdrop-blur-md">
+                <span className="glass mb-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium">
                   <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
                   {dateChip}
                 </span>
@@ -368,7 +368,7 @@ export function TodayPage() {
                     onClick={() => refreshBrief.mutate()}
                     disabled={refreshBrief.isPending}
                     aria-label="Refresh brief"
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--nav-circle-bg)] text-[var(--hero-fg)] transition-colors hover:bg-[var(--glass-hover)] disabled:opacity-50"
+                    className="glass inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] disabled:opacity-50"
                   >
                     <RefreshCw
                       className={`h-4 w-4 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
@@ -391,7 +391,7 @@ export function TodayPage() {
                   type="button"
                   onClick={() => setWeekChartOpen((v) => !v)}
                   aria-expanded={weekChartOpen}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 text-xs font-medium text-[var(--hero-fg)] backdrop-blur-md md:hidden"
+                  className="glass inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-medium md:hidden"
                 >
                   This week
                   <ChevronDown
@@ -439,7 +439,7 @@ export function TodayPage() {
       />
 
       {isLoading ? (
-        <div className="space-y-6 px-4 py-6 sm:px-6 md:px-8">
+        <div className="working-panel space-y-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Skeleton className="h-48 rounded-[18px]" />
             <Skeleton className="hidden h-48 rounded-[18px] md:block" />
@@ -448,11 +448,11 @@ export function TodayPage() {
           </div>
         </div>
       ) : isError || !data ? (
-        <div className="px-4 py-6 sm:px-6 md:px-8">
+        <div className="working-panel">
           <ErrorState onRetry={() => refetch()} />
         </div>
       ) : (
-        <div className="space-y-6 px-4 py-6 sm:px-6 md:px-8">
+        <div className="working-panel space-y-6">
           <FilterBar
             filters={filterDefs}
             page={safePage}

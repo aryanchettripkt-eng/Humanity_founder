@@ -27,7 +27,7 @@ export function GlassTabs<T extends string = string>({
     <nav
       aria-label={ariaLabel}
       className={cn(
-        'inline-flex items-center gap-1 rounded-full border border-[var(--nav-pill-border)] bg-[var(--nav-pill-bg)] p-1 backdrop-blur-xl',
+        'glass inline-flex items-center gap-1 rounded-full p-1',
         className
       )}
     >

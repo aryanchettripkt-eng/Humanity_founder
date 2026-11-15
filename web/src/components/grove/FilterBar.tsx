@@ -72,7 +72,7 @@ export function FilterBar({
           type="button"
           onClick={() => setSheetOpen(true)}
           aria-label="All filters"
-          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--avatar-tile-bg)] text-[var(--avatar-tile-fg)] transition-opacity hover:opacity-90 sm:order-3"
+          className="order-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-foreground transition-colors hover:bg-[var(--statbox-bg)] sm:order-3"
         >
           <SlidersHorizontal className="h-4 w-4" />
         </button>
