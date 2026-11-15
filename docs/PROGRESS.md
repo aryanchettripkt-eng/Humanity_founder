@@ -28,6 +28,11 @@ _None yet._
 
 ---
 
+### 2026-11-16 05:15 · claude · Remove the old marketing landing page
+- Done (Aryan: "destroy the / while signed out", the main website is the glass app): `/` now sends signed-out visitors to `/login` (signed-in users still go to `/app/today` or `/c`). `/welcome` redirects to `/login`.
+- Deleted the lime landing page and everything only it used: `pages/LandingPage.tsx` (+ test), `features/landing/`, `components/workspace/`. FRONTEND.md routes updated.
+- Checked: lint, typecheck, tests (server 38, web 38), web build. `/` and `/welcome` land on the glass sign-in page.
+
 ### 2026-11-16 05:00 · claude · About page copy
 - Done (asked by Aryan in chat; content only, no layout or style changes): `AboutPage.tsx` explains Relay in plain words. It says "your client" everywhere instead of the selected client's name. The 4 steps are now Read, Sort, Reply, Hand off, each with one short line. "The four owners" is now "Who an email can be for", with page-local descriptions (shared `OWNER_META` untouched). "What works today" is now "Good to know". Every claim matches what the app does (D20).
 - Checked: lint, typecheck, web tests (43).

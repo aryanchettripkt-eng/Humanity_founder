@@ -34,7 +34,7 @@ web/
         ClientLayout.tsx     # minimal header + outlet
         AuthLayout.tsx
     pages/                   # thin route components; compose features
-      LandingPage.tsx  LoginPage.tsx  SignupPage.tsx  OnboardingPage.tsx
+      LoginPage.tsx  SignupPage.tsx  OnboardingPage.tsx
       TodayPage.tsx  InboxPage.tsx  SettingsAccountsPage.tsx
       ClientHomePage.tsx  ClientThreadPage.tsx  NotFoundPage.tsx
     features/                # one folder per domain; owns its hooks + components
@@ -44,7 +44,6 @@ web/
       ui/                    # shadcn generated — do not hand-edit except via shadcn CLI
       common/                # OwnerPill, EmptyState, ErrorState, KbdHint, NotchedCard, PillBar, ChipRow, ...
       grove/                 # AppFrame, HeroBand, TopNav, BottomTabBar, GlassCard, GlassTabs, GlassStat, GlassList, StackedBars, FilterBar, ThreadCard, ThreadListRow, StatBox, Sparkline, DeltaChip, Avatar, AvatarTile, models.ts
-      workspace/             # Transitional for LandingPage until G9.1b (NavRail & MobileTabBar deleted in G9.1)
     lib/
       api.ts                 # fetch wrapper, auth header, error normalisation
       socket.ts              # singleton socket + useSocketEvent hook
@@ -66,8 +65,8 @@ web/
 ## 3. Routes
 | Path | Page | Auth | Notes |
 |---|---|---|---|
-| `/` | Landing / redirect | – | shows `LandingPage` (anon); redirects signed-in users → `/app/today` (assistant) or `/c` (client) |
-| `/welcome` | Landing (signed-in) | – | always renders `LandingPage` for signed-in users wanting to view the marketing page |
+| `/` | Redirect | – | signed out → `/login`; signed in → `/app/today` (assistant) or `/c` (client). The old marketing landing page was removed (Aryan, 2026-11-16). |
+| `/welcome` | Redirect | – | → `/login` (kept so old links still work) |
 | `/login`, `/signup` | Login/Signup | anon | split-screen glass auth (`AuthLayout`); real `Remember me` (`localStorage` vs `sessionStorage` via `setAuthToken(token, { remember })`); demo buttons call `POST /api/auth/demo`; "Google" navigates to `${API}/auth/google/start` (shown only if `/health` says `googleLogin:true`) |
 | `/auth/callback` | AuthCallback | anon | reads `#token=` (or `?error=`), stores token, clears the hash, routes by role. P1 |
 | `/onboarding` | Onboarding | assistant | step via `?step=welcome|connect|sync`; after real Gmail OAuth the server lands here with `&accountId=` or `&error=` (`not_test_user`, `access_denied`, …) |
@@ -126,7 +125,6 @@ Route guards: `RequireAuth role="assistant"|"client"`. Assistant without any con
 - `index.html` applies the saved theme before first paint and arms the one-time intro.
 
 ## 7. Screen composition (what each page uses)
-- **LandingPage**: `AppTopBar` · `WorkspaceHeader` · `WorkspaceGrid` (`PersonCard`, `TaskCard`, `FocusPanel` mapped from `sampleData.ts`) · `HowItWorks` · `FeatureStrip` · `LandingFooter`.
 - **TodayPage**: `AppFrame` (full-bleed fixed `/bg/app-bg.webp`, `#1A1B19` fallback) + `BottomTabBar` (in `AssistantLayout`) · transparent `HeroBand` (smoky `.glass` nav, greeting + radial scrim + date chip + 1-line brief w/ `more`, `StackedBars` "This week", `GlassStat×2` For you / For Priya, `GlassList` "Needs your call" / "Next up") · `.working-panel` (`FilterBar` w/ outlined filter circle + `ThreadCard` `1/2/4` responsive + `ThreadListRow×5` "Recently sorted").
 - **InboxPage**: `SegmentNav` (in layout) · `ThreadList` (+ search/filter bar) · `ThreadView` (`ThreadHeader`, `MessageItem[]`, `DraftComposer`) · `AIPanel`.
 - **ClientHomePage**: greeting, count, `ClientCard[]` with AnimatePresence, all‑caught‑up `EmptyState`.
