@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type SeenClientCounts = {
+  assistant: number;
+  client: number;
+  review: number;
+};
+
 interface UiState {
   sidebarCollapsed: boolean;
   aiPanelOpen: boolean;
@@ -8,6 +14,8 @@ interface UiState {
   activeClientId: string | null;
   activeClientUserId: string | null;
   newThreadIds: string[];
+  lastSeenCounts: Record<string, SeenClientCounts>;
+  lastSeenActivityAt: string | null;
   toggleSidebar: () => void;
   setSidebarCollapsed: (v: boolean) => void;
   toggleAiPanel: () => void;
@@ -17,6 +25,8 @@ interface UiState {
   setActiveClientUserId: (id: string | null) => void;
   markNewThread: (id: string) => void;
   clearNewThread: (id: string) => void;
+  setLastSeenCounts: (clientId: string, counts: SeenClientCounts) => void;
+  markActivitySeen: (iso?: string) => void;
 }
 
 export const useUiStore = create<UiState>()(
@@ -28,6 +38,8 @@ export const useUiStore = create<UiState>()(
       activeClientId: null,
       activeClientUserId: null,
       newThreadIds: [],
+      lastSeenCounts: {},
+      lastSeenActivityAt: null,
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebarCollapsed: (v) => set({ sidebarCollapsed: v }),
       toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
@@ -46,6 +58,14 @@ export const useUiStore = create<UiState>()(
         set((s) => ({
           newThreadIds: s.newThreadIds.filter((x) => x !== id),
         })),
+      setLastSeenCounts: (clientId, counts) =>
+        set((s) => ({
+          lastSeenCounts: { ...s.lastSeenCounts, [clientId]: counts },
+        })),
+      markActivitySeen: (iso) =>
+        set({
+          lastSeenActivityAt: iso ?? new Date().toISOString(),
+        }),
     }),
     {
       name: 'relay-ui',
@@ -55,6 +75,8 @@ export const useUiStore = create<UiState>()(
         theme: s.theme,
         activeClientId: s.activeClientId,
         activeClientUserId: s.activeClientUserId,
+        lastSeenCounts: s.lastSeenCounts,
+        lastSeenActivityAt: s.lastSeenActivityAt,
       }),
     }
   )

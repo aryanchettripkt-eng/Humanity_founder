@@ -56,22 +56,23 @@ function renderLanding() {
 describe('LandingPage', () => {
   it('renders hero, sections, summary panel, and footer CTA', () => {
     renderLanding();
-    expect(screen.getByRole('heading', { name: 'WHO REPLIES?' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'WHO NEEDS TO REPLY?' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Who needs to reply' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Your day' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Summary' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'STOP GUESSING WHO REPLIES' })).toBeInTheDocument();
   });
 
-  it('updates SummaryPanel preview and timeline when selecting a different reply card', () => {
+  it('updates FocusPanel preview and timeline when selecting a different reply card', () => {
     renderLanding();
-    expect(screen.getByText('2 emails need you, Priya')).toBeInTheDocument();
-    expect(screen.getByText('Why: Client')).toBeInTheDocument();
+    expect(screen.getByText('In client queue')).toBeInTheDocument();
+    expect(
+      screen.getAllByText('Priya is asked directly to approve the budget.').length
+    ).toBeGreaterThan(0);
 
-    fireEvent.click(screen.getByRole('button', { name: "Inspect Daniel Okafor's thread in Summary" }));
-    expect(screen.getByText("Not in Priya's queue · Alex handles it")).toBeInTheDocument();
-    expect(screen.getByText('Why: Assistant')).toBeInTheDocument();
-    expect(screen.queryByText('2 emails need you, Priya')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Daniel Okafor'));
+    expect(screen.getByText('Handled by assistant')).toBeInTheDocument();
+    expect(screen.queryByText('In client queue')).not.toBeInTheDocument();
   });
 
   it('filters reply cards and updates the thread count', async () => {

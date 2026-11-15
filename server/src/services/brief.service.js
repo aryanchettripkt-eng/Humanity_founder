@@ -87,22 +87,33 @@ export async function generateMorningBrief({
         minute: '2-digit',
       });
     }
-    const formatUpcomingTime = (val) => {
+    const formatBriefTime = (val) => {
       const d = new Date(val);
-      return Number.isNaN(d.getTime()) ? String(val) : timeFmt.format(d);
+      if (Number.isNaN(d.getTime())) return String(val);
+      const parts = timeFmt.formatToParts(d);
+      const weekday = parts.find((p) => p.type === 'weekday')?.value || '';
+      const hour = parts.find((p) => p.type === 'hour')?.value || '';
+      const minute = parts.find((p) => p.type === 'minute')?.value || '';
+      const dayPeriod = (parts.find((p) => p.type === 'dayPeriod')?.value || '').toLowerCase();
+      return `${weekday} ${hour}:${minute} ${dayPeriod}`.trim();
     };
+    const sanitizeSummaryDates = (text) =>
+      String(text || '').replace(
+        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?/g,
+        (iso) => formatBriefTime(iso)
+      );
 
     const provider = getProvider();
     const prompt = [
       `Morning brief for ${client?.name || clientName}.`,
       `Counts: assistant=${counts.assistant ?? 0}, client=${counts.client ?? 0}, review=${counts.review ?? 0}, waiting=${counts.waiting ?? 0}.`,
-      `Top threads:\n${topThreads.map((t) => `- [${t.owner}] ${t.subject}: ${t.summary}`).join('\n')}`,
-      `Upcoming:\n${upcoming.slice(0, 3).map((u) => `- ${u.title} (${formatUpcomingTime(u.startsAt)})`).join('\n') || 'None'}`,
+      `Top threads:\n${topThreads.map((t) => `- [${t.owner}] ${t.subject}: ${sanitizeSummaryDates(t.summary)}`).join('\n')}`,
+      `Upcoming:\n${upcoming.slice(0, 3).map((u) => `- ${u.title} (${formatBriefTime(u.startsAt)})`).join('\n') || 'None'}`,
     ].join('\n\n');
 
     const text = await provider.generateText({
       system:
-        'Write a calm, concise 2-3 sentence morning brief for a personal assistant. No greeting fluff. Never mention UTC or timezones.',
+        'Write a calm, concise 2-3 sentence morning brief for a personal assistant. No greeting fluff. Never write UTC, timezone names, or the year (say e.g. "Sun 8:00 pm", never "20:03 UTC" or "Nov 15 2026").',
       prompt,
       temperature: 0.4,
     });

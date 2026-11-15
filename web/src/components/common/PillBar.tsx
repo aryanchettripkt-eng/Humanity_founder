@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, CalendarDays } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ type PillBarProps = {
   actionHref?: string;
   actionLabel?: string;
   actionTooltip?: string;
+  actionSlot?: ReactNode;
   className?: string;
 };
 
@@ -36,6 +38,7 @@ export function PillBar({
   actionHref,
   actionLabel = 'View schedule',
   actionTooltip,
+  actionSlot,
   className,
 }: PillBarProps) {
   const prefersReducedMotion = useReducedMotion();
@@ -70,7 +73,7 @@ export function PillBar({
           <span>{dateLabel}</span>
         </span>
 
-        <div className="relative flex min-w-0 flex-1 items-center rounded-full bg-accent-lime px-3 py-1.5 text-accent-lime-foreground">
+        <div className="no-scrollbar relative flex min-w-0 flex-1 items-center overflow-x-auto rounded-full bg-accent-lime px-3 py-1.5 text-accent-lime-foreground">
           {slots.length === 0 ? (
             <p className="truncate text-xs font-medium">{emptyText}</p>
           ) : (
@@ -144,20 +147,21 @@ export function PillBar({
         </div>
       </div>
 
-      {actionHref && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <a
-              href={actionHref}
-              aria-label={actionLabel}
-              className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink-surface text-ink-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-lime lg:inline-flex"
-            >
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-          </TooltipTrigger>
-          {actionTooltip && <TooltipContent>{actionTooltip}</TooltipContent>}
-        </Tooltip>
-      )}
+      {actionSlot ||
+        (actionHref && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={actionHref}
+                aria-label={actionLabel}
+                className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink-surface text-ink-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-lime lg:inline-flex"
+              >
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </TooltipTrigger>
+            {actionTooltip && <TooltipContent>{actionTooltip}</TooltipContent>}
+          </Tooltip>
+        ))}
     </section>
   );
 }

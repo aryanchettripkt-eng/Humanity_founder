@@ -66,6 +66,7 @@ export function AppRouter() {
       <Suspense fallback={<RouteFallback />}>
         <Routes>
         <Route path="/" element={<RootRedirect />} />
+        <Route path="/welcome" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
@@ -96,7 +97,7 @@ export function AppRouter() {
         <Route
           path="/c"
           element={
-            <RequireAuth role="client">
+            <RequireAuth role="client" allowAssistantPreview>
               <ClientLayout />
             </RequireAuth>
           }

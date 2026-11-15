@@ -11,7 +11,7 @@ import { logger } from '../utils/logger.js';
 import { recordActivity } from './activity.service.js';
 import { trimQuotedReplies } from './gmail/mapper.js';
 
-export const PROMPT_VERSION = 'v3';
+export const PROMPT_VERSION = 'v4';
 
 const MAX_CORRECTIONS = 5;
 

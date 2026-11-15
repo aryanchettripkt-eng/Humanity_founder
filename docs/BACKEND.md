@@ -326,7 +326,7 @@ To: {{to}}  Cc: {{cc}}
 ### 5.6 Other prompts (short specs)
 - **Draft** (`generateText`): inputs thread, tone, instruction, optional client note, signature "{{assistant.name}}, on behalf of {{client.name}}" when owner is assistant. Output plain text body only, ≤ 150 words for brief. Never invent facts/dates not in thread or instruction; use `[placeholder]` if missing.
 - **Ask** (`generateJSON`): server first runs intent routing with cheap rules (`waiting` → waiting segment, `attention|need me` → assistant+review, `client` → client segment, `why` + threadId → return stored reason, `draft` → action draft). Pass the matching thread summaries (≤ 25) to the model: `{ answer, threadIds }`. Model only cites ids it was given.
-- **Brief** (`generateText`): input counts + top 5 assistant/client/review threads + upcoming 48h entities → 2–3 sentences, no greeting fluff. Fallback template: `"{a} threads need you, {c} need {client}, {r} to review. Next up: {entity}."`
+- **Brief** (`generateText`, `PROMPT_VERSION = 'v4'`): input counts + top 5 assistant/client/review threads + upcoming 48h entities → 2–3 sentences, no greeting fluff, times formatted in the client's timezone as `"Sun 8:00 pm"` (never UTC or year), and ISO timestamps in thread summaries sanitized before prompt injection. Fallback template: `"{a} threads need you, {c} need {client}, {r} to review. Next up: {entity}."`
 
 ## 6. Mock integrations (what is simulated)
 > Real vs simulated summary lives in PRD §11. Real Gmail (read-only) is an optional path, see §11 below; the demo inbox stays the default.
