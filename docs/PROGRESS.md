@@ -27,6 +27,11 @@ _None yet._
 
 ---
 
+### 2026-11-16 00:30 · claude · G9.1c review + docs to match the build
+- Reviewed G9.1c on main @ bab156a: composition correct, Today matches target, lint/typecheck/tests green. 8 fixes listed in ROADMAP G9.1c-fixes (hero contrast, StatBox truncation, nav/filter wrap <1024, offline toast, iOS background, phone rows, chart height).
+- DESIGN_V2 §1.0 rewritten for what was built; D22 supersedes D21. ROADMAP G9.2/G9.3 specs expanded.
+- Process: 8f7d12b and bab156a were pushed to main directly and #25 to #28 merged unreviewed; 8f7d12b reverted the UX subtraction work and removed its PROGRESS entry. Please use PRs.
+
 ### 2026-11-15 23:12 · gemini · G9.1c glass hero over full-bleed background
 - Done: Updated `gemini/G9.1c-themes` to match the full-bleed background + smoky glass hero + floating working panel composition:
   - Placed `web/public/bg/app-bg.webp` (`cover`, `center`, `fixed`, `#1A1B19` fallback, `20%` dark overlay in `.dark` via `--canvas-overlay`).
