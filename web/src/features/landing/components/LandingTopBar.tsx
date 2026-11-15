@@ -31,7 +31,7 @@ export function LandingTopBar({ demoLoading, onDemoLogin }: LandingTopBarProps) 
 
       <section
         aria-label="Today's extracted schedule"
-        className="order-3 flex w-full items-center justify-between gap-2 rounded-full bg-landing-ink p-1.5 text-landing-ink-foreground lg:order-2 lg:w-auto lg:flex-1 lg:max-w-[780px]"
+        className="order-3 flex w-full items-center justify-between gap-2 rounded-full bg-landing-ink p-1.5 text-landing-ink-foreground lg:order-2 lg:mx-4 lg:w-auto lg:flex-1"
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-landing-ink-surface px-3 py-2 text-xs font-medium text-landing-ink-foreground">

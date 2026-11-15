@@ -104,8 +104,8 @@ export function LandingPage() {
   const taskCountLabel = `${visibleTasks.length} ${visibleTasks.length === 1 ? 'task' : 'tasks'}`;
 
   return (
-    <div className="theme-landing min-h-screen bg-landing-canvas p-2 text-landing-ink antialiased selection:bg-landing-accent selection:text-landing-accent-foreground sm:p-4 md:p-6 lg:p-8">
-      <div className="relative mx-auto max-w-[1400px] overflow-x-clip rounded-[28px] border border-landing-card/80 bg-landing-surface p-4 shadow-landing sm:rounded-[32px] sm:p-6 lg:p-8">
+    <div className="theme-landing min-h-screen w-full overflow-x-clip bg-landing-surface text-landing-ink antialiased selection:bg-landing-accent selection:text-landing-accent-foreground">
+      <div className="relative w-full px-4 py-4 sm:px-6 sm:py-6 lg:px-10 lg:py-8">
         <LandingTopBar demoLoading={demoLoading} onDemoLogin={handleDemo} />
 
         <main>

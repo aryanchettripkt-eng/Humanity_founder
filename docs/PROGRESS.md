@@ -27,6 +27,13 @@ _None yet._
 
 ---
 
+### 2026-11-15 17:53 · gemini · L7.1 full-bleed landing + replace TodayPage with lime workspace
+- Done:
+  - Extended `LandingPage` edge-to-edge (`w-full`, removed outer grey frame and `max-w-[1400px]` box) and stretched `LandingTopBar` schedule bar across wide screens.
+  - Replaced the old `TodayPage` UI (`/app/today`) with the new lime-workspace layout powered by live `useDashboard` data (`web/src/features/today/mappers.ts`, `TodaySummaryPanel.tsx`, and `TodayPage.tsx`), preserving Morning Brief + refresh, owner counts, Quick Review 1-click owner assignment, Recent conversations (`ReplyCard`), Upcoming dates, Follow-up nudges (`TaskCard`), and Activity.
+- Changed contracts: none.
+- Next: review on `gemini/L7.1-landing-page` and merge PR.
+
 ### 2026-11-15 17:47 · gemini · L7.1 landing page audit fixes (P1 + P2 + a11y)
 - Done:
   - P1 #1 (`StatWithDelta`): absolute top-right delta badge on the number wrapper; stacked label under number below `sm` so 320/375/390 stats never overlap.
