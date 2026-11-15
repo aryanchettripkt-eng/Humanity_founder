@@ -70,7 +70,7 @@ export function AvatarTile({ initials, size = 'md', className }: AvatarTileProps
     <span
       aria-hidden="true"
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-xl bg-ink font-display font-semibold text-ink-foreground',
+        'inline-flex shrink-0 items-center justify-center rounded-xl bg-[#1E1F1C] font-display font-semibold text-white dark:bg-[#2A2C27] dark:text-white',
         size === 'sm' ? 'h-9 w-9 text-xs' : 'h-11 w-11 text-sm',
         className
       )}

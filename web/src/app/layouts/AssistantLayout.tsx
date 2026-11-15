@@ -7,6 +7,7 @@ import { OfflineBanner } from '@/components/common/OfflineBanner';
 import { AppFrame } from '@/components/grove/AppFrame';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
 import { BottomTabBar } from '@/components/grove/BottomTabBar';
+import { HeroBand } from '@/components/grove/HeroBand';
 import { useMe } from '@/features/auth/api';
 import { AskPanel } from '@/features/command/AskPanel';
 import { CommandPalette } from '@/features/command/CommandPalette';
@@ -65,6 +66,7 @@ export function AssistantLayout() {
   useSocketEvent('draft:created', onThreadUpdated);
 
   const isToday = location.pathname === '/app/today';
+  const pageTitle = location.pathname.startsWith('/app/settings') ? 'Settings' : 'Inbox';
 
   return (
     <AppFrame>
@@ -72,12 +74,18 @@ export function AssistantLayout() {
 
       {/* Pages that render their own HeroBand (TodayPage) embed AssistantTopNav inside it */}
       {!isToday ? (
-        <div className="bg-ink px-4 py-3 text-ink-foreground sm:px-6 md:px-8">
-          <AssistantTopNav />
-        </div>
+        <HeroBand
+          size="short"
+          nav={<AssistantTopNav />}
+          left={
+            <h1 className="font-display text-3xl font-semibold tracking-tight text-white">
+              {pageTitle}
+            </h1>
+          }
+        />
       ) : null}
 
-      <main className="flex-1 pb-20 md:pb-0">
+      <main className="flex min-h-0 flex-1 flex-col pb-20 md:pb-0">
         <Outlet />
       </main>
 

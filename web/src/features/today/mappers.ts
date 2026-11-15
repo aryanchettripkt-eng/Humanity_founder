@@ -7,7 +7,7 @@ import type {
 } from '@/components/grove/models';
 import { Crown, UserRoundCheck } from 'lucide-react';
 import { formatRelativeTime, formatUpcomingDate, getInitials } from '@/lib/format';
-import { OWNER_META } from '@/lib/owners';
+import { getOwnerShortLabel } from '@/lib/owners';
 import type { SeenClientCounts } from '@/stores/ui';
 import type {
   ActivityItem,
@@ -58,23 +58,49 @@ export function extractDomain(email: string | undefined): string {
   return email.split('@')[1] || 'gmail.com';
 }
 
-export function buildWeeklyBars(threads: ThreadListItem[]): GroveBarDayModel[] {
+function formatDateKeyInZone(date: Date, timeZone?: string): string {
+  try {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: timeZone || 'UTC',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+  } catch {
+    return date.toISOString().slice(0, 10);
+  }
+}
+
+function formatWeekdayInZone(date: Date, timeZone?: string): string {
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      timeZone: timeZone || 'UTC',
+    }).format(date);
+  } catch {
+    return date.toLocaleDateString([], { weekday: 'short' });
+  }
+}
+
+export function buildWeeklyBars(threads: ThreadListItem[], timeZone?: string): GroveBarDayModel[] {
   const now = new Date();
   const days: GroveBarDayModel[] = [];
   const dayMap = new Map<string, GroveBarDayModel>();
 
   for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
-    const label = d.toLocaleDateString([], { weekday: 'short' });
+    const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    const key = formatDateKeyInZone(d, timeZone);
+    const label = formatWeekdayInZone(d, timeZone);
     const entry: GroveBarDayModel = { key, label, assistant: 0, client: 0, none: 0 };
     days.push(entry);
     dayMap.set(key, entry);
   }
 
   for (const t of threads) {
-    const key = (t.lastMessageAt || '').slice(0, 10);
+    if (!t.lastMessageAt) continue;
+    const parsed = new Date(t.lastMessageAt);
+    if (Number.isNaN(parsed.getTime())) continue;
+    const key = formatDateKeyInZone(parsed, timeZone);
     const bucket = dayMap.get(key);
     if (!bucket) continue;
     if (t.owner === 'assistant') bucket.assistant += 1;
@@ -100,9 +126,9 @@ export function buildGroveStats(
   const diff = seen ? assistant - seen.assistant : 0;
   const assistantDelta =
     diff > 0
-      ? `+${diff} since this morning`
+      ? `+${diff} since your last visit`
       : diff < 0
-        ? `${diff} since this morning`
+        ? `${diff} since your last visit`
         : `${assistant} ready for reply`;
 
   return [
@@ -166,16 +192,25 @@ export function buildNeedsYourCallList(
   };
 }
 
-function buildThreadSeries(t: ThreadListItem): number[] {
-  const base = Math.max(1, Math.min(6, t.messageCount || 1));
-  const seed = t.id.charCodeAt(t.id.length - 1) || 3;
-  return Array.from({ length: 8 }, (_, i) => {
-    if (i === 7) return base;
-    return ((seed + i * 3) % (base + 1)) + (i > 4 ? 1 : 0);
-  });
+function formatCompactCardDate(iso: string, timeZone?: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: timeZone || undefined,
+    })
+      .format(d)
+      .replace(/\s*(AM|PM)$/i, (_, mer: string) => ` ${mer.toLowerCase()}`);
+  } catch {
+    return formatUpcomingDate(iso, timeZone);
+  }
 }
 
-function ctaLabelForThread(t: ThreadListItem, clientFirstName: string): string {
+export function ctaLabelForThread(t: ThreadListItem, clientFirstName: string): string {
   if (t.owner === 'assistant') return 'Draft reply';
   if (t.owner === 'client') {
     return t.handoff?.state === 'client_handling' ? `Nudge ${clientFirstName}` : `Send to ${clientFirstName}`;
@@ -219,9 +254,9 @@ export function buildGroveThreadCards(
     const sender = t.participants?.[0]?.name || t.participants?.[0]?.email || 'Contact';
     const domain = extractDomain(t.participants?.[0]?.email);
     const nextEntity = t.entities?.[0];
-    const ownerLabel =
-      t.owner === 'client' ? `For ${clientFirstName}` : OWNER_META[t.owner].shortLabel;
+    const ownerLabel = getOwnerShortLabel(t.owner, clientFirstName);
     const isFresh = now - new Date(t.lastMessageAt).getTime() < 2 * dayMs;
+    const msgCount = t.messageCount ?? 0;
 
     return {
       id: t.id,
@@ -231,10 +266,12 @@ export function buildGroveThreadCards(
       owner: t.owner,
       ownerLabel,
       confidence: Math.round((t.confidence ?? 0.5) * 100),
-      nextDateLabel: nextEntity ? formatUpcomingDate(nextEntity.startsAt, timeZone) : '—',
-      series: buildThreadSeries(t),
+      nextDateLabel: nextEntity ? formatCompactCardDate(nextEntity.startsAt, timeZone) : '—',
+      series: [],
       sparkTone: t.lastSender === 'them' ? 'olive' : 'ink',
-      deltaText: isFresh ? `${t.messageCount} msgs` : `quiet ${formatRelativeTime(t.lastMessageAt)}`,
+      deltaText: isFresh
+        ? `${msgCount} ${msgCount === 1 ? 'msg' : 'msgs'}`
+        : `quiet ${formatRelativeTime(t.lastMessageAt)}`,
       deltaDirection: isFresh ? 'up' : 'down',
       ctaLabel: ctaLabelForThread(t, clientFirstName),
       href: `/app/inbox/${t.owner === 'review' ? 'review' : 'inbox'}/${t.id}`,

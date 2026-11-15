@@ -6,11 +6,12 @@ import { cn } from '@/lib/utils';
 
 export type ThreadListRowProps = {
   item: GroveThreadRowModel;
+  ownerLabel?: string;
   onSelect?: (item: GroveThreadRowModel) => void;
   className?: string;
 };
 
-export function ThreadListRow({ item, onSelect, className }: ThreadListRowProps) {
+export function ThreadListRow({ item, ownerLabel, onSelect, className }: ThreadListRowProps) {
   const inner = (
     <div
       className={cn(
@@ -37,7 +38,7 @@ export function ThreadListRow({ item, onSelect, className }: ThreadListRowProps)
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <OwnerPill owner={item.owner} hideLabelOnSmall />
+        <OwnerPill owner={item.owner} label={ownerLabel} />
         <span className="w-16 text-right text-xs text-muted-foreground tabular-nums">
           {item.timeLabel}
         </span>

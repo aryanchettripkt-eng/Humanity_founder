@@ -41,7 +41,7 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
   client: {
     id: 'client',
     label: 'Client',
-    shortLabel: 'For Priya',
+    shortLabel: 'For client',
     description: 'Needs your client’s personal decision or approval',
     icon: Crown,
     pillClass:
@@ -74,6 +74,13 @@ export const OWNER_META: Record<Owner, OwnerMetaItem> = {
 };
 
 export const OWNER_ORDER: Owner[] = ['assistant', 'client', 'none', 'review'];
+
+export function getOwnerShortLabel(owner: Owner, clientFirstName?: string): string {
+  if (owner === 'client' && clientFirstName) {
+    return `For ${clientFirstName}`;
+  }
+  return OWNER_META[owner].shortLabel;
+}
 
 export const CATEGORY_ICONS: Record<Category, LucideIcon> = {
   meeting: CalendarDays,

@@ -6,6 +6,7 @@ import type { Owner, OwnerSource } from '@/types/api';
 export type OwnerPillProps = {
   owner: Owner;
   source?: OwnerSource;
+  label?: string;
   size?: 'sm' | 'md';
   loading?: boolean;
   interactive?: boolean;
@@ -23,6 +24,7 @@ const SOURCE_ICON: Partial<Record<OwnerSource, { icon: typeof Bot; label: string
 export function OwnerPill({
   owner,
   source,
+  label,
   size = 'sm',
   loading = false,
   interactive = false,
@@ -51,7 +53,7 @@ export function OwnerPill({
   const content = (
     <>
       <Icon className={cn(size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5', 'shrink-0')} />
-      <span className={cn(hideLabelOnSmall && 'hidden sm:inline')}>{meta.label}</span>
+      <span className={cn(hideLabelOnSmall && 'hidden sm:inline')}>{label ?? meta.label}</span>
       {SourceIcon && (
         <span title={sourceInfo.label} className="opacity-70">
           <SourceIcon className="h-2.5 w-2.5" />

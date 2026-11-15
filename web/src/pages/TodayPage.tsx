@@ -1,6 +1,7 @@
 import { CalendarDays, ChevronDown, RefreshCw, Sparkles } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type TouchEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
@@ -8,12 +9,14 @@ import { FilterBar, type FilterDropdownDef } from '@/components/grove/FilterBar'
 import { GlassList } from '@/components/grove/GlassList';
 import { GlassStat } from '@/components/grove/GlassStat';
 import { HeroBand } from '@/components/grove/HeroBand';
+import type { GroveThreadCardModel } from '@/components/grove/models';
 import { StackedBars } from '@/components/grove/StackedBars';
 import { ThreadCard } from '@/components/grove/ThreadCard';
 import { ThreadListRow } from '@/components/grove/ThreadListRow';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMe } from '@/features/auth/api';
-import { useThreadCounts, useThreads } from '@/features/inbox/api';
+import { useCreateDraft } from '@/features/composer/api';
+import { useChangeOwner, usePatchThread, useThreadCounts, useThreads } from '@/features/inbox/api';
 import { useDashboard, useRefreshBrief } from '@/features/today/api';
 import {
   buildGroveRecentRows,
@@ -25,10 +28,35 @@ import {
   splitFirstSentence,
   type TodayGroveFilters,
 } from '@/features/today/mappers';
+import { getOwnerShortLabel } from '@/lib/owners';
 import { useUiStore } from '@/stores/ui';
 import type { Category, Owner } from '@/types/api';
 
-const PAGE_SIZE = 4;
+function getResponsivePageSize(): number {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 4;
+  if (window.matchMedia('(min-width: 1280px)').matches) return 4;
+  if (window.matchMedia('(min-width: 768px)').matches) return 2;
+  return 1;
+}
+
+function useResponsivePageSize(): number {
+  const [pageSize, setPageSize] = useState<number>(getResponsivePageSize);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const xlQuery = window.matchMedia('(min-width: 1280px)');
+    const mdQuery = window.matchMedia('(min-width: 768px)');
+    const sync = () => setPageSize(getResponsivePageSize());
+    xlQuery.addEventListener('change', sync);
+    mdQuery.addEventListener('change', sync);
+    return () => {
+      xlQuery.removeEventListener('change', sync);
+      mdQuery.removeEventListener('change', sync);
+    };
+  }, []);
+
+  return pageSize;
+}
 
 export function TodayPage() {
   const navigate = useNavigate();
@@ -50,14 +78,21 @@ export function TodayPage() {
     clientId: activeClient?.id,
   });
   const refreshBrief = useRefreshBrief(activeClient?.id);
+  const createDraft = useCreateDraft();
+  const patchThread = usePatchThread();
+  const changeOwner = useChangeOwner();
+  const pageSize = useResponsivePageSize();
 
   const [briefOpen, setBriefOpen] = useState(false);
+  const [weekChartOpen, setWeekChartOpen] = useState(false);
+  const [pendingCardId, setPendingCardId] = useState<string | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
 
   const filters = useMemo<TodayGroveFilters>(
     () => ({
       owner: (searchParams.get('owner') as TodayGroveFilters['owner']) || 'all',
       category: (searchParams.get('category') as TodayGroveFilters['category']) || 'all',
-      date: (searchParams.get('date') as TodayGroveFilters['date']) || 'all',
+      date: (searchParams.get('date') as TodayGroveFilters['date']) || 'week',
       confidence: (searchParams.get('confidence') as TodayGroveFilters['confidence']) || 'all',
       source: (searchParams.get('source') as TodayGroveFilters['source']) || 'all',
     }),
@@ -67,7 +102,11 @@ export function TodayPage() {
 
   const updateFilter = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
-    if (value === 'all' || (key === 'page' && value === '1')) next.delete(key);
+    const isDefault =
+      (key === 'date' && value === 'week') ||
+      (key !== 'date' && value === 'all') ||
+      (key === 'page' && value === '1');
+    if (isDefault) next.delete(key);
     else next.set(key, value);
     if (key !== 'page') next.delete('page');
     setSearchParams(next, { replace: true });
@@ -105,7 +144,10 @@ export function TodayPage() {
     });
   }, [threadsRes?.data, data]);
 
-  const weeklyBars = useMemo(() => buildWeeklyBars(allThreads), [allThreads]);
+  const weeklyBars = useMemo(
+    () => buildWeeklyBars(allThreads, activeClient?.timezone),
+    [allThreads, activeClient?.timezone]
+  );
 
   const groveStats = useMemo(
     () =>
@@ -133,9 +175,9 @@ export function TodayPage() {
     [allThreads, filters, clientFirstName, activeClient?.timezone]
   );
 
-  const totalPages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(cards.length / pageSize));
   const safePage = Math.min(pageParam, totalPages);
-  const pageCards = cards.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pageCards = cards.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const recentRows = useMemo(
     () => buildGroveRecentRows(data?.recent ?? allThreads),
@@ -147,7 +189,84 @@ export function TodayPage() {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
+    timeZone: activeClient?.timezone || undefined,
   });
+
+  const handlePrimaryAction = (card: GroveThreadCardModel) => {
+    const thread = allThreads.find((t) => t.id === card.id);
+    setPendingCardId(card.id);
+
+    if (card.owner === 'assistant') {
+      createDraft.mutate(
+        { threadId: card.id, tone: 'formal' },
+        {
+          onSuccess: () => {
+            toast.success('Draft ready');
+            navigate(`/app/inbox/inbox/${card.id}`);
+          },
+          onSettled: () => setPendingCardId(null),
+        }
+      );
+      return;
+    }
+
+    if (card.owner === 'client') {
+      if (thread?.handoff?.state === 'client_handling') {
+        patchThread.mutate(
+          {
+            id: card.id,
+            patch: { unread: true },
+            undoPatch: { unread: Boolean(thread?.unread) },
+            label: `Reminder sent to ${clientFirstName}`,
+          },
+          { onSettled: () => setPendingCardId(null) }
+        );
+      } else {
+        patchThread.mutate(
+          {
+            id: card.id,
+            patch: { important: true },
+            undoPatch: { important: Boolean(thread?.important) },
+            label: `Sent to ${clientFirstName}`,
+          },
+          { onSettled: () => setPendingCardId(null) }
+        );
+      }
+      return;
+    }
+
+    if (card.owner === 'review') {
+      changeOwner.mutate(
+        {
+          id: card.id,
+          owner: thread?.suggestedOwner ?? 'assistant',
+          previousOwner: 'review',
+        },
+        { onSettled: () => setPendingCardId(null) }
+      );
+      return;
+    }
+
+    setPendingCardId(null);
+    if (card.href) navigate(card.href);
+  };
+
+  const handleCardTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
+  };
+
+  const handleCardTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
+    if (touchStartXRef.current === null || totalPages <= 1) return;
+    const endX = e.changedTouches[0]?.clientX;
+    if (typeof endX !== 'number') return;
+    const deltaX = endX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (deltaX < -48 && safePage < totalPages) {
+      updateFilter('page', String(safePage + 1));
+    } else if (deltaX > 48 && safePage > 1) {
+      updateFilter('page', String(safePage - 1));
+    }
+  };
 
   const filterDefs: FilterDropdownDef[] = [
     {
@@ -175,6 +294,9 @@ export function TodayPage() {
         { value: 'finance' as Category, label: 'Finance' },
         { value: 'legal' as Category, label: 'Legal' },
         { value: 'update' as Category, label: 'Update' },
+        { value: 'newsletter' as Category, label: 'Newsletter' },
+        { value: 'personal' as Category, label: 'Personal' },
+        { value: 'general' as Category, label: 'General' },
       ],
     },
     {
@@ -213,28 +335,6 @@ export function TodayPage() {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6 p-4 sm:p-6 md:p-8">
-        <Skeleton className="h-[340px] w-full rounded-[24px]" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Skeleton className="h-44 rounded-[18px]" />
-          <Skeleton className="h-44 rounded-[18px]" />
-          <Skeleton className="h-44 rounded-[18px]" />
-          <Skeleton className="h-44 rounded-[18px]" />
-        </div>
-      </div>
-    );
-  }
-
-  if (isError || !data) {
-    return (
-      <div className="p-6">
-        <ErrorState onRetry={() => refetch()} />
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col">
       <HeroBand
@@ -254,7 +354,9 @@ export function TodayPage() {
                 </span>
               </div>
 
-              {briefParts ? (
+              {isLoading ? (
+                <Skeleton className="h-10 max-w-md rounded-xl bg-white/15" />
+              ) : briefParts ? (
                 <div className="relative flex flex-wrap items-center gap-2 text-sm text-white/85">
                   <p className="max-w-xl">{briefParts.head}</p>
                   {briefParts.rest ? (
@@ -262,7 +364,7 @@ export function TodayPage() {
                       type="button"
                       onClick={() => setBriefOpen((v) => !v)}
                       aria-expanded={briefOpen}
-                      className="inline-flex items-center gap-0.5 text-xs font-semibold text-white underline underline-offset-4"
+                      className="inline-flex min-h-[44px] items-center gap-0.5 px-1 text-xs font-semibold text-white underline underline-offset-4"
                     >
                       more
                       <ChevronDown className="h-3.5 w-3.5" />
@@ -273,13 +375,13 @@ export function TodayPage() {
                     onClick={() => refreshBrief.mutate()}
                     disabled={refreshBrief.isPending}
                     aria-label="Refresh brief"
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-50"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-50"
                   >
                     <RefreshCw
-                      className={`h-3.5 w-3.5 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
+                      className={`h-4 w-4 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
                     />
                   </button>
-                  {briefOpen && briefParts.rest ? (
+                  {briefOpen && briefParts.rest && data?.brief ? (
                     <div className="w-full rounded-2xl border border-white/30 bg-black/45 p-3 text-xs leading-relaxed text-white backdrop-blur-xl">
                       {data.brief.text}
                     </div>
@@ -288,87 +390,141 @@ export function TodayPage() {
               ) : null}
             </div>
 
-            <StackedBars
-              title="This week"
-              days={weeklyBars}
-              actionHref="/app/inbox/inbox"
-              onSelectOwner={(owner) => updateFilter('owner', owner)}
-            />
+            {isLoading ? (
+              <Skeleton className="h-44 w-full rounded-[20px] bg-white/15" />
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setWeekChartOpen((v) => !v)}
+                  aria-expanded={weekChartOpen}
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-4 text-xs font-medium text-white backdrop-blur-md md:hidden"
+                >
+                  This week
+                  <ChevronDown
+                    className={`h-3.5 w-3.5 transition-transform ${weekChartOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                <div className={weekChartOpen ? 'block' : 'hidden md:block'}>
+                  <StackedBars
+                    title="This week"
+                    days={weeklyBars}
+                    clientName={clientFirstName}
+                    actionHref="/app/inbox/inbox"
+                    onSelectOwner={(owner) => updateFilter('owner', owner)}
+                  />
+                </div>
+              </>
+            )}
           </div>
         }
         right={
-          <div className="grid grid-cols-1 gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              {groveStats.map((stat) => (
-                <GlassStat key={stat.id} stat={stat} />
-              ))}
+          isLoading ? (
+            <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <Skeleton className="h-28 rounded-[20px] bg-white/15" />
+                <Skeleton className="h-28 rounded-[20px] bg-white/15" />
+              </div>
+              <Skeleton className="h-40 rounded-[20px] bg-white/15" />
             </div>
-            <GlassList
-              title={callList.title}
-              actionHref={callList.actionHref}
-              rows={callList.rows}
-              emptyText={callList.emptyText}
-            />
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                {groveStats.map((stat) => (
+                  <GlassStat key={stat.id} stat={stat} />
+                ))}
+              </div>
+              <GlassList
+                title={callList.title}
+                actionHref={callList.actionHref}
+                rows={callList.rows}
+                emptyText={callList.emptyText}
+              />
+            </div>
+          )
         }
       />
 
-      <div className="space-y-6 bg-surface px-4 py-6 sm:px-6 md:px-8">
-        <FilterBar
-          filters={filterDefs}
-          page={safePage}
-          totalPages={totalPages}
-          onPageChange={(p) => updateFilter('page', String(p))}
-          onClearAll={clearAllFilters}
-        />
-
-        {pageCards.length === 0 ? (
-          <EmptyState
-            icon={Sparkles}
-            title="No threads match these filters"
-            description="Try clearing a filter or switching to All."
+      {isLoading ? (
+        <div className="space-y-6 bg-surface px-4 py-6 sm:px-6 md:px-8">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <Skeleton className="h-48 rounded-[18px]" />
+            <Skeleton className="hidden h-48 rounded-[18px] md:block" />
+            <Skeleton className="hidden h-48 rounded-[18px] xl:block" />
+            <Skeleton className="hidden h-48 rounded-[18px] xl:block" />
+          </div>
+        </div>
+      ) : isError || !data ? (
+        <div className="bg-surface px-4 py-6 sm:px-6 md:px-8">
+          <ErrorState onRetry={() => refetch()} />
+        </div>
+      ) : (
+        <div className="space-y-6 bg-surface px-4 py-6 sm:px-6 md:px-8">
+          <FilterBar
+            filters={filterDefs}
+            page={safePage}
+            totalPages={totalPages}
+            onPageChange={(p) => updateFilter('page', String(p))}
+            onClearAll={clearAllFilters}
           />
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {pageCards.map((card) => (
-              <ThreadCard
-                key={card.id}
-                item={card}
-                onOpen={(item) => item.href && navigate(item.href)}
-                onPrimaryAction={(item) => item.href && navigate(item.href)}
-              />
-            ))}
-          </div>
-        )}
 
-        <section aria-label="Recently sorted" className="space-y-3 pt-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">
-              Recently sorted
-            </h2>
-            <Link
-              to="/app/inbox/inbox"
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              View inbox
-            </Link>
-          </div>
-
-          {recentRows.length === 0 ? (
+          {pageCards.length === 0 ? (
             <EmptyState
               icon={Sparkles}
-              title="Inbox is clear"
-              description="No recent conversations yet for this client."
+              title="No threads match these filters"
+              description="Try clearing a filter or switching to All."
             />
           ) : (
-            <div className="space-y-2">
-              {recentRows.map((row) => (
-                <ThreadListRow key={row.id} item={row} />
+            <div
+              onTouchStart={handleCardTouchStart}
+              onTouchEnd={handleCardTouchEnd}
+              className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+            >
+              {pageCards.map((card) => (
+                <ThreadCard
+                  key={card.id}
+                  item={card}
+                  actionPending={pendingCardId === card.id}
+                  onOpen={(item) => item.href && navigate(item.href)}
+                  onPrimaryAction={handlePrimaryAction}
+                />
               ))}
             </div>
           )}
-        </section>
-      </div>
+
+          <section aria-label="Recently sorted" className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold tracking-tight text-foreground">
+                Recently sorted
+              </h2>
+              <Link
+                to="/app/inbox/inbox"
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold text-primary hover:underline"
+              >
+                View inbox
+              </Link>
+            </div>
+
+            {recentRows.length === 0 ? (
+              <EmptyState
+                icon={Sparkles}
+                title="Inbox is clear"
+                description="No recent conversations yet for this client."
+              />
+            ) : (
+              <div className="space-y-2">
+                {recentRows.map((row) => (
+                  <ThreadListRow
+                    key={row.id}
+                    item={row}
+                    ownerLabel={getOwnerShortLabel(row.owner, clientFirstName)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

@@ -27,6 +27,16 @@ _None yet._
 
 ---
 
+### 2026-11-15 19:50 · gemini · G9.1 PR #21 review fixes
+- Done: Addressed all Blockers (1–5) and Should-fix/Nits (6–14) from PR #21 review:
+  - Wired real Today card CTAs (`useCreateDraft`, `usePatchThread`, `useChangeOwner`) with pending state and Undo/toast feedback.
+  - Removed fabricated sparkline data (`series: []` until real 14-day series exists), fixed singular/plural `deltaText` (`1 msg` / `N msgs`), formatted compact `nextDateLabel` (`Mon 6:30 pm`), and changed delta label to `since your last visit`.
+  - Kept `HeroBand` + `AssistantTopNav` visible during loading/error states; added responsive `PAGE_SIZE` (`1/2/4`) + mobile touch swipe + `<768px` `"This week ▾"` chart toggle; replaced dark bar on non-Today pages in `AssistantLayout` with short `HeroBand` and `flex-1 min-h-0` `<main>` so `InboxPage` fills frame height.
+  - Upgraded `TopNav` menus to Radix `Popover` (`role="menu"`, `Esc` + outside-click + `aria-expanded`), added `.glass` utility, `h-11`/`min-h-[44px]` tap targets across Grove controls, CSS-var `StackedBars` + `getOwnerShortLabel` (`For Priya` / `For client`), fixed `AvatarTile` dark mode contrast, `HeroBand` `fetchpriority="high"`, and untracked `tsconfig.tsbuildinfo`.
+  - Set `G9.1` back to `[~]` in `docs/ROADMAP.md` until PR #21 is merged.
+- Changed contracts: none.
+- Next: Push to `gemini/G9.1-grove-foundation` to update PR #21; wait for Claude re-review & Aryan merge before starting `G9.1b`.
+
 ### 2026-11-15 19:33 · gemini · G9.1 Grove foundation, frame and Today
 - Done:
   - Updated `:root` and `.dark` tokens in `web/src/styles/globals.css`, `web/tailwind.config.ts`, and `web/src/lib/owners.ts` to the Grove earthy palette (sage `#DDE1D5` canvas, `#F4F4F2` surface, olive `#5E9A18`/`#8CC63F`, forest `#2F5D3A`, clay `#8C7466`, linen `#E8E4DE`, terracotta `#C2562A`).

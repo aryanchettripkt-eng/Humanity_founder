@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { GlassCard } from '@/components/grove/GlassCard';
 import type { GroveBarDayModel } from '@/components/grove/models';
+import { getOwnerShortLabel, OWNER_META } from '@/lib/owners';
+import { cn } from '@/lib/utils';
 import type { Owner } from '@/types/api';
 
 export type StackedBarsProps = {
   title?: string;
+  clientName?: string;
   days: GroveBarDayModel[];
   actionHref?: string;
   onSelectOwner?: (owner: Exclude<Owner, 'review'>) => void;
@@ -13,6 +16,7 @@ export type StackedBarsProps = {
 
 export function StackedBars({
   title = 'This week',
+  clientName = 'client',
   days,
   actionHref,
   onSelectOwner,
@@ -24,47 +28,52 @@ export function StackedBars({
     ...days.map((d) => d.assistant + d.client + d.none)
   );
 
+  const assistantLabel = getOwnerShortLabel('assistant', clientName);
+  const clientLabel = getOwnerShortLabel('client', clientName);
+  const noneLabel = getOwnerShortLabel('none', clientName);
+
   return (
     <GlassCard
       title={title}
       actionHref={actionHref}
       actionLabel="Open Inbox"
       rightSlot={
-        <div className="hidden items-center gap-2.5 text-[11px] font-medium text-white/85 sm:flex">
+        <div className="hidden items-center gap-2 text-[11px] font-medium text-white/85 sm:flex">
           <button
             type="button"
             onClick={() => onSelectOwner?.('assistant')}
-            className="inline-flex items-center gap-1 hover:text-white"
+            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-white"
           >
-            <span className="h-2 w-2 rounded-full bg-[#2F5D3A] ring-1 ring-white/40" />
-            For you
+            <span className={cn('h-2 w-2 rounded-full ring-1 ring-white/40', OWNER_META.assistant.dotClass)} />
+            {assistantLabel}
           </button>
           <button
             type="button"
             onClick={() => onSelectOwner?.('client')}
-            className="inline-flex items-center gap-1 hover:text-white"
+            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-white"
           >
-            <span className="h-2 w-2 rounded-full bg-[#8C7466] ring-1 ring-white/40" />
-            For Priya
+            <span className={cn('h-2 w-2 rounded-full ring-1 ring-white/40', OWNER_META.client.dotClass)} />
+            {clientLabel}
           </button>
           <button
             type="button"
             onClick={() => onSelectOwner?.('none')}
-            className="inline-flex items-center gap-1 hover:text-white"
+            className="inline-flex min-h-[44px] items-center gap-1 px-1.5 hover:text-white"
           >
-            <span className="h-2 w-2 rounded-full bg-[#E8E4DE] ring-1 ring-white/40" />
-            No reply
+            <span className={cn('h-2 w-2 rounded-full ring-1 ring-white/40', OWNER_META.none.dotClass)} />
+            {noneLabel}
           </button>
         </div>
       }
       className={className}
     >
       <div className="flex flex-col justify-between gap-2">
-        <div className="h-4 text-[11px] font-medium text-white/80">
+        <div aria-live="polite" className="min-h-[16px] text-[11px] font-medium text-white/85">
           {hovered ? (
             <span>
-              {hovered.label}: {hovered.assistant} for you · {hovered.client} for Priya ·{' '}
-              {hovered.none} no reply
+              {hovered.label}: {hovered.assistant} {assistantLabel.toLowerCase()} ·{' '}
+              {hovered.client} {clientLabel.toLowerCase()} · {hovered.none}{' '}
+              {noneLabel.toLowerCase()}
             </span>
           ) : (
             <span>Sorted threads across the last 7 days</span>
@@ -72,15 +81,15 @@ export function StackedBars({
         </div>
 
         <svg
-          viewBox={`0 0 ${Math.max(1, days.length) * 44} 112`}
-          className="h-28 w-full overflow-visible"
+          viewBox={`0 0 ${Math.max(1, days.length) * 44} 126`}
+          className="h-32 w-full overflow-visible"
           role="img"
           aria-label="Weekly sorted threads stacked bar chart"
         >
           {days.map((day, i) => {
             const x = i * 44 + 6;
             const barW = 32;
-            const maxH = 86;
+            const maxH = 102;
             const total = day.assistant + day.client + day.none;
             const scale = total > 0 ? maxH / maxTotal : 0;
 
@@ -88,16 +97,21 @@ export function StackedBars({
             const hClient = day.client * scale;
             const hNone = day.none * scale;
 
-            const yAssistant = 92 - hAssistant;
+            const yAssistant = 106 - hAssistant;
             const yClient = yAssistant - hClient;
             const yNone = yClient - hNone;
 
             return (
               <g
                 key={day.key}
+                tabIndex={0}
+                role="button"
+                aria-label={`${day.label}: ${day.assistant} ${assistantLabel}, ${day.client} ${clientLabel}, ${day.none} ${noneLabel}`}
                 onMouseEnter={() => setHovered(day)}
                 onMouseLeave={() => setHovered(null)}
-                className="cursor-pointer"
+                onFocus={() => setHovered(day)}
+                onBlur={() => setHovered(null)}
+                className="cursor-pointer focus:outline-none"
               >
                 {hNone > 0 ? (
                   <rect
@@ -106,7 +120,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hNone - 1.5)}
                     rx={5}
-                    fill="#E8E4DE"
+                    fill="hsl(var(--grove-linen))"
                     onClick={() => onSelectOwner?.('none')}
                   />
                 ) : null}
@@ -117,7 +131,7 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hClient - 1.5)}
                     rx={5}
-                    fill="#8C7466"
+                    fill="hsl(var(--grove-clay))"
                     onClick={() => onSelectOwner?.('client')}
                   />
                 ) : null}
@@ -128,14 +142,14 @@ export function StackedBars({
                     width={barW}
                     height={Math.max(3, hAssistant)}
                     rx={5}
-                    fill="#2F5D3A"
+                    fill="hsl(var(--grove-forest))"
                     onClick={() => onSelectOwner?.('assistant')}
                   />
                 ) : null}
                 {total === 0 ? (
                   <rect
                     x={x}
-                    y={86}
+                    y={100}
                     width={barW}
                     height={6}
                     rx={3}
@@ -144,9 +158,9 @@ export function StackedBars({
                 ) : null}
                 <text
                   x={x + barW / 2}
-                  y={108}
+                  y={122}
                   textAnchor="middle"
-                  fill="rgba(255,255,255,0.8)"
+                  fill="rgba(255,255,255,0.85)"
                   fontSize="10"
                   fontWeight="500"
                 >
@@ -160,4 +174,3 @@ export function StackedBars({
     </GlassCard>
   );
 }
-

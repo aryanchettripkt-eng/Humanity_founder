@@ -51,7 +51,7 @@ export function HeroBand({
           src="/hero/grove.webp"
           alt=""
           aria-hidden="true"
-          fetchPriority="high"
+          {...({ fetchpriority: 'high' } as Record<string, string>)}
           onError={() => setImgFailed(true)}
           className="motion-safe:animate-[heroZoom_1.2s_ease-out_forwards] absolute inset-0 h-full w-full object-cover"
         />

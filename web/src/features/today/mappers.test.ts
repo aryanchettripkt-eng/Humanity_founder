@@ -6,6 +6,7 @@ import {
   buildNeedsYourCallList,
   buildWeeklyBars,
   collapseActivity,
+  ctaLabelForThread,
 } from '@/features/today/mappers';
 import type { ActivityItem, ThreadListItem, UpcomingItem } from '@/types/api';
 
@@ -61,7 +62,7 @@ describe('today grove mappers', () => {
       'Priya',
       [makeThread({ id: '1', owner: 'client' })]
     );
-    expect(stats[0]).toMatchObject({ label: 'For you', value: 5, delta: '+2 since this morning' });
+    expect(stats[0]).toMatchObject({ label: 'For you', value: 5, delta: '+2 since your last visit' });
     expect(stats[1]).toMatchObject({ label: 'For Priya', value: 2, delta: '1 waiting on Priya' });
   });
 
@@ -129,5 +130,41 @@ describe('today grove mappers', () => {
     const collapsed = collapseActivity(acts);
     expect(collapsed).toHaveLength(1);
     expect(collapsed[0].count).toBe(2);
+  });
+
+  it('computes all 4 CTA labels from owner and handoff state', () => {
+    expect(ctaLabelForThread(makeThread({ owner: 'assistant' }), 'Priya')).toBe('Draft reply');
+    expect(
+      ctaLabelForThread(makeThread({ owner: 'client', handoff: { state: 'none' } }), 'Priya')
+    ).toBe('Send to Priya');
+    expect(
+      ctaLabelForThread(
+        makeThread({ owner: 'client', handoff: { state: 'client_handling' } }),
+        'Priya'
+      )
+    ).toBe('Nudge Priya');
+    expect(ctaLabelForThread(makeThread({ owner: 'review' }), 'Priya')).toBe('Confirm');
+  });
+
+  it('omits fabricated sparklines and formats singular message count', () => {
+    const cards = buildGroveThreadCards(
+      [makeThread({ id: 's1', owner: 'assistant', messageCount: 1 })],
+      { owner: 'all', category: 'all', date: 'week', confidence: 'all', source: 'all' },
+      'Priya',
+      'Asia/Kolkata'
+    );
+    expect(cards).toHaveLength(1);
+    expect(cards[0].series).toEqual([]);
+    expect(cards[0].deltaText).toBe('1 msg');
+  });
+
+  it('buckets weekly bars using the client timezone', () => {
+    const nowIso = new Date().toISOString();
+    const bars = buildWeeklyBars(
+      [makeThread({ id: 'tz1', owner: 'assistant', lastMessageAt: nowIso })],
+      'Asia/Kolkata'
+    );
+    expect(bars).toHaveLength(7);
+    expect(bars[6].assistant).toBe(1);
   });
 });

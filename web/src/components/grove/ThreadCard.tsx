@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 
 export type ThreadCardProps = {
   item: GroveThreadCardModel;
+  actionPending?: boolean;
   onOpen?: (item: GroveThreadCardModel) => void;
   onPrimaryAction?: (item: GroveThreadCardModel) => void;
   className?: string;
@@ -23,6 +24,7 @@ const OWNER_TEXT_CLASS: Record<GroveThreadCardModel['owner'], string> = {
 
 export function ThreadCard({
   item,
+  actionPending = false,
   onOpen,
   onPrimaryAction,
   className,
@@ -49,7 +51,7 @@ export function ThreadCard({
           <Link
             to={item.href}
             aria-label={`Open ${item.sender}`}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
           >
             <ArrowUpRight className="h-4 w-4" />
           </Link>
@@ -58,7 +60,7 @@ export function ThreadCard({
             type="button"
             onClick={() => onOpen?.(item)}
             aria-label={`Open ${item.sender}`}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
           >
             <ArrowUpRight className="h-4 w-4" />
           </button>
@@ -85,14 +87,17 @@ export function ThreadCard({
 
       <div className="flex items-center justify-between gap-2 pt-0.5">
         <div className="flex min-w-0 items-center gap-2">
-          <Sparkline values={item.series} tone={item.sparkTone} />
+          {item.series.length > 0 ? (
+            <Sparkline values={item.series} tone={item.sparkTone} />
+          ) : null}
           <DeltaChip text={item.deltaText} direction={item.deltaDirection} />
         </div>
 
         <button
           type="button"
+          disabled={actionPending}
           onClick={() => (onPrimaryAction ? onPrimaryAction(item) : onOpen?.(item))}
-          className="inline-flex min-h-[36px] shrink-0 items-center justify-center rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition-colors hover:bg-[#4F8413] dark:hover:bg-primary/90"
+          className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-[#4F8413] disabled:opacity-50 dark:hover:bg-primary/90"
         >
           {item.ctaLabel}
         </button>

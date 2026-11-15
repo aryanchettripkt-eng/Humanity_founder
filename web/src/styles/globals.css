@@ -76,6 +76,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+@layer components {
+  .glass {
+    @apply border border-white/35 bg-white/[0.14] backdrop-blur-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.28)];
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }

@@ -25,7 +25,7 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-[20px] border border-white/35 bg-white/15 p-4 text-white shadow-[0_12px_32px_-12px_rgba(0,0,0,0.28)] backdrop-blur-xl',
+        'glass relative overflow-hidden rounded-[20px] p-4 text-white',
         className
       )}
     >
@@ -49,18 +49,18 @@ export function GlassCard({
                 <Link
                   to={actionHref}
                   aria-label={actionLabel}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
                 >
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <ArrowUpRight className="h-4 w-4" />
                 </Link>
               ) : onAction ? (
                 <button
                   type="button"
                   onClick={onAction}
                   aria-label={actionLabel}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white transition-colors hover:bg-white/20"
                 >
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <ArrowUpRight className="h-4 w-4" />
                 </button>
               ) : null}
             </div>
