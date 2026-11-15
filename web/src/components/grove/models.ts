@@ -35,7 +35,6 @@ export type GroveThreadCardModel = {
   sender: string;
   initials: string;
   domain: string;
-  subject?: string;
   owner: Owner;
   ownerLabel: string;
   confidence: number;

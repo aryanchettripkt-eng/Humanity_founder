@@ -56,6 +56,7 @@ export function TopNav({
   onSelectClient,
   userName = 'Alex Morgan',
   userEmail,
+  userInitials = 'AM',
   theme = 'light',
   onToggleTheme,
   onOpenSearch,
@@ -67,6 +68,7 @@ export function TopNav({
   className,
 }: TopNavProps) {
   const [clientOpen, setClientOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
 
   const activeClient = clients.find((c) => c.id === activeClientId) ?? clients[0];
   const clientFirstName = activeClient?.name.split(' ')[0] || 'Client';
@@ -135,67 +137,6 @@ export function TopNav({
                     ) : null}
                   </button>
                 ))}
-                <div className="mt-1 border-t border-border px-2.5 pb-1.5 pt-2">
-                  <p className="truncate text-xs font-semibold">{userName}</p>
-                  {userEmail ? (
-                    <p className="truncate text-[11px] text-muted-foreground">{userEmail}</p>
-                  ) : null}
-                </div>
-                {onToggleTheme ? (
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setClientOpen(false);
-                      onToggleTheme();
-                    }}
-                    className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface"
-                  >
-                    {theme === 'light' ? (
-                      <Moon className="h-3.5 w-3.5" />
-                    ) : (
-                      <Sun className="h-3.5 w-3.5" />
-                    )}
-                    {theme === 'light' ? 'Dark mode' : 'Light mode'}
-                  </button>
-                ) : null}
-                <Link
-                  to={settingsHref}
-                  role="menuitem"
-                  onClick={() => setClientOpen(false)}
-                  className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface sm:hidden"
-                >
-                  <Settings className="h-3.5 w-3.5" />
-                  Settings
-                </Link>
-                {showSendTestEmail && onSendTestEmail ? (
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setClientOpen(false);
-                      onSendTestEmail();
-                    }}
-                    className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface"
-                  >
-                    <MailPlus className="h-3.5 w-3.5" />
-                    Send test email
-                  </button>
-                ) : null}
-                {onSignOut ? (
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setClientOpen(false);
-                      onSignOut();
-                    }}
-                    className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium text-destructive hover:bg-surface"
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                    Sign out
-                  </button>
-                ) : null}
               </PopoverContent>
             </Popover>
           ) : null}
@@ -218,6 +159,83 @@ export function TopNav({
           >
             <Settings className="h-4 w-4" />
           </Link>
+
+          <Popover open={userOpen} onOpenChange={setUserOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label="User menu"
+                aria-haspopup="menu"
+                aria-expanded={userOpen}
+                className="glass flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)]"
+              >
+                <Avatar name={userName} initials={userInitials} size="sm" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" role="menu" className="w-56 rounded-2xl p-1.5">
+              <div className="border-b border-border px-2.5 py-2">
+                <p className="truncate text-xs font-semibold">{userName}</p>
+                {userEmail ? (
+                  <p className="truncate text-[11px] text-muted-foreground">{userEmail}</p>
+                ) : null}
+              </div>
+              {onToggleTheme ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setUserOpen(false);
+                    onToggleTheme();
+                  }}
+                  className="mt-1 flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface"
+                >
+                  {theme === 'light' ? (
+                    <Moon className="h-3.5 w-3.5" />
+                  ) : (
+                    <Sun className="h-3.5 w-3.5" />
+                  )}
+                  {theme === 'light' ? 'Dark mode' : 'Light mode'}
+                </button>
+              ) : null}
+              <Link
+                to={settingsHref}
+                role="menuitem"
+                onClick={() => setUserOpen(false)}
+                className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface sm:hidden"
+              >
+                <Settings className="h-3.5 w-3.5" />
+                Settings
+              </Link>
+              {showSendTestEmail && onSendTestEmail ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setUserOpen(false);
+                    onSendTestEmail();
+                  }}
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium hover:bg-surface"
+                >
+                  <MailPlus className="h-3.5 w-3.5" />
+                  Send test email
+                </button>
+              ) : null}
+              {onSignOut ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setUserOpen(false);
+                    onSignOut();
+                  }}
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-medium text-destructive hover:bg-surface"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  Sign out
+                </button>
+              ) : null}
+            </PopoverContent>
+          </Popover>
         </div>
       )}
     </header>
