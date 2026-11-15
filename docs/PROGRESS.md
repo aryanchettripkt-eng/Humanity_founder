@@ -28,6 +28,13 @@ _None yet._
 
 ---
 
+### 2026-11-16 03:40 · claude · G9.3a client view in the glass Inbox layout
+- Done (assigned by Aryan in chat): rebuilt `/c` and `/c/thread/:id` to match the Inbox. The client's queue list (tabs All / Needs you / You're on it), a reading pane with "Why you", messages and docked actions (I'll handle it / Mark handled, Assistant take over, Reply with a note), and an "At a glance" column (summary, key points, dates with real .ics, the client's note). Below 1280 the glance shows inline; below 1024 list and thread are separate views with a back button. The page never scrolls.
+- Assistant preview (`/c?preview=1`): same screen, AssistantTopNav, preview banner with Exit preview, actions read-only.
+- New: `features/client-view/mappers.ts` (+ tests), `components/ClientQueueList`, `ClientGlance`, `ClientActionBar`. `ClientThreadPage` now renders the same split view. `ClientLayout` uses AppFrame.
+- Contract change (additive): `TopNav` hides tabs and the Menu button when `tabs` is empty, and hides Settings when `settingsHref={null}`.
+- Checked: lint, typecheck, tests (server 36, web 27). No page scroll at 1903, 1440, 1024 and 390. Screenshots in project files `reviews/shots-client-view/`.
+
 ### 2026-11-16 03:05 · gemini · G9.2b wider frame, no page scroll, Needs-your-call redirect
 - Done:
   - **1. Wider frame (no width cap):** Updated `--frame-gap-x: clamp(12px, 6.4vw, 128px)` in `globals.css`, removed `--frame-max-w`, set `.floating-frame` width to `calc(100% - 2 * var(--frame-gap-x))`, and capped message body text in `MessageItem.tsx` at `max-w-[760px]`.

@@ -1,261 +1,303 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, MessageSquarePlus, Send, UserRoundCheck } from 'lucide-react';
-import { useState, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Crown, Inbox } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ErrorState } from '@/components/common/ErrorState';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { AssistantTopNav } from '@/components/grove/AssistantTopNav';
+import { HeroBand } from '@/components/grove/HeroBand';
+import { TopNav } from '@/components/grove/TopNav';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useMe } from '@/features/auth/api';
-import { useClientAction, useClientQueue } from '@/features/client-view/api';
-import { useThreads } from '@/features/inbox/api';
-import { formatShortDate } from '@/lib/format';
-import { useSocketEvent } from '@/lib/socket';
-import { useQueryClient } from '@tanstack/react-query';
+import { useLogout, useMe } from '@/features/auth/api';
+import { ClientActionBar, type ClientAction } from '@/features/client-view/components/ClientActionBar';
+import { ClientGlance } from '@/features/client-view/components/ClientGlance';
+import { ClientQueueList } from '@/features/client-view/components/ClientQueueList';
+import { useClientAction, useClientQueue, useClientThread } from '@/features/client-view/api';
+import {
+  clientStatusLabel,
+  clientSummaryLine,
+  filterClientQueue,
+  isClientHandling,
+  type ClientQueueTab,
+} from '@/features/client-view/mappers';
+import { useThreadDetail, useThreads } from '@/features/inbox/api';
+import { getTimeGreeting } from '@/features/today/mappers';
+import { MessageItem } from '@/features/thread/components/MessageItem';
+import { getInitials } from '@/lib/format';
 import { qk } from '@/lib/queryKeys';
+import { useSocketEvent } from '@/lib/socket';
+import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui';
 
+/**
+ * Client view (/c and /c/thread/:threadId): the client's queue in the same glass
+ * shell as the assistant Inbox. List | reading pane | at-a-glance column.
+ * With ?preview=1 an assistant sees the same screen read-only.
+ */
 export function ClientHomePage() {
-  const queryClient = useQueryClient();
+  const { threadId } = useParams<{ threadId?: string }>();
   const [searchParams] = useSearchParams();
-  const { activeClientId } = useUiStore();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const logout = useLogout();
   const { data: me } = useMe();
-  const isAssistantPreview =
-    me?.user.role === 'assistant' && searchParams.get('preview') === '1';
+  const { activeClientId, theme, toggleTheme } = useUiStore();
 
-  const clientQueueQuery = useClientQueue(!isAssistantPreview);
-  const previewThreadsQuery = useThreads({
-    clientId: isAssistantPreview ? activeClientId || undefined : undefined,
-    segment: 'client',
-  });
+  const isPreview = me?.user.role === 'assistant' && searchParams.get('preview') === '1';
+  const qs = isPreview ? '?preview=1' : '';
 
-  const queue = isAssistantPreview
-    ? previewThreadsQuery.data?.data
-    : clientQueueQuery.data;
-  const isLoading = isAssistantPreview
-    ? previewThreadsQuery.isLoading
-    : clientQueueQuery.isLoading;
-  const isError = isAssistantPreview
-    ? previewThreadsQuery.isError
-    : clientQueueQuery.isError;
-  const refetch = isAssistantPreview
-    ? previewThreadsQuery.refetch
-    : clientQueueQuery.refetch;
-
-  const actionMutation = useClientAction();
-
-  const [noteOpenId, setNoteOpenId] = useState<string | null>(null);
-  const [noteText, setNoteText] = useState('');
-
-  const syncQueue = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: qk.client.queue() });
-  }, [queryClient]);
-
-  useSocketEvent('thread:created', syncQueue);
-  useSocketEvent('thread:updated', syncQueue);
-
-  const activeClient =
-    me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
-  const firstName = isAssistantPreview
+  const activeClient = me?.clients?.find((c) => c.id === activeClientId) ?? me?.clients?.[0];
+  const clientFirstName = isPreview
     ? activeClient?.name.split(' ')[0] || 'Client'
     : me?.user.name.split(' ')[0] || 'there';
-  const count = queue?.length ?? 0;
+
+  // Queue: the client's own endpoint, or the assistant's "client" segment in preview.
+  const clientQueue = useClientQueue(!isPreview);
+  const previewQueue = useThreads({
+    clientId: isPreview ? activeClient?.id : undefined,
+    segment: 'client',
+  });
+  const queueQuery = isPreview ? previewQueue : clientQueue;
+  const queue = useMemo(
+    () => (isPreview ? previewQueue.data?.data : clientQueue.data) ?? [],
+    [isPreview, previewQueue.data, clientQueue.data]
+  );
+
+  const [tab, setTab] = useState<ClientQueueTab>('all');
+  const visible = useMemo(() => filterClientQueue(queue, tab), [queue, tab]);
+  const selectedId = threadId || visible[0]?.id;
+
+  // Detail: the client endpoint, or the assistant detail in preview.
+  const clientDetail = useClientThread(isPreview ? undefined : selectedId);
+  const previewDetail = useThreadDetail(isPreview ? selectedId : undefined);
+  const detailQuery = isPreview ? previewDetail : clientDetail;
+  const detail = detailQuery.data;
+
+  const action = useClientAction();
+
+  const sync = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: qk.client.queue() });
+    if (selectedId) queryClient.invalidateQueries({ queryKey: qk.client.detail(selectedId) });
+  }, [queryClient, selectedId]);
+  useSocketEvent('thread:created', sync);
+  useSocketEvent('thread:updated', sync);
+
+  const [showAll, setShowAll] = useState(false);
+  useEffect(() => setShowAll(false), [selectedId]);
+
+  const openThread = (id: string) => navigate(`/c/thread/${id}${qs}`);
+  const backToList = () => navigate(`/c${qs}`);
+
+  const runAction = (kind: ClientAction, note?: string) => {
+    if (!detail) return;
+    const leavesQueue = kind !== 'handling';
+    action.mutate(
+      { threadId: detail.id, action: kind, note },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: qk.client.detail(detail.id) });
+          if (leavesQueue) {
+            const next = queue.find((t) => t.id !== detail.id);
+            navigate(next ? `/c/thread/${next.id}${qs}` : `/c${qs}`, { replace: true });
+          }
+        },
+      }
+    );
+  };
+
+  const messages = detail?.messages ?? [];
+  const collapsed = !showAll && messages.length > 3 ? messages.length - 2 : 0;
+  const visibleMessages = collapsed > 0 ? messages.slice(-2) : messages;
+
+  const nav = isPreview ? (
+    <AssistantTopNav />
+  ) : (
+    <TopNav
+      variant="app"
+      logoHref="/c"
+      tabs={[]}
+      activeTabId=""
+      settingsHref={null}
+      userName={me?.user.name || 'You'}
+      userEmail={me?.user.email}
+      userInitials={getInitials(me?.user.name || 'You')}
+      theme={theme}
+      onToggleTheme={toggleTheme}
+      onSignOut={() => {
+        logout();
+        navigate('/login', { replace: true });
+      }}
+    />
+  );
 
   return (
-    <div className="space-y-6">
-      {isAssistantPreview ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border bg-muted/60 px-4 py-2.5 text-xs">
-          <span className="font-medium text-foreground">
-            Preview of {firstName}&apos;s view (read-only)
-          </span>
-          <Link
-            to="/app/today"
-            className="font-semibold text-foreground underline underline-offset-4"
-          >
-            Back to Workspace
-          </Link>
-        </div>
-      ) : null}
-
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Good morning, {firstName}.
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {count === 0
-            ? 'Nothing needs your decision right now.'
-            : `${count} ${count === 1 ? 'thing needs' : 'things need'} you.`}
-        </p>
-      </div>
-
-      {isLoading ? (
-        <div className="space-y-3">
-          <Skeleton className="h-40 w-full rounded-xl" />
-          <Skeleton className="h-40 w-full rounded-xl" />
-        </div>
-      ) : isError ? (
-        <ErrorState onRetry={() => refetch()} />
-      ) : count === 0 ? (
-        <Card className="p-6">
-          <EmptyState
-            icon={CheckCircle2}
-            title="You're all caught up."
-            description="Your assistant will handle everything else."
-          />
-        </Card>
-      ) : (
-        <AnimatePresence mode="popLayout">
-          <div className="space-y-4">
-            {queue?.map((t) => {
-              const isHandling = t.handoff?.state === 'client_handling';
-              const sender = t.participants?.[0]?.name || t.participants?.[0]?.email;
-              return (
-                <motion.div
-                  key={t.id}
-                  layout
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: 40 }}
-                  transition={{ duration: 0.2 }}
+    <>
+      <HeroBand
+        size="short"
+        nav={nav}
+        left={
+          <div className={cn('space-y-2', threadId && 'hidden lg:block')}>
+            {isPreview ? (
+              <div className="glass inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full px-4 py-2 text-sm">
+                <Crown className="h-4 w-4 text-[var(--grove-lime)]" aria-hidden="true" />
+                <span className="font-medium">You&apos;re previewing {clientFirstName}&apos;s view</span>
+                <Link
+                  to="/app/today"
+                  className="font-semibold underline underline-offset-4 hover:text-[var(--grove-lime)]"
                 >
-                  <Card className="space-y-3 p-4 sm:p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium text-muted-foreground">{sender}</p>
-                        <Link
-                          to={`/c/thread/${t.id}`}
-                          className="mt-0.5 block text-base font-semibold text-foreground hover:underline"
-                        >
-                          {t.subject}
-                        </Link>
-                      </div>
-                      <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
-                        {formatShortDate(t.lastMessageAt)}
-                      </span>
-                    </div>
-
-                    <p className="text-sm leading-relaxed text-foreground/90">
-                      {t.summary || t.snippet}
-                    </p>
-
-                    {(t.clientReason || t.reason) && (
-                      <p className="rounded-lg bg-amber-50/80 px-3 py-2 text-xs text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
-                        <strong>Why you:</strong> {t.clientReason || t.reason}
-                      </p>
-                    )}
-
-                    {isHandling && (
-                      <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                        You&apos;re on it
-                      </span>
-                    )}
-
-                    <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
-                      {isAssistantPreview ? (
-                        <span className="text-xs text-muted-foreground">
-                          Read-only preview — {firstName} sees &ldquo;I&apos;ll handle it&rdquo;,
-                          &ldquo;Assistant take over&rdquo;, and &ldquo;Add note&rdquo; here.
-                        </span>
-                      ) : isHandling ? (
-                        <Button
-                          size="lg"
-                          className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
-                          disabled={actionMutation.isPending}
-                          onClick={() =>
-                            actionMutation.mutate({ threadId: t.id, action: 'handled' })
-                          }
-                        >
-                          <CheckCircle2 className="h-4 w-4 shrink-0" />
-                          Mark handled
-                        </Button>
-                      ) : (
-                        <Button
-                          size="lg"
-                          variant="default"
-                          className="min-h-[44px] w-full whitespace-nowrap sm:w-auto sm:flex-1"
-                          disabled={actionMutation.isPending}
-                          onClick={() =>
-                            actionMutation.mutate({ threadId: t.id, action: 'handling' })
-                          }
-                        >
-                          I&apos;ll handle it
-                        </Button>
-                      )}
-
-                      {!isAssistantPreview ? (
-                        <>
-                          <Button
-                            size="lg"
-                            variant="secondary"
-                            className="min-h-[44px] w-full whitespace-nowrap border border-border sm:w-auto sm:flex-1"
-                            disabled={actionMutation.isPending}
-                            onClick={() =>
-                              actionMutation.mutate({ threadId: t.id, action: 'handoff' })
-                            }
-                          >
-                            <UserRoundCheck className="h-4 w-4 shrink-0" />
-                            Assistant take over
-                          </Button>
-
-                          <Button
-                            size="lg"
-                            variant="outline"
-                            className="min-h-[44px] w-full whitespace-nowrap sm:w-auto"
-                            onClick={() => {
-                              setNoteOpenId(noteOpenId === t.id ? null : t.id);
-                              setNoteText('');
-                            }}
-                          >
-                            <MessageSquarePlus className="h-4 w-4" />
-                            Reply with a note
-                          </Button>
-                        </>
-                      ) : null}
-                    </div>
-
-                    {noteOpenId === t.id && (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          if (!noteText.trim()) return;
-                          actionMutation.mutate(
-                            { threadId: t.id, action: 'note', note: noteText.trim() },
-                            {
-                              onSuccess: () => {
-                                setNoteOpenId(null);
-                                setNoteText('');
-                              },
-                            }
-                          );
-                        }}
-                        className="flex gap-2 pt-1"
-                      >
-                        <Input
-                          value={noteText}
-                          onChange={(e) => setNoteText(e.target.value)}
-                          placeholder="e.g. Say yes, but push to Friday…"
-                          className="min-h-[44px]"
-                        />
-                        <Button
-                          type="submit"
-                          size="lg"
-                          className="min-h-[44px]"
-                          disabled={actionMutation.isPending || !noteText.trim()}
-                        >
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      </form>
-                    )}
-                  </Card>
-                </motion.div>
-              );
-            })}
+                  Exit preview
+                </Link>
+              </div>
+            ) : null}
+            <h1
+              style={{ textShadow: 'var(--hero-text-shadow)' }}
+              className="font-display text-[32px] font-semibold leading-[1.05] tracking-tight text-[var(--fg)] md:text-[48px]"
+            >
+              {getTimeGreeting()}, {clientFirstName}
+            </h1>
+            <p className="text-base text-[var(--fg-muted)] md:text-lg">
+              {queueQuery.isLoading ? ' ' : clientSummaryLine(queue)}
+            </p>
           </div>
-        </AnimatePresence>
-      )}
-    </div>
+        }
+      />
+
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden px-[clamp(16px,2.5vw,32px)] pb-[clamp(16px,2.5vw,32px)]">
+        <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:gap-4">
+          {/* Queue list */}
+          <div
+            className={cn(
+              'min-h-0 w-full shrink-0 lg:w-[360px] xl:w-[380px]',
+              threadId ? 'hidden lg:flex lg:flex-col' : 'flex flex-1 flex-col lg:flex-none'
+            )}
+          >
+            <ClientQueueList
+              threads={visible}
+              total={queue.length}
+              tab={tab}
+              onTabChange={setTab}
+              selectedId={selectedId}
+              onSelect={openThread}
+              isLoading={queueQuery.isLoading}
+              isError={queueQuery.isError}
+              onRetry={() => queueQuery.refetch()}
+            />
+          </div>
+
+          {/* Reading pane */}
+          <div
+            className={cn(
+              'glass-pane min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
+              threadId ? 'flex' : 'hidden lg:flex'
+            )}
+          >
+            {!selectedId ? (
+              <EmptyState
+                icon={Inbox}
+                title="Nothing to read"
+                description="When your assistant needs your call, the email shows up here."
+                className="flex-1"
+              />
+            ) : detailQuery.isLoading ? (
+              <div className="space-y-4 p-6">
+                <Skeleton className="h-7 w-72 rounded-xl bg-[var(--card-glass-bg)]" />
+                <Skeleton className="h-4 w-48 rounded-lg bg-[var(--card-glass-bg)]" />
+                <Skeleton className="h-40 w-full rounded-[20px] bg-[var(--card-glass-bg)]" />
+              </div>
+            ) : detailQuery.isError || !detail ? (
+              <ErrorState onRetry={() => detailQuery.refetch()} className="flex-1" />
+            ) : (
+              <>
+                <div className="shrink-0 space-y-3 border-b border-[var(--glass-divider)] px-5 pb-4 pt-5 sm:px-6">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={backToList}
+                        aria-label="Back to your queue"
+                        className="glass flex h-10 w-10 items-center justify-center rounded-full lg:hidden"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                      </button>
+                      <span
+                        className={cn(
+                          'rounded-full px-3 py-1 text-sm font-medium',
+                          isClientHandling(detail)
+                            ? 'border border-[var(--pane-border)] bg-[var(--card-glass-bg)] text-[var(--fg-muted)]'
+                            : 'bg-[var(--chip-bg)] text-[var(--chip-fg)]'
+                        )}
+                      >
+                        {clientStatusLabel(detail)}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="font-display text-[22px] font-semibold leading-tight text-[var(--fg)] md:text-[26px]">
+                      {detail.subject}
+                    </h2>
+                    <p className="mt-1 truncate text-[15px] text-[var(--fg-muted)]">
+                      {detail.participants
+                        ?.map((p) => p.name || p.email)
+                        .filter(Boolean)
+                        .join(', ')}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grove-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6">
+                  {detail.clientReason ? (
+                    <div className="glass-card flex items-start gap-3 rounded-[20px] p-4">
+                      <Crown
+                        className="mt-0.5 h-4 w-4 shrink-0 text-[var(--grove-lime)]"
+                        aria-hidden="true"
+                      />
+                      <div>
+                        <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[var(--fg-muted)]">
+                          Why you
+                        </p>
+                        <p className="mt-1 text-base text-[var(--fg)]">{detail.clientReason}</p>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <ClientGlance thread={detail} variant="inline" className="xl:hidden" />
+
+                  {collapsed > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowAll(true)}
+                      className="glass-card flex w-full items-center justify-center rounded-full py-2 text-xs font-medium text-[var(--fg-muted)] hover:text-[var(--fg)]"
+                    >
+                      Show {collapsed} earlier messages
+                    </button>
+                  ) : null}
+
+                  {visibleMessages.map((m) => (
+                    <MessageItem key={m.id} message={m} />
+                  ))}
+                </div>
+
+                <div className="shrink-0 border-t border-[var(--glass-divider)] p-4 sm:px-6">
+                  <ClientActionBar
+                    thread={detail}
+                    pending={action.isPending}
+                    readOnly={isPreview}
+                    clientFirstName={clientFirstName}
+                    onAction={runAction}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* At a glance (≥1280) */}
+          {detail ? (
+            <div className="hidden min-h-0 w-[320px] shrink-0 xl:flex xl:flex-col">
+              <ClientGlance thread={detail} />
+            </div>
+          ) : null}
+        </div>
+      </main>
+    </>
   );
 }
-

@@ -97,6 +97,7 @@
 - [x] **G9.2a** Glass shell everywhere + new 4-column Inbox rebuild — @gemini (gemini/G9.2a-inbox-glass)
 - [x] **G9.2b** Wider frame, no page scroll, Needs-your-call redirect — @gemini (gemini/G9.2b-no-page-scroll)
 - [ ] **G9.2** Inbox (short hero + segment glass tabs + search pill, list / reading pane / AI column in the panel), composer with truthful send copy, real .ics download, ⌘K glass dialog — @gemini
+- [~] **G9.3a** Client view (`/c`, `/c/thread/:id`, assistant preview) in the glass Inbox layout: queue list, reading pane with docked actions, at-a-glance column — @claude (claude/project-thread-mnokkm)
 - [ ] **G9.3** Settings and client view (work-page shape, preview banner), then login, signup, onboarding, 404, auth callback (focus-page shape); all "simulated"/"prototype" copy removed — @gemini
 - [ ] **G9.4** Review each G9 PR against DESIGN_V2 at 1440/820/390/320, light + dark — @claude
 
