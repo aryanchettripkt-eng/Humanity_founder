@@ -70,15 +70,6 @@ const mockDetail = {
   },
 };
 
-vi.mock('@/features/auth/api', () => ({
-  useMe: () => ({
-    data: {
-      user: { id: 'u1', name: 'Alex Morgan', email: 'alex@demo.relay', role: 'assistant' },
-      clients: [{ id: 'c1', name: 'Priya Nair', firstName: 'Priya', email: 'priya@relay.demo' }],
-    },
-  }),
-}));
-
 vi.mock('@/features/inbox/api', () => ({
   useThreadCounts: () => ({ data: { inbox: 2, important: 1, waiting: 0, done: 0, archived: 0 } }),
   useThreads: () => ({
@@ -86,19 +77,6 @@ vi.mock('@/features/inbox/api', () => ({
     isLoading: false,
     isError: false,
     refetch: vi.fn(),
-  }),
-  useActivity: () => ({
-    data: {
-      data: [
-        {
-          id: 'act1',
-          type: 'client_note',
-          threadId: 't1',
-          payload: { note: 'Say yes, but push to Friday' },
-          createdAt: new Date().toISOString(),
-        },
-      ],
-    },
   }),
   useThreadDetail: () => ({
     data: mockDetail,
@@ -145,9 +123,6 @@ describe('InboxPage', () => {
     expect(screen.getByRole('heading', { name: 'Inbox' })).toBeInTheDocument();
     expect(screen.getAllByText('Series B counsel intro').length).toBeGreaterThan(0);
     expect(screen.getAllByText('AI INSIGHTS').length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Priya's desk").length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('link', { name: /See what Priya sees/i }).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Say yes, but push to Friday/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /Save reply/i })).toBeInTheDocument();
     expect(screen.queryByText(/Simulated send/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/\(simulated\)/i)).not.toBeInTheDocument();

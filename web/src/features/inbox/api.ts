@@ -3,41 +3,27 @@ import { toast } from 'sonner';
 import { apiFetch, apiFetchList, ApiError } from '@/lib/api';
 import { OWNER_META } from '@/lib/owners';
 import { qk } from '@/lib/queryKeys';
-import type { ActivityItem, Owner, ThreadDetail, ThreadListItem } from '@/types/api';
+import type { Owner, ThreadDetail, ThreadListItem } from '@/types/api';
 
 export function useThreads(params: {
   segment: string;
   q?: string;
   filters?: string;
-  handoff?: string;
   account?: string;
   clientId?: string;
-  pageSize?: number;
+  handoff?: string;
 }) {
   const sp = new URLSearchParams();
   if (params.clientId) sp.set('clientId', params.clientId);
   if (params.segment) sp.set('segment', params.segment);
   if (params.q) sp.set('q', params.q);
   if (params.filters) sp.set('filters', params.filters);
-  if (params.handoff) sp.set('handoff', params.handoff);
   if (params.account) sp.set('account', params.account);
-  if (params.pageSize) sp.set('pageSize', String(params.pageSize));
+  if (params.handoff) sp.set('handoff', params.handoff);
 
   return useQuery({
     queryKey: qk.threads.list(params),
     queryFn: () => apiFetchList<ThreadListItem>(`/threads?${sp.toString()}`),
-    staleTime: 30_000,
-  });
-}
-
-export function useActivity(clientId?: string, limit = 20) {
-  const sp = new URLSearchParams();
-  if (clientId) sp.set('clientId', clientId);
-  sp.set('limit', String(limit));
-
-  return useQuery({
-    queryKey: qk.activity.list(clientId),
-    queryFn: () => apiFetchList<ActivityItem>(`/activity?${sp.toString()}`),
     staleTime: 30_000,
   });
 }
