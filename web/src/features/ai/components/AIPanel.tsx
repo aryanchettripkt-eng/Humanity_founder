@@ -33,11 +33,11 @@ export function AIPanel({
   return (
     <aside
       className={cn(
-        'glass-pane flex h-full min-h-0 flex-col gap-5 overflow-y-auto p-5 text-sm text-[var(--fg)]',
+        'glass-pane flex h-full min-h-0 flex-col gap-4 overflow-hidden p-5 text-sm text-[var(--fg)]',
         className
       )}
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex shrink-0 items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-[15px] font-semibold uppercase tracking-[0.06em] text-[var(--fg)]">
           <Sparkles className="h-4 w-4 text-[var(--grove-lime)]" aria-hidden="true" />
           <span>AI INSIGHTS</span>
@@ -66,6 +66,7 @@ export function AIPanel({
         </div>
       </div>
 
+      <div className="grove-scroll min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
       {thread.aiStatus === 'failed' ? (
         <div className="rounded-[20px] border border-warning/40 bg-warning/10 p-4 text-xs">
           <div className="flex items-center gap-1.5 font-medium text-warning">
@@ -244,6 +245,7 @@ export function AIPanel({
           </div>
         </section>
       ) : null}
+      </div>
     </aside>
   );
 }

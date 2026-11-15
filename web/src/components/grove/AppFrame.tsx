@@ -9,7 +9,7 @@ export type AppFrameProps = {
 
 export function AppFrame({ children, className, frameClassName }: AppFrameProps) {
   return (
-    <div className={cn('relative flex min-h-screen w-full flex-col overflow-x-clip', className)}>
+    <div className={cn('relative flex h-full w-full flex-col overflow-hidden', className)}>
       <div
         aria-hidden="true"
         style={{
@@ -25,7 +25,7 @@ export function AppFrame({ children, className, frameClassName }: AppFrameProps)
         style={{ backgroundColor: 'var(--canvas-overlay)' }}
         className="pointer-events-none fixed inset-0 -z-10"
       />
-      <div className={cn('floating-frame relative z-10 flex flex-1 flex-col', frameClassName)}>
+      <div className={cn('floating-frame relative z-10', frameClassName)}>
         {children}
       </div>
     </div>

@@ -28,6 +28,17 @@ _None yet._
 
 ---
 
+### 2026-11-16 03:05 · gemini · G9.2b wider frame, no page scroll, Needs-your-call redirect
+- Done:
+  - **1. Wider frame (no width cap):** Updated `--frame-gap-x: clamp(12px, 6.4vw, 128px)` in `globals.css`, removed `--frame-max-w`, set `.floating-frame` width to `calc(100% - 2 * var(--frame-gap-x))`, and capped message body text in `MessageItem.tsx` at `max-w-[760px]`.
+  - **2. Zero page scroll everywhere:** Locked `html, body, #root { height: 100%; overflow: hidden; }` + `overscroll-behavior: none`; `.floating-frame` is `height: calc(100dvh - var(--frame-gap-top) - var(--frame-gap-bottom))` flex column at every width; moved `BottomTabBar` inside the frame on `<768px`; added `.grove-scroll` thin scrollbars + 24px top/bottom `mask-image` fades on all scroll containers (`ThreadList`, `InboxPage` messages, `InboxRail`, `AIPanel`, `TodayPage` `<1024` body / `>=1024` cards area, `AssistantLayout`, `ClientLayout`, `AuthLayout`).
+  - **3. Today "Needs your call" redirect + count badge:** Replaced `+{N} more` with top-right glass count badge (hidden when 0) + 40px `↗` circle button linking to `/app/inbox/review` with `aria-label="Open all {n} in Inbox"`. Updated `TodayPage.test.tsx`.
+- Verification:
+  - `npm run lint`, `npm run typecheck --workspace=web`, `npm test --workspace=web` (6 files, 24/24 tests) pass.
+  - Playwright no-scroll check passed (`scrollHeight === innerHeight` and `scrollWidth === innerWidth`) for `/app/today`, `/app/inbox/inbox`, `/app/inbox/inbox/t1`, `/app/settings/accounts`, and `/c` at `1920x1080`, `1440x900`, `1024x768`, `820x1180`, and `390x844`.
+- Changed contracts: none.
+- Next: Review & merge PR for `gemini/G9.2b-no-page-scroll`.
+
 ### 2026-11-16 02:41 · gemini · G9.2a glass shell everywhere + new 4-column Inbox
 - Done:
   - **Part 1 (Glass shell everywhere):** Fixed-height floating glass frame at `>=1024px` (`height: calc(100dvh - var(--frame-gap-top) - var(--frame-gap-bottom))`), `--frame-max-w: 1440px`, `--frame-radius: 36px` (`>=768px`) / `24px` (`<768px`), single `backdrop-filter` on `.floating-frame`, translucent `.glass-pane` / `.glass-card` / `.working-panel` surfaces, removed dead `--hero-glass-*` / `--hero-pill-bg` / `--hero-scrim` / `--panel-*` tokens, updated `TopNav` (`44px` logo, `20px` Relay) / `GlassTabs` (`48px` pill) / `AssistantLayout` (`48px` page title, `overflow-hidden` on Inbox `<main>`, `overflow-y-auto` on other pages).

@@ -18,7 +18,7 @@ export function BottomTabBar({ onOpenAsk }: BottomTabBarProps) {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed bottom-[calc(env(safe-area-inset-bottom)+12px)] left-[var(--frame-gap-x)] right-[var(--frame-gap-x)] z-40 flex items-center gap-1 rounded-[24px] border border-border bg-card p-1.5 shadow-lg md:hidden"
+      className="mx-3 mb-[calc(env(safe-area-inset-bottom)+10px)] mt-2 flex shrink-0 items-center gap-1 rounded-[24px] border border-[var(--pane-border)] bg-[var(--card-glass-bg)] p-1.5 shadow-sm md:hidden"
     >
       <NavLink to="/app/today" className={linkClass}>
         <Sun className="h-4 w-4" aria-hidden="true" />

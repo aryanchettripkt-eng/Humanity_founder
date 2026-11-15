@@ -200,9 +200,9 @@ export function InboxPage() {
   const visibleMessages = collapsedCount > 0 ? messages.slice(-2) : messages;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col md:flex-row md:gap-4 lg:overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:gap-4">
       {/* Segment rail: horizontal chips on mobile (<768 when list visible), vertical 72px rail on >=768 */}
-      <div className={cn(threadId ? 'hidden md:flex' : 'flex')}>
+      <div className={cn('shrink-0 md:min-h-0', threadId ? 'hidden md:flex' : 'flex')}>
         <InboxRail
           activeSegment={segment as SegmentId}
           counts={counts as Partial<Record<SegmentId, number>> | undefined}
@@ -214,7 +214,7 @@ export function InboxPage() {
       <div
         className={cn(
           'min-h-0 w-full shrink-0 md:w-[360px] lg:w-[380px]',
-          threadId ? 'hidden lg:block' : 'block'
+          threadId ? 'hidden lg:flex lg:flex-col' : 'flex flex-1 flex-col lg:flex-none'
         )}
       >
         <ThreadList
@@ -330,7 +330,7 @@ export function InboxPage() {
               }}
             />
 
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6">
+            <div className="grove-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-5 sm:p-6">
               <MobileAISummary
                 thread={detail}
                 reclassifying={reclassify.isPending}
@@ -402,7 +402,7 @@ export function InboxPage() {
 
       {/* AI insights column (>=1280 desktop) */}
       {detail && aiPanelOpen ? (
-        <div className="hidden w-[320px] shrink-0 xl:block">
+        <div className="hidden min-h-0 w-[320px] shrink-0 xl:flex xl:flex-col">
           <AIPanel
             thread={detail}
             reclassifying={reclassify.isPending}
