@@ -36,7 +36,7 @@ export function HeroBand({
       <div
         aria-hidden="true"
         style={{ background: 'var(--hero-scrim)' }}
-        className="pointer-events-none absolute inset-0 z-0 md:hidden"
+        className="pointer-events-none absolute inset-0 z-0 lg:hidden"
       />
       <div className="relative z-10 flex h-full flex-col justify-between gap-6 px-[clamp(16px,8.5vw,160px)] pb-7 pt-4">
         {nav ? <div>{nav}</div> : null}

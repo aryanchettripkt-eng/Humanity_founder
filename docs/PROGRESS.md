@@ -38,6 +38,7 @@ _None yet._
   7. Recently sorted on phones: moved `OwnerPill` under the subject line below `640px` (`sm:hidden` / `hidden sm:inline-flex`) in `ThreadListRow`.
   8. Chart bars: tightened `StackedBars` spacing (`p-3.5`, `gap-1`) and expanded SVG height (`h-40`, `maxH = 112`) so bars fill ~70% of the card height.
   - Restored the `2026-11-15 23:30` UX subtraction PROGRESS entry with a revert note for `8f7d12b`.
+  - Round 2 fixes: made `TopNav` Menu sheet solid (`--panel-bg` / `--cta-bg`), added `--toast-bg` / `--toast-fg` and moved `OfflineBanner` to bottom-center (`bottom-[calc(env(safe-area-inset-bottom)+88px)] md:bottom-6`), extended hero scrim to `<1024px` (`lg:hidden`), added `--hero-pill-bg` (`rgba(0,0,0,0.38)`) with `rounded-2xl sm:rounded-full` and inline `more` for the brief pill, fixed `ThreadListRow` time `min-w-16 whitespace-nowrap`, aligned `StatBox` values with `min-h-[2lh]`, and rendered `CONF.` with `<abbr title="Confidence">`.
 - Changed contracts: none.
 - Next: Open PR for `gemini/G9.1c-fixes` and wait for Aryan's merge before starting `G9.2`.
 

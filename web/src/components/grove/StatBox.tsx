@@ -24,17 +24,19 @@ export function StatBox({ cells, className }: StatBoxProps) {
     >
       {cells.map((cell) => (
         <div key={cell.label} className="min-w-0">
-          <p
-            title={cell.labelTitle}
-            aria-label={cell.ariaLabel}
-            className="truncate text-[10px] font-medium uppercase tracking-wider text-muted-foreground"
-          >
-            {cell.label}
+          <p className="truncate text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            {cell.labelTitle ? (
+              <abbr title={cell.labelTitle} className="no-underline">
+                {cell.label}
+              </abbr>
+            ) : (
+              cell.label
+            )}
           </p>
           <p
             className={cn(
-              'mt-0.5 font-display text-xs font-semibold text-foreground tabular-nums',
-              cell.allowWrap ? 'line-clamp-2 leading-tight' : 'truncate',
+              'mt-0.5 min-h-[2lh] font-display text-xs font-semibold leading-tight text-foreground tabular-nums',
+              cell.allowWrap ? 'line-clamp-2' : 'truncate',
               cell.toneClass
             )}
           >

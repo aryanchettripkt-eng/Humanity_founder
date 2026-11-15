@@ -353,34 +353,41 @@ export function TodayPage() {
               {isLoading ? (
                 <Skeleton className="h-10 max-w-md rounded-xl bg-[var(--glass-bg)]" />
               ) : briefParts ? (
-                <div className="relative flex flex-wrap items-center gap-2 text-sm text-[var(--hero-fg)]">
-                  <div className="inline-flex max-w-xl flex-wrap items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2 text-[var(--hero-fg)] backdrop-blur-md">
-                    <p>{briefParts.head}</p>
-                    {briefParts.rest ? (
-                      <button
-                        type="button"
-                        onClick={() => setBriefOpen((v) => !v)}
-                        aria-expanded={briefOpen}
-                        className="inline-flex min-h-[28px] items-center gap-0.5 px-1 text-xs font-semibold text-[var(--hero-fg)] underline underline-offset-4"
-                      >
-                        more
-                        <ChevronDown className="h-3.5 w-3.5" />
-                      </button>
-                    ) : null}
+                <div className="relative space-y-2 text-sm text-[var(--hero-fg)]">
+                  <div className="flex items-center gap-2">
+                    <div className="min-w-0 max-w-xl rounded-2xl border border-[var(--glass-border)] bg-[var(--hero-pill-bg)] px-4 py-2 text-[var(--hero-fg)] backdrop-blur-md sm:rounded-full">
+                      <p className="inline">
+                        {briefParts.head}
+                        {briefParts.rest ? (
+                          <>
+                            {' '}
+                            <button
+                              type="button"
+                              onClick={() => setBriefOpen((v) => !v)}
+                              aria-expanded={briefOpen}
+                              className="inline-flex items-center gap-0.5 text-xs font-semibold text-[var(--hero-fg)] underline underline-offset-4"
+                            >
+                              more
+                              <ChevronDown className="h-3.5 w-3.5" />
+                            </button>
+                          </>
+                        ) : null}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => refreshBrief.mutate()}
+                      disabled={refreshBrief.isPending}
+                      aria-label="Refresh brief"
+                      className="glass inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] disabled:opacity-50"
+                    >
+                      <RefreshCw
+                        className={`h-4 w-4 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
+                      />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => refreshBrief.mutate()}
-                    disabled={refreshBrief.isPending}
-                    aria-label="Refresh brief"
-                    className="glass inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-[var(--glass-hover)] disabled:opacity-50"
-                  >
-                    <RefreshCw
-                      className={`h-4 w-4 ${refreshBrief.isPending ? 'animate-spin' : ''}`}
-                    />
-                  </button>
                   {briefOpen && briefParts.rest && data?.brief ? (
-                    <div className="glass w-full rounded-2xl p-3 text-xs leading-relaxed text-[var(--glass-fg)]">
+                    <div className="glass w-full max-w-xl rounded-2xl p-3 text-xs leading-relaxed text-[var(--glass-fg)]">
                       {data.brief.text}
                     </div>
                   ) : null}

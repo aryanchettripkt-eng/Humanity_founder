@@ -42,7 +42,7 @@ export function ThreadListRow({ item, ownerLabel, onSelect, className }: ThreadL
 
       <div className="flex shrink-0 items-center gap-3">
         <OwnerPill owner={item.owner} label={ownerLabel} className="hidden sm:inline-flex" />
-        <span className="w-16 text-right text-xs text-muted-foreground tabular-nums">
+        <span className="min-w-16 whitespace-nowrap text-right text-xs text-muted-foreground tabular-nums">
           {item.timeLabel}
         </span>
       </div>

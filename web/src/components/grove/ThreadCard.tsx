@@ -78,7 +78,6 @@ export function ThreadCard({
           {
             label: 'CONF.',
             labelTitle: 'Confidence',
-            ariaLabel: 'Confidence',
             value: `${item.confidence}%`,
           },
           {

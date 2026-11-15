@@ -111,9 +111,9 @@ export function TopNav({
       </div>
 
       <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-        <DialogContent className="glass max-w-xs border-[var(--glass-border)] text-[var(--glass-fg)]">
+        <DialogContent className="max-w-xs border-[var(--panel-border)] bg-[var(--panel-bg)] text-foreground">
           <DialogHeader>
-            <DialogTitle className="font-display text-base font-semibold text-[var(--glass-fg)]">
+            <DialogTitle className="font-display text-base font-semibold text-foreground">
               Navigation
             </DialogTitle>
           </DialogHeader>
@@ -123,8 +123,8 @@ export function TopNav({
               const cls = cn(
                 'flex min-h-[44px] w-full items-center justify-between rounded-full px-4 text-xs font-medium transition-colors',
                 isActive
-                  ? 'bg-[var(--nav-active-bg)] font-semibold text-[var(--nav-active-fg)]'
-                  : 'text-[var(--glass-fg)] hover:bg-[var(--glass-hover)]'
+                  ? 'bg-[var(--cta-bg)] font-semibold text-[var(--cta-fg)]'
+                  : 'text-foreground hover:bg-[var(--card-bg)]'
               );
               if (tab.to) {
                 return (
