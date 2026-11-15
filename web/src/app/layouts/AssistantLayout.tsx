@@ -78,11 +78,12 @@ export function AssistantLayout() {
           size="short"
           nav={<AssistantTopNav />}
           left={
-            <div className="inline-block rounded-2xl bg-[radial-gradient(ellipse_at_25%_50%,rgba(0,0,0,0.28)_0%,transparent_75%)] px-1 py-0.5">
-              <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--hero-fg)]">
-                {pageTitle}
-              </h1>
-            </div>
+            <h1
+              style={{ textShadow: 'var(--hero-text-shadow)' }}
+              className="font-display text-3xl font-semibold tracking-tight text-[var(--hero-fg)]"
+            >
+              {pageTitle}
+            </h1>
           }
         />
       ) : null}
