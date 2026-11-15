@@ -1,4 +1,4 @@
-import { Crown, Inbox, Sparkles, Sun } from 'lucide-react';
+import { BarChart3, Inbox, Info, Sparkles, Sun } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -28,9 +28,13 @@ export function BottomTabBar({ onOpenAsk }: BottomTabBarProps) {
         <Inbox className="h-4 w-4" aria-hidden="true" />
         <span>Inbox</span>
       </NavLink>
-      <NavLink to="/c?preview=1" className={linkClass}>
-        <Crown className="h-4 w-4" aria-hidden="true" />
-        <span>Client</span>
+      <NavLink to="/app/stats" className={linkClass}>
+        <BarChart3 className="h-4 w-4" aria-hidden="true" />
+        <span>Stats</span>
+      </NavLink>
+      <NavLink to="/app/about" className={linkClass}>
+        <Info className="h-4 w-4" aria-hidden="true" />
+        <span>About</span>
       </NavLink>
       <button
         type="button"

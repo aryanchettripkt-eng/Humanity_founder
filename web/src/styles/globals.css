@@ -82,6 +82,11 @@
     --chart-client: rgba(160, 126, 102, 0.85);
     --chart-none: rgba(138, 140, 134, 0.85);
     --chart-empty: rgba(255, 255, 255, 0.22);
+    /* Validated categorical series (dataviz palette check, light surface) */
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
     --avatar-tile-bg: #1E1F1C;
     --avatar-tile-fg: #FFFFFF;
     --avatar-tile-radius: 12px;
@@ -173,6 +178,11 @@
     --chart-client: rgba(160, 126, 102, 0.85);
     --chart-none: rgba(138, 140, 134, 0.85);
     --chart-empty: rgba(255, 255, 255, 0.22);
+    /* Validated categorical series (dataviz palette check, dark surface) */
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
     --avatar-tile-bg: #2A2C27;
     --avatar-tile-fg: #FFFFFF;
     --avatar-tile-radius: 12px;

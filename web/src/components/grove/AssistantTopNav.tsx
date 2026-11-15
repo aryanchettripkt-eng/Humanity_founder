@@ -31,15 +31,20 @@ export function AssistantTopNav() {
   const tabs: GlassTabItem[] = [
     { id: 'today', label: 'Today', to: '/app/today' },
     { id: 'inbox', label: 'Inbox', to: '/app/inbox/inbox' },
-    { id: 'client', label: 'Client view', to: '/c?preview=1' },
+    { id: 'stats', label: 'Statistics', to: '/app/stats' },
+    { id: 'about', label: 'About', to: '/app/about' },
     { id: 'ask', label: 'Ask AI' },
   ];
 
   const activeTabId = location.pathname.startsWith('/app/inbox')
     ? 'inbox'
-    : location.pathname.startsWith('/c')
-      ? 'client'
-      : 'today';
+    : location.pathname.startsWith('/app/stats')
+      ? 'stats'
+      : location.pathname.startsWith('/app/about')
+        ? 'about'
+        : location.pathname.startsWith('/app/today')
+          ? 'today'
+          : '';
 
   const clients = (me?.clients ?? []).map((c) => ({
     id: c.id,

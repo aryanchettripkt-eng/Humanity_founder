@@ -68,14 +68,17 @@ export function AssistantLayout() {
 
   const isToday = location.pathname === '/app/today';
   const isInbox = location.pathname.startsWith('/app/inbox');
+  // Pages that render their own nav and HeroBand, and scroll inside their own panel.
+  const ownsHero =
+    isToday || location.pathname === '/app/stats' || location.pathname === '/app/about';
   const pageTitle = location.pathname.startsWith('/app/settings') ? 'Settings' : 'Inbox';
 
   return (
     <AppFrame>
       <OfflineBanner />
 
-      {/* Pages that render their own HeroBand (TodayPage) embed AssistantTopNav inside it */}
-      {!isToday ? (
+      {/* Pages that render their own HeroBand (Today, Stats, About) embed AssistantTopNav inside it */}
+      {!ownsHero ? (
         <HeroBand
           size="short"
           nav={<AssistantTopNav />}
@@ -95,12 +98,12 @@ export function AssistantLayout() {
           'flex min-h-0 flex-1 flex-col',
           isInbox
             ? 'overflow-hidden px-[clamp(16px,2.5vw,32px)] pb-[clamp(16px,2.5vw,32px)]'
-            : isToday
+            : ownsHero
               ? 'overflow-hidden'
               : 'grove-scroll overflow-y-auto'
         )}
       >
-        {!isToday && !isInbox ? (
+        {!ownsHero && !isInbox ? (
           <div className="mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex min-h-0 flex-1 flex-col">
             <div className="working-panel flex min-h-0 flex-1 flex-col">
               <Outlet />

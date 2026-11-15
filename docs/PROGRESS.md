@@ -28,6 +28,14 @@ _None yet._
 
 ---
 
+### 2026-11-16 04:30 · claude · G9.3c Statistics and About pages
+- Done (assigned by Aryan in chat): the Client view tab is gone. The top nav is now Today, Inbox, Statistics, About, Ask AI. The phone tab bar is Today, Inbox, Stats, About, Ask. The `/c` routes still work for client logins and `/c?preview=1` (G9.3b puts the preview link in the Inbox header).
+- `/app/stats`: hero with a 7 / 30 day range, 4 KPI tiles (emails sorted, kept as the AI sorted, corrected by you, needed your call), an emails-per-day stacked bar chart by owner with legend, hover tooltip and a table view, "Who it's for", categories, AI confidence, the client's side (on it, handed back, handled) and recent activity. Built from the latest 100 threads in each of the inbox, done and archived segments; when there are more, the page says "Based on the latest N of M emails". Live updates on `thread:*` and `activity:new`.
+- `/app/about`: what Relay is, how it works in 4 steps, the four owners, the real Inbox shortcuts (j/k, o, r, s, u, d, e, ⌘K) and what works today (Gmail read-only beta, replies saved not emailed, the client isn't notified, .ics download, notes become drafts).
+- New tokens `--series-1..4` (light and dark) for charts. They passed the dataviz palette check; the old `--chart-*` owner colours didn't, so charts don't use them.
+- New: `features/stats/{api,mappers}.ts` (+ tests), `components/VolumeChart`, `BarList`, `pages/StatsPage.tsx`, `pages/AboutPage.tsx`. Stats and About render their own nav and hero, like Today (`AssistantLayout` `ownsHero`).
+- Checked: lint, typecheck, tests (server 36, web 33). No page scroll at 1903, 1440, 1024 and 390, light and dark. Screenshots in project files `reviews/shots-stats-about/`.
+
 ### 2026-11-16 03:40 · claude · G9.3a client view in the glass Inbox layout
 - Done (assigned by Aryan in chat): rebuilt `/c` and `/c/thread/:id` to match the Inbox. The client's queue list (tabs All / Needs you / You're on it), a reading pane with "Why you", messages and docked actions (I'll handle it / Mark handled, Assistant take over, Reply with a note), and an "At a glance" column (summary, key points, dates with real .ics, the client's note). Below 1280 the glance shows inline; below 1024 list and thread are separate views with a back button. The page never scrolls.
 - Assistant preview (`/c?preview=1`): same screen, AssistantTopNav, preview banner with Exit preview, actions read-only.
