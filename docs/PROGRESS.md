@@ -27,6 +27,10 @@ _None yet._
 
 ---
 
+### 2026-11-15 19:20 · claude · Public site + product copy (docs)
+- Done: DESIGN_V2 §6 rewritten as a 5-page public site (D19) with per-page functionality and a shared `tourStore`; §6.8 product copy with no prototype labels (D20). AGENTS §7, DESIGN_SYSTEM §7 and PRD AC14 amended (struck, not deleted).
+- Next: Gemini G9.1, then G9.1b.
+
 ### 2026-11-15 19:10 · claude · Design v2 "Grove" spec (docs)
 - Done: Aryan scrapped the lime workspace look and chose a new reference (sage canvas, nature-image hero with frosted glass, white working area with filter pills, pager and data cards). Wrote `docs/DESIGN_V2.md` mapping every slot to Relay features; D18 supersedes D13–D15 and WORKSPACE_UX; D16 font and D17 reuse rule kept. Phase 8 W8.2–W8.4 superseded by Phase 9 (G9.1–G9.4).
 - Changed contracts: design only; Today's "This week" chart is computed client-side from the thread list (no new endpoint).

@@ -36,7 +36,7 @@ Positive delta chips are an olive tint and negative ones a terracotta tint, usin
 
 **Top nav, inside the hero band** (glass on the image):
 - `[● logo]` then **glass tab pill**: `Today · Inbox · Client view · Ask AI`. The active tab is a solid white pill with ink text, as in the reference.
-- On the right are glass circles: **search ⌘K**, **settings** and the **user avatar** (menu: theme, Simulate email *(Simulated in prototype)*, Sign out).
+- On the right are glass circles: **search ⌘K**, **settings** and the **user avatar** (menu: theme, **Send test email** (demo workspace only), Sign out).
 - A **client switcher** sits as a glass pill to the left of the circles: `Priya ▾` (clients with open counts).
 - No sidebar, no rail. Segments live as filters in the working area (§3.2, §4).
 
@@ -80,7 +80,7 @@ Under the greeting there's **one line of AI brief** in white/80 (first sentence,
 - **Hero band, short (≈ 220px):** the nav, then the title "Inbox" in white with three glass stat chips (For you · For Priya · Needs your call) that act as **segment tabs**.
 - **Working area: 2 panes on desktop.** The **left list** (380px) is the same filter bar (compact), then thread rows as small white cards (avatar tile, sender, subject, owner pill, time, unread dot in olive). The **right reading pane** is a white card. Its header shows the subject (Urbanist 24), participants as avatars, and actions as circle buttons. Messages are inside it.
 - **AI insight:** a **glass panel on a mini image strip** at the top of the reading pane. It shows the **Why** (reason and confidence), **Summary**, **Dates** (with Add to calendar) and **History**. It reuses the same `GlassCard` components as the Today hero, so the AI always "lives on the glass".
-- **Composer:** a white card at the bottom with tone pills (Formal · Friendly · Brief), "Generate with AI", streaming dots and the olive pill "Send (simulated)".
+- **Composer:** a white card at the bottom with tone pills (Formal · Friendly · Brief), "Generate with AI", streaming dots and the olive pill "Send".
 - **Phones:** the list fills the screen and tapping opens the full thread. The AI glass panel collapses above the messages.
 
 ## 5. Client view `/c` (Priya, phone first)
@@ -89,80 +89,77 @@ Under the greeting there's **one line of AI brief** in white/80 (first sentence,
 - **All caught up:** the hero shows "Nothing needs you, Priya" on a glass card and the working area is empty.
 - The assistant opens it from the **Client view** tab in read-only preview mode.
 
-## 6. Landing page `/` (also `/welcome` when signed in): a working sandbox
+## 6. Public site: separate pages, no long scroll (D19)
 
-The landing page is **a working mini-version of Relay that runs in the browser on sample data**. Every control does something. It uses the **same components as the app** (D17), fed by a `landingSandbox` store (Zustand, in memory, seeded from `sampleData.ts`) instead of the API. One action in the sandbox updates every widget that reads the same store: chart, stats, list, cards and phone. A **"Reset sample"** link restores the seed. The layout follows the reference exactly: nav, then hero with greeting and chart on the left and glass cards on the right, then a white area with filter pills, a pager and a row of cards.
+The public site is **5 pages**, not one long scroll. Each page is **one screen inside the frame** on desktop (frame height = viewport − 48px). The hero band takes the top half and the white working area the bottom half, exactly like the reference. Anything that doesn't fit goes into a pager, tabs or a sheet, never extra scroll. Phones scroll naturally, but every page stays short. You move between pages with the **glass tabs** in the nav or the **"Next" buttons** on each page.
 
-Sample seed: **10 threads** for Priya (3 For you, 3 For Priya, 2 No reply, 2 Needs your call), each with sender, domain, subject, body (3–6 lines), owner, confidence, reason, summary, key points, 0–1 date and a 14-day message-count series.
+All interactive parts use the **same components as the app** (D17), fed by a shared `tourStore` (Zustand, kept in `sessionStorage`) seeded with 10 example threads for Priya. **A change made on one page carries over to the others**, so assigning a thread on Overview shows up on the Client page. Copy reads like a finished product (D20).
 
-### 6.1 Top nav (glass, on the hero)
-| Element | What it does |
+### 6.0 Public nav (every public page)
+`[● Relay]` `[ Overview · Sorting · Client app · Ask & drafts · How it works ]` … `[Log in]` `[Get started]`
+- The tabs are real routes: `/`, `/sorting`, `/client-app`, `/ask`, `/how-it-works`. The active tab is the white pill.
+- **Log in** goes to `/login`. **Get started** (olive) goes to `/signup`.
+- Every page also has **Open demo workspace** (outline pill): one-click demo login as the assistant, then `/app/today`. The page warms the API with `GET /health` on load. If login takes over 4s, the button reads "Opening your workspace…".
+- Phones: the tabs collapse into a glass menu button (sheet with the 5 pages).
+
+### 6.1 Overview `/` — "Know who replies."
+| Area | Content and behaviour |
 |---|---|
-| Logo | Scrolls to the top |
-| Glass tabs: **Assistant · Client · How it works · Real vs simulated** | **Assistant** and **Client** switch the **right side of the hero** between the assistant cards and Priya's phone (§6.3). **How it works** and **Real vs simulated** scroll to those sections. The active tab is the white pill and follows the scroll position |
-| 🔍 circle | Opens the **Ask sandbox** (§6.5) |
-| ⚙ circle | Toggles light and dark (saved in localStorage) |
-| Avatar circle | Goes to `/login` |
-| **Try the demo** olive pill | Demo login as the assistant (same as §6.2) |
+| Hero, left | The headline **"Know who replies."** and one line: "Relay reads your client's inbox and sorts every email: yours, theirs, or nobody's, with the reason why." Then **Get started** and **Open demo workspace**. Below that, the glass **"Sorted this week"** `StackedBars` chart. Hovering shows counts. Clicking a segment filters the cards below |
+| Hero, right | `GlassStat` **For you** and **For Priya**: live counts from `tourStore`, and a click filters the cards. `GlassList` **Needs your call**: review threads with **You · Priya · No reply** buttons (keys 1–3). A click moves the thread, every widget updates, and a toast offers Undo |
+| White area | `FilterBar` (Owner only) + pager `‹ 01 / 03 ›` + 4 `ThreadCard`s. The card CTAs work as they do in the app (Draft reply opens the thread sheet with the draft typing in). Bottom right: **Next: Sorting →** |
 
-### 6.2 Hero, left
-| Element | What it does |
+### 6.2 Sorting `/sorting` — "Every email gets one owner."
+| Area | Content and behaviour |
 |---|---|
-| **"Know who replies."** + one line | Static |
-| Date chip | Today's real date in the visitor's locale |
-| **Try as assistant** / **Try as client** | `useDemoLogin(role)`, then `/app/today` or `/c`. While loading, the button shows a spinner. If the API takes over 4s, the label becomes **"Waking the demo server…"** (Render cold start). On error, a toast with Retry |
-| Server warm-up | On page load, fire `GET /health` once in the background, so the API is warm by the time someone clicks. Nothing is shown unless it fails, and then a small glass note says "Demo server is starting, the first click may take ~30s" |
-| **Glass chart "Sorted this week"** | `StackedBars` for Mon–Sun from the sandbox (day × owner, forest/clay/linen). **Hover** shows a tooltip ("Wed · 2 for you · 1 for Priya"). **Clicking a segment** sets the filters below (owner and day) and scrolls to the cards. It updates live when an owner changes |
+| Hero, left | The title and one line. A glass **"Incoming"** card with 5 email chips. **Picking one** plays the classification: the subject arrives, then the verdict appears in steps: owner pill → confidence → reason ("Priya is asked directly to approve the budget.") → extracted date. **Add to inbox** puts it into `tourStore` as a new card |
+| Hero, right | A glass **Why** card for the selected thread: the reason, a confidence meter and the evidence lines quoted from the email. An **Override** row (You · Priya · No reply) with an **"Always for this sender"** checkbox: once it's set, every thread from that sender in the store moves too, and a toast says so |
+| White area | The full `FilterBar` (Owner · Category · Date · Confidence, plus the dark clear circle) + pager + `ThreadCard`s. ↗ opens the **thread sheet**: email body, Why, Summary, Key points, Dates with **Add to calendar** (downloads a real `.ics`), and the owner dropdown. **Next: Client app →** |
 
-### 6.3 Hero, right (switches with the Assistant / Client tab)
-**Assistant tab (default):**
-| Element | What it does |
+### 6.3 Client app `/client-app` — "Your client decides in one tap."
+| Area | Content and behaviour |
 |---|---|
-| `GlassStat` **For you** / **For Priya** | Counts from the sandbox, with a delta line ("+1 since you arrived" after a change). **Clicking** sets the Owner filter below and scrolls |
-| `GlassList` **Needs your call** | The sandbox's review threads (avatar, sender, subject, confidence %). Each row has **3 quick-assign buttons (You · Priya · No reply, keys 1–3)**. A click moves the thread to that owner: the row leaves, the stats, chart and cards update, and a toast says "Moved to Priya · Undo". Once the list is empty it shows "AI is confident about everything right now" and a "Reset sample" link |
+| Hero, left | The title and one line. A glass **phone** showing Priya's queue (the store's client threads that aren't handled yet). The buttons **I'll handle it**, **Alex, take it** and **Add note** (a small input) all work. Handled cards slide out. When the queue is empty: "Nothing needs you, Priya." |
+| Hero, right | A glass **"Assistant side"** list: the threads sent to Priya, each with a live status chip (Waiting → Priya is handling it → Back with you), plus a small activity feed of her taps with times. A phone tap updates this list instantly |
+| White area | `ThreadCard`s owned by `client`. **Send to Priya** pushes a thread onto the phone, and **Nudge Priya** adds a "Reminder sent" line to the activity. **Next: Ask & drafts →** |
 
-**Client tab:**
-| Element | What it does |
+### 6.4 Ask & drafts `/ask` — "Ask your inbox. Reply in your voice."
+| Area | Content and behaviour |
 |---|---|
-| Glass **phone frame** showing Priya's queue | Lists the sandbox threads that are owned by `client` and not yet handled. Each card has **I'll handle it** and **Alex, take it**. *I'll handle it* marks it handled: the card slides out, and the matching thread card below gets a "Priya is handling it" chip. *Alex, take it* sets the owner to assistant, so the For you count goes up. This demonstrates the live assistant ↔ client sync on one screen |
+| Hero, left | A glass **Ask** box with 4 suggested questions ("What does Priya need to sign this week?", "Anything waiting on me?", "Summarise the offsite thread", "Which emails can wait?"). Each one returns an answer with **cited thread chips**, and a chip opens the thread sheet. Typing your own question offers those suggestions plus **Open demo workspace** to ask anything |
+| Hero, right | A glass **Draft** card for the selected thread: tone pills **Formal · Friendly · Brief** switch versions, the draft types itself out, **Copy** works, and **Insert** shows the reply in the thread sheet |
+| White area | A row of **Dates found** cards (meeting, deadline, travel), each with **Add to calendar** (`.ics`) and the source thread. Below that, the assistant-owned `ThreadCard`s, and picking one sets the Draft card's thread. **Next: How it works →** |
 
-### 6.4 White working area (the reference's filter row and cards)
-| Element | What it does |
+### 6.5 How it works `/how-it-works` — "Set up in two minutes."
+| Area | Content and behaviour |
 |---|---|
-| `FilterBar` dropdown pills: **Owner** (All / For you / For Priya / No reply / Needs your call) · **Category** (Meeting, Finance, Legal, Personal, Update…) · **Date** (Any / Has a date / Next 7 days) · **Confidence** (Any / ≥ 90% / 70–89% / < 70%) | Filters the cards. Combined filters use AND. Selected pills show their value ("Owner: For Priya"). The state is mirrored in the URL hash so a link reproduces it |
-| Dark circle | Clears all filters (tooltip "Clear filters"). It shows a dot when any filter is active |
-| Pager `‹ 01 / 03 ›` | 4 cards per page on desktop, 2 on tablet, 1 on phones. Arrows, swipe and ←/→ keys work. It resets to page 1 when the filters change |
-| Empty result | `EmptyState` "No sample threads match" and a Clear filters button |
-| **`ThreadCard`** header: `AvatarTile`, sender, domain, ↗ | ↗ (or clicking the card) opens the **thread sheet** (§6.6) |
-| `StatBox` **OWNER · CONFIDENCE · NEXT DATE** | OWNER is a small dropdown. **Changing it overrides the AI**: the card, chart, stats, list and phone all update, and the confidence becomes "Manual". CONFIDENCE shows a % with a tooltip of the AI's reason. NEXT DATE shows "Fri 5 pm" or "—" |
-| `Sparkline` + `DeltaChip` | The thread's 14-day message counts. The chip shows "↗ 2 new" (olive) or "↘ quiet 5d" (terracotta) |
-| **Olive CTA** (one, chosen by state) | **Draft reply** (owner = you): opens the thread sheet with the draft streaming in (pre-written, typed out at about 40 chars/s), with tone pills that switch between 3 pre-written versions. **Send to Priya** (owner = client, not handed off): marks it handed off, so it appears on the phone in the Client tab, with a toast "Sent to Priya's view". **Nudge Priya** (handed off and waiting): the toast "Nudge drafted" opens the sheet with a short pre-written nudge. **Confirm** (needs your call): accepts the AI's suggestion and moves the thread to the suggested owner |
+| Hero | 3 glass step cards: **Connect Gmail** (read-only) → **Relay sorts every thread** → **Your client decides**. Each one has a **See it** button that goes to Overview, Sorting or Client app |
+| White area | **Integration cards:** Gmail (Connect, read-only access) and Outlook (Connect). **Trust cards** with true claims only: "Read-only access to Gmail", "Nothing is sent or changed in your mailbox", "Every AI decision shows its reason and can be overridden". Then a final row with **Get started** and **Open demo workspace** |
 
-### 6.5 Ask sandbox (🔍 or ⌘K)
-A glass dialog with **4 suggested questions** ("What does Priya need to sign this week?", "Anything waiting on me?", "Summarise the offsite thread", "Which emails can I ignore?"). Each one returns a **pre-written answer** with **cited thread chips**, and clicking a chip opens that thread sheet. Free-text questions are answered with "In the live demo, Ask searches the whole inbox" and a Try as assistant button. The dialog is labelled **"Sample answers"**.
+### 6.6 Rules
+- **API calls:** only `GET /health` and demo login. Everything else runs in `tourStore`. Avatar menu → **Reset tour** restores the seed.
+- **No** "prototype", "simulated", "sample data" or "real vs simulated" anywhere in the UI (D20).
+- Every interactive piece is built from the shared Grove components. The public pages only provide `tourStore` data and handlers.
+- All states are designed: login loading and error, empty phone, empty filters, empty review list, reduced motion.
 
-### 6.6 Thread sheet (right-side sheet, full screen on phones)
-Shows the subject, participants, the sample email body, and an **AI glass panel**: Why (reason + confidence), Summary, Key points, Dates (**Add to calendar** downloads a real `.ics` for that sample date, built in the browser), the draft area (§6.4) and the owner dropdown. Esc closes it.
-
-### 6.7 Below the cards
-- **How it works:** 3 white cards (Connect Gmail read-only → AI decides who replies and why → Priya taps once). Each card has a **"Show me"** button that scrolls to and highlights the matching live widget (the filter bar, the Needs-your-call list, the Client tab).
-- **Real vs simulated:** a table generated from the same list as the README / PRD §11.
-- **Footer:** the two demo buttons again, plus GitHub and video links if Aryan adds them.
-
-### 6.8 Rules
-- **No API calls except `GET /health` and demo login.** Everything else is local and labelled "Sample data" in the hero corner.
-- Everything here is built from the shared components. The sandbox only provides a different data source and different handlers.
-- All states are designed: loading (demo login), empty (filters, review list, phone), errors (login, health) and reduced motion.
-
-### 6.9 What lives on other pages, not the landing page
+### 6.7 What stays in the app
 | Page | Owns |
 |---|---|
-| Today | Real brief, real counts and chart, real review queue, real cards, Simulate email |
-| Inbox | Real thread reading, full AI panel, real drafts (LLM), owner rules ("Always for this sender") |
-| Client view `/c` | Priya's real queue and actions over the socket |
-| Ask (⌘K) in the app | Real LLM answers over the whole inbox |
-| Onboarding / Settings | Connecting Gmail or the demo inbox, sync, disconnect |
+| Today | Real brief, counts, chart, review queue, cards, **Send test email** |
+| Inbox | Real threads, full AI panel, AI drafts, sender rules |
+| `/c` | Priya's real queue and actions |
+| ⌘K Ask | Real answers over the whole inbox |
+| Onboarding / Settings | Connecting accounts, sync, disconnect |
 | Login / Signup | Accounts, Google sign-in |
+
+### 6.8 Product copy (D20)
+The UI reads like a finished product, without prototype labels. Wording must still be **true**:
+- "Simulate email" becomes **"Send test email"** (it delivers a scripted test email to the demo workspace).
+- The demo inbox is called **"Demo workspace"**.
+- The simulated OAuth modal is titled **"Connect demo workspace"**.
+- Sending in the demo workspace says **"Reply sent"**. For a real Gmail thread it says **"Reply saved in Relay"** with an "Open in Gmail" link, because Relay doesn't send through Gmail.
+- "Add to calendar" downloads a real `.ics` file instead of showing a toast.
+- The "real vs simulated" list stays in the README for reviewers, but never in the UI.
 
 ## 7. Auth, onboarding, settings, 404
 - **Login/Signup:** the frame splits 50/50. Left is the hero image with one glass sample card ("Needs your call") and the tagline. Right is white with the **demo buttons first**, then Google, then email.
@@ -207,7 +204,7 @@ All visual components live in `web/src/components/grove/` and take **view models
 
 ## 10. Build order (ROADMAP Phase 9)
 - **G9.1:** tokens, fonts and the image + fallback, `AppFrame`, `HeroBand`, `TopNav`, `BottomTabBar`, the glass set, `FilterBar`, `ThreadCard`, `StackedBars`, then **Today** on them. Delete the replaced workspace components.
-- **G9.1b:** the **Landing sandbox** (§6) on the same components.
+- **G9.1b:** the **public site** (§6): 5 pages, `tourStore`, public nav, on the same components.
 - **G9.2:** Inbox, `AIGlassPanel`, composer and ⌘K restyle.
 - **G9.3:** Client view, auth, onboarding, settings and 404.
 - **G9.4** (Claude): review each PR at 1440, 820, 390 and 320 in light and dark.

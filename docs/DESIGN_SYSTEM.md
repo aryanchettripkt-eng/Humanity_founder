@@ -144,7 +144,7 @@ shadcn primitives to install: button, input, textarea, badge, card, dialog, shee
 - AI reasons: one sentence, starts with the evidence: *"Priya is asked directly to approve the budget."* not *"I think…"*.
 - Client view addresses the client by first name and says "your assistant" or the assistant's first name.
 - Empty states (examples): Assistant segment → "Nothing on your plate. Nice." · Client segment → "Nothing waiting on Priya." · Review → "AI is confident about everything right now." · Search → "No conversations match "{q}"."
-- Simulated features: small muted label "Simulated in prototype" with an `Info` tooltip — never hide it, never shout it.
+- ~~Simulated features: small muted label "Simulated in prototype" with an `Info` tooltip~~ Superseded by D20: no prototype labels in the UI; product wording per DESIGN_V2 §6.8.
 - Real Gmail copy:
   - Connect card helper: "Read-only. Your emails are analysed by AI to sort them. Nothing is sent or changed in Gmail."
   - Beta note: "Works for approved test accounts while Google reviews the app."

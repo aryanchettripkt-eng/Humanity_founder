@@ -76,7 +76,7 @@ Newest at the top, one entry per work session:
 - Keep components < ~200 lines; extract when larger.
 - **Reuse before you build (D17).** Check `docs/DESIGN_V2.md` §8 and `web/src/components` first. Extend a shared component with a prop instead of copying it; the landing page uses the same components as the app with sample data.
 - Every user‑facing async action: loading state, success feedback, error feedback.
-- Anything simulated is labelled in UI and listed in README "What's simulated".
+- ~~Anything simulated is labelled in UI~~ (superseded by D20): no "prototype/simulated" labels in the UI; use the true product wording in DESIGN_V2 §6.8 and keep the list in README "What's simulated".
 - AI calls only through `server/src/ai` providers. Frontend never calls an LLM directly.
 
 ## 8. When unsure
