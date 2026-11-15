@@ -92,10 +92,12 @@ export function AssistantLayout() {
 
       <main
         className={cn(
-          'flex min-h-0 flex-1 flex-col pb-20 md:pb-0',
+          'flex min-h-0 flex-1 flex-col',
           isInbox
-            ? 'px-[clamp(16px,2.5vw,32px)] pb-[clamp(16px,2.5vw,32px)] lg:overflow-hidden'
-            : 'lg:overflow-y-auto'
+            ? 'overflow-hidden px-[clamp(16px,2.5vw,32px)] pb-[clamp(16px,2.5vw,32px)]'
+            : isToday
+              ? 'overflow-hidden'
+              : 'grove-scroll overflow-y-auto'
         )}
       >
         {!isToday && !isInbox ? (

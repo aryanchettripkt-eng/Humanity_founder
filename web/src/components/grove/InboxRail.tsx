@@ -63,7 +63,7 @@ export function InboxRail({ activeSegment, counts, onSelectSegment }: InboxRailP
       {/* Desktop/tablet vertical glass rail (>=768px) */}
       <nav
         aria-label="Inbox segments"
-        className="glass-pane hidden w-[72px] shrink-0 flex-col items-center gap-3 self-stretch rounded-[36px] py-3 md:flex"
+        className="glass-pane grove-scroll hidden max-h-full min-h-0 w-[72px] shrink-0 flex-col items-center gap-3 self-stretch overflow-y-auto rounded-[36px] py-3 md:flex"
       >
         {primarySegments.map((seg) => {
           const Icon = seg.icon;

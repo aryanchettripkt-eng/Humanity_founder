@@ -166,6 +166,9 @@ describe('TodayPage', () => {
     renderToday();
     expect(screen.getByText('1 email needs your call. Priya has 1 waiting.')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Needs your call' })).toBeInTheDocument();
+    const reviewLinks = screen.getAllByRole('link', { name: 'Open all 1 in Inbox' });
+    expect(reviewLinks).toHaveLength(2);
+    expect(reviewLinks[0]).toHaveAttribute('href', '/app/inbox/review');
     expect(screen.getAllByText('You reply').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Waiting on Priya').length).toBeGreaterThan(0);
     expect(screen.queryByText(/Connect emails/i)).not.toBeInTheDocument();

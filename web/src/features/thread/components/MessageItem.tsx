@@ -61,7 +61,7 @@ export function MessageItem({ message, defaultCollapsed = false }: MessageItemPr
       </div>
 
       {!collapsed ? (
-        <div className="mt-4 max-w-[72ch] whitespace-pre-wrap text-[16px] leading-[1.6] text-[var(--fg)]">
+        <div className="mt-4 max-w-[760px] whitespace-pre-wrap text-[16px] leading-[1.6] text-[var(--fg)]">
           {message.bodyText}
         </div>
       ) : null}

@@ -1,3 +1,4 @@
+import { ArrowUpRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -168,10 +169,15 @@ export function TodayPage() {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="shrink-0 px-[clamp(16px,2.5vw,32px)] pt-[clamp(16px,2.5vw,32px)]">
+        <AssistantTopNav />
+      </div>
+
+      <div className="grove-scroll flex min-h-0 flex-1 flex-col overflow-y-auto lg:overflow-hidden">
       <HeroBand
         size="tall"
-        nav={<AssistantTopNav />}
+        className="[&>div]:pt-5"
         bottom={
           <div className="space-y-6">
             <div className="space-y-2">
@@ -195,12 +201,32 @@ export function TodayPage() {
                 aria-labelledby="needs-your-call-heading"
                 className="glass rounded-[20px] p-6"
               >
-                <h2
-                  id="needs-your-call-heading"
-                  className="font-display text-[32px] font-semibold leading-tight tracking-tight text-[var(--hero-fg)]"
-                >
-                  Needs your call
-                </h2>
+                <div className="flex items-center justify-between gap-3">
+                  <h2
+                    id="needs-your-call-heading"
+                    className="font-display text-[32px] font-semibold leading-tight tracking-tight text-[var(--hero-fg)]"
+                  >
+                    Needs your call
+                  </h2>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {reviewCount > 0 ? (
+                      <Link
+                        to="/app/inbox/review"
+                        aria-label={`Open all ${reviewCount} in Inbox`}
+                        className="glass inline-flex h-8 min-w-[32px] items-center justify-center rounded-full px-3 text-sm font-semibold tabular-nums text-[var(--hero-fg)] transition-colors hover:bg-[var(--glass-hover)]"
+                      >
+                        {reviewCount}
+                      </Link>
+                    ) : null}
+                    <Link
+                      to="/app/inbox/review"
+                      aria-label={`Open all ${reviewCount} in Inbox`}
+                      className="glass flex h-10 w-10 items-center justify-center rounded-full text-[var(--hero-fg)] transition-colors hover:bg-[var(--glass-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </div>
+                </div>
 
                 {isLoading ? (
                   <div className="mt-4 space-y-3">
@@ -274,15 +300,6 @@ export function TodayPage() {
                         );
                       })}
                     </div>
-
-                    {reviewThreads.length > 3 ? (
-                      <Link
-                        to="/app/inbox/review"
-                        className="mt-4 inline-flex items-center text-base font-medium text-[var(--hero-muted)] transition-colors hover:text-[var(--hero-fg)]"
-                      >
-                        +{reviewThreads.length - 3} more
-                      </Link>
-                    ) : null}
                   </>
                 )}
               </section>
@@ -325,11 +342,11 @@ export function TodayPage() {
         }
       />
 
-      <div className="working-panel mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] space-y-6">
+      <div className="working-panel mx-[clamp(16px,2.5vw,32px)] mb-[clamp(16px,2.5vw,32px)] flex flex-col gap-6 lg:min-h-0 lg:flex-1">
         <div
           role="tablist"
           aria-label="Filter threads"
-          className="no-scrollbar flex items-center gap-6 overflow-x-auto"
+          className="no-scrollbar flex shrink-0 items-center gap-6 overflow-x-auto"
         >
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -391,7 +408,7 @@ export function TodayPage() {
             </Link>
           </div>
         ) : (
-          <>
+          <div className="space-y-4 lg:grove-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:py-1">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
               {visibleCards.map((t) => {
                 const sender =
@@ -447,8 +464,9 @@ export function TodayPage() {
                 View all in Inbox →
               </Link>
             </div>
-          </>
+          </div>
         )}
+      </div>
       </div>
     </div>
   );

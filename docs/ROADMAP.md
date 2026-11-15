@@ -95,6 +95,7 @@
 - [x] **G9.1e** Simplified Today page (counts summary, Needs your call confirm pills, 2 stat cards, 4-tab working panel + 4 simple cards) — @gemini (gemini/G9.1e-today-simple)
 - [ ] **G9.1b** Public site (DESIGN_V2 §1.0 composition + §6, D19/D20): 5 one-screen pages `/`, `/sorting`, `/client-app`, `/ask`, `/how-it-works`, public nav, shared `tourStore`, `/health` warm-up, product copy — @gemini
 - [x] **G9.2a** Glass shell everywhere + new 4-column Inbox rebuild — @gemini (gemini/G9.2a-inbox-glass)
+- [x] **G9.2b** Wider frame, no page scroll, Needs-your-call redirect — @gemini (gemini/G9.2b-no-page-scroll)
 - [ ] **G9.2** Inbox (short hero + segment glass tabs + search pill, list / reading pane / AI column in the panel), composer with truthful send copy, real .ics download, ⌘K glass dialog — @gemini
 - [ ] **G9.3** Settings and client view (work-page shape, preview banner), then login, signup, onboarding, 404, auth callback (focus-page shape); all "simulated"/"prototype" copy removed — @gemini
 - [ ] **G9.4** Review each G9 PR against DESIGN_V2 at 1440/820/390/320, light + dark — @claude
