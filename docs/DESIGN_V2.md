@@ -71,7 +71,7 @@ Under the greeting there's **one line of AI brief** in white/80 (first sentence,
     |---|---|---|
     | `For Priya` (owner colour) | `92%` | `Fri 5 pm` or "—" |
 
-  - **Footer:** a **sparkline** of the thread's message activity over 14 days (olive when the last message is from them, ink when it's from us), a delta chip (`↗ 2 new` / `↘ quiet 5d`), and **one olive pill CTA** chosen by state: `Draft reply` (assistant), `Send to Priya` (client, not handed off), `Nudge Priya` (handed off and waiting), `Confirm` (review). It always opens a real action.
+  - **Footer:** a **sparkline** of the thread's message activity over 14 days (olive when the last message is from them, ink when it's from us), a delta chip (`↗ 2 new` / `↘ quiet 5d`), and **one olive pill CTA** chosen by state: `Draft reply` (assistant), ~~`Send to Priya` (client, not handed off), `Nudge Priya` (handed off and waiting)~~ `Move up for Priya` (client, not yet important and not being handled: sets `important`, which puts it at the top of her queue, with Undo) or `Open in Priya's view` (otherwise; goes to `/c?preview=1`), `Confirm` (review). It always opens a real action, and its toast only states what actually happened (D20). A real "Nudge Priya" needs a backend notification endpoint and is out of scope for G9.1.
 - **Below the row, a "Recently sorted" compact list** (5 rows) with a "View inbox" link.
 
 ---
