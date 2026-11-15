@@ -38,6 +38,8 @@
     --canvas-overlay: transparent;
     --hero-fg: #FFFFFF;
     --hero-muted: rgba(255, 255, 255, 0.85);
+    --hero-scrim: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.10));
+    --hero-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     --glass-bg: rgba(0, 0, 0, 0.25);
     --glass-border: rgba(255, 255, 255, 0.20);
     --glass-fg: #FFFFFF;
@@ -105,6 +107,8 @@
     --canvas-overlay: rgba(0, 0, 0, 0.20);
     --hero-fg: #FFFFFF;
     --hero-muted: rgba(255, 255, 255, 0.85);
+    --hero-scrim: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.10));
+    --hero-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     --glass-bg: rgba(0, 0, 0, 0.25);
     --glass-border: rgba(255, 255, 255, 0.20);
     --glass-fg: #FFFFFF;
@@ -165,7 +169,7 @@
     background-color: var(--panel-bg);
     border: 1px solid var(--panel-border);
     box-shadow: var(--panel-shadow);
-    @apply mx-0 rounded-t-[24px] p-4 backdrop-blur-xl sm:p-6 md:mx-[clamp(0px,6.4vw,120px)] md:mb-7 md:rounded-[32px] md:p-[40px];
+    @apply mx-0 rounded-t-[24px] p-4 backdrop-blur-xl sm:p-6 md:mx-[clamp(0px,6.4vw,120px)] md:mb-7 md:rounded-[32px] md:p-8 min-[1600px]:p-[40px];
   }
 }
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { GlassCard } from '@/components/grove/GlassCard';
 import type { GroveBarDayModel } from '@/components/grove/models';
 import { getOwnerShortLabel, OWNER_META } from '@/lib/owners';
+import { cn } from '@/lib/utils';
 import type { Owner } from '@/types/api';
 
 export type StackedBarsProps = {
@@ -73,10 +74,10 @@ export function StackedBars({
           </button>
         </div>
       }
-      className={className}
+      className={cn('p-3.5', className)}
     >
-      <div className="flex flex-col justify-between gap-2">
-        <div aria-live="polite" className="min-h-[16px] text-[11px] font-medium text-[var(--glass-muted)]">
+      <div className="flex flex-col justify-between gap-1">
+        <div aria-live="polite" className="min-h-[14px] text-[11px] font-medium text-[var(--glass-muted)]">
           {hovered ? (
             <span>
               {hovered.label}: {hovered.assistant} {assistantLabel.toLowerCase()} ·{' '}
@@ -89,15 +90,15 @@ export function StackedBars({
         </div>
 
         <svg
-          viewBox={`0 0 ${Math.max(1, days.length) * 44} 126`}
-          className="h-32 w-full overflow-visible"
+          viewBox={`0 0 ${Math.max(1, days.length) * 44} 130`}
+          className="h-40 w-full overflow-visible"
           role="img"
           aria-label="Weekly sorted threads stacked bar chart"
         >
           {days.map((day, i) => {
             const x = i * 44 + 6;
             const barW = 32;
-            const maxH = 102;
+            const maxH = 112;
             const total = day.assistant + day.client + day.none;
             const scale = total > 0 ? maxH / maxTotal : 0;
 
@@ -105,7 +106,7 @@ export function StackedBars({
             const hClient = day.client * scale;
             const hNone = day.none * scale;
 
-            const yAssistant = 106 - hAssistant;
+            const yAssistant = 114 - hAssistant;
             const yClient = yAssistant - hClient;
             const yNone = yClient - hNone;
 
@@ -157,7 +158,7 @@ export function StackedBars({
                 {total === 0 ? (
                   <rect
                     x={x}
-                    y={100}
+                    y={108}
                     width={barW}
                     height={6}
                     rx={3}
@@ -166,7 +167,7 @@ export function StackedBars({
                 ) : null}
                 <text
                   x={x + barW / 2}
-                  y={122}
+                  y={126}
                   textAnchor="middle"
                   fill="var(--glass-muted)"
                   fontSize="10"

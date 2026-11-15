@@ -15,11 +15,11 @@ export function ThreadListRow({ item, ownerLabel, onSelect, className }: ThreadL
   const inner = (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3 transition-colors hover:border-foreground/20',
+        'flex items-start justify-between gap-3 rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3 transition-colors hover:border-foreground/20 sm:items-center',
         className
       )}
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 items-start gap-3 sm:items-center">
         <AvatarTile initials={item.initials} size="sm" />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -34,11 +34,14 @@ export function ThreadListRow({ item, ownerLabel, onSelect, className }: ThreadL
             </span>
           </div>
           <p className="truncate text-xs text-muted-foreground">{item.subject}</p>
+          <div className="mt-1.5 sm:hidden">
+            <OwnerPill owner={item.owner} label={ownerLabel} />
+          </div>
         </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <OwnerPill owner={item.owner} label={ownerLabel} />
+        <OwnerPill owner={item.owner} label={ownerLabel} className="hidden sm:inline-flex" />
         <span className="w-16 text-right text-xs text-muted-foreground tabular-nums">
           {item.timeLabel}
         </span>

@@ -337,7 +337,10 @@ export function TodayPage() {
           <div className="space-y-4">
             <div className="relative space-y-2 rounded-3xl bg-[radial-gradient(ellipse_at_25%_45%,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.12)_55%,transparent_78%)] py-1">
               <div className="flex flex-wrap items-end gap-3">
-                <h1 className="font-display text-[36px] font-semibold leading-[1.06] tracking-tight text-[var(--hero-fg)] sm:text-[52px]">
+                <h1
+                  style={{ textShadow: 'var(--hero-text-shadow)' }}
+                  className="font-display text-[36px] font-semibold leading-[1.06] tracking-tight text-[var(--hero-fg)] sm:text-[52px]"
+                >
                   {getTimeGreeting()},<br />
                   {userFirstName}!
                 </h1>
@@ -350,19 +353,21 @@ export function TodayPage() {
               {isLoading ? (
                 <Skeleton className="h-10 max-w-md rounded-xl bg-[var(--glass-bg)]" />
               ) : briefParts ? (
-                <div className="relative flex flex-wrap items-center gap-2 text-sm text-[var(--hero-muted)]">
-                  <p className="max-w-xl">{briefParts.head}</p>
-                  {briefParts.rest ? (
-                    <button
-                      type="button"
-                      onClick={() => setBriefOpen((v) => !v)}
-                      aria-expanded={briefOpen}
-                      className="inline-flex min-h-[44px] items-center gap-0.5 px-1 text-xs font-semibold text-[var(--hero-fg)] underline underline-offset-4"
-                    >
-                      more
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    </button>
-                  ) : null}
+                <div className="relative flex flex-wrap items-center gap-2 text-sm text-[var(--hero-fg)]">
+                  <div className="inline-flex max-w-xl flex-wrap items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2 text-[var(--hero-fg)] backdrop-blur-md">
+                    <p>{briefParts.head}</p>
+                    {briefParts.rest ? (
+                      <button
+                        type="button"
+                        onClick={() => setBriefOpen((v) => !v)}
+                        aria-expanded={briefOpen}
+                        className="inline-flex min-h-[28px] items-center gap-0.5 px-1 text-xs font-semibold text-[var(--hero-fg)] underline underline-offset-4"
+                      >
+                        more
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      </button>
+                    ) : null}
+                  </div>
                   <button
                     type="button"
                     onClick={() => refreshBrief.mutate()}

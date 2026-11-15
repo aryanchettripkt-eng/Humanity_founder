@@ -3,6 +3,7 @@ import {
   LogOut,
   MailCheck,
   MailPlus,
+  Menu,
   Moon,
   Search,
   Settings,
@@ -12,6 +13,7 @@ import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/grove/Avatar';
 import { GlassTabs, type GlassTabItem } from '@/components/grove/GlassTabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
@@ -69,16 +71,17 @@ export function TopNav({
 }: TopNavProps) {
   const [clientOpen, setClientOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const activeClient = clients.find((c) => c.id === activeClientId) ?? clients[0];
   const clientFirstName = activeClient?.name.split(' ')[0] || 'Client';
 
   return (
-    <header className={cn('flex flex-wrap items-center justify-between gap-3', className)}>
-      <div className="flex items-center gap-3">
+    <header className={cn('flex flex-nowrap items-center justify-between gap-3', className)}>
+      <div className="flex min-w-0 items-center gap-3">
         <Link
           to={logoHref}
-          className="inline-flex min-h-[44px] items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex min-h-[44px] shrink-0 items-center gap-2.5 rounded-full pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--logo-bg)] text-[var(--logo-fg)] shadow-sm">
             <MailCheck className="h-4 w-4" aria-hidden="true" />
@@ -92,9 +95,66 @@ export function TopNav({
           items={tabs}
           activeId={activeTabId}
           onChange={onTabChange}
-          className="hidden md:inline-flex"
+          className="hidden lg:inline-flex"
         />
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-label="Open navigation menu"
+          aria-expanded={menuOpen}
+          className="glass hidden min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)] md:inline-flex lg:hidden"
+        >
+          <Menu className="h-4 w-4" aria-hidden="true" />
+          <span>Menu</span>
+        </button>
       </div>
+
+      <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
+        <DialogContent className="glass max-w-xs border-[var(--glass-border)] text-[var(--glass-fg)]">
+          <DialogHeader>
+            <DialogTitle className="font-display text-base font-semibold text-[var(--glass-fg)]">
+              Navigation
+            </DialogTitle>
+          </DialogHeader>
+          <nav aria-label="Menu navigation" className="mt-2 flex flex-col gap-1.5">
+            {tabs.map((tab) => {
+              const isActive = tab.id === activeTabId;
+              const cls = cn(
+                'flex min-h-[44px] w-full items-center justify-between rounded-full px-4 text-xs font-medium transition-colors',
+                isActive
+                  ? 'bg-[var(--nav-active-bg)] font-semibold text-[var(--nav-active-fg)]'
+                  : 'text-[var(--glass-fg)] hover:bg-[var(--glass-hover)]'
+              );
+              if (tab.to) {
+                return (
+                  <Link
+                    key={tab.id}
+                    to={tab.to}
+                    onClick={() => setMenuOpen(false)}
+                    className={cls}
+                  >
+                    <span>{tab.label}</span>
+                  </Link>
+                );
+              }
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    onTabChange?.(tab.id);
+                    setMenuOpen(false);
+                  }}
+                  className={cls}
+                >
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </DialogContent>
+      </Dialog>
 
       {variant === 'public' ? (
         <div className="flex items-center gap-2">{rightSlot}</div>
@@ -110,7 +170,7 @@ export function TopNav({
                   className="glass inline-flex h-11 items-center gap-2 rounded-full pl-2 pr-3.5 text-xs font-semibold transition-colors hover:bg-[var(--glass-hover)]"
                 >
                   <Avatar name={activeClient.name} initials={activeClient.initials} size="sm" />
-                  <span>{clientFirstName}</span>
+                  <span className="hidden lg:inline">{clientFirstName}</span>
                   <ChevronDown className="h-3.5 w-3.5 text-[var(--hero-muted)]" />
                 </button>
               </PopoverTrigger>
