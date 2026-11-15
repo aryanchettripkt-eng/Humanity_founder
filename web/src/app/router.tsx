@@ -7,6 +7,9 @@ import { useMe } from '@/features/auth/api';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { getAuthToken } from '@/lib/api';
 
+const AboutPage = lazy(() =>
+  import('@/pages/AboutPage').then((m) => ({ default: m.AboutPage }))
+);
 const AuthCallbackPage = lazy(() =>
   import('@/pages/AuthCallbackPage').then((m) => ({ default: m.AuthCallbackPage }))
 );
@@ -33,6 +36,9 @@ const OnboardingPage = lazy(() =>
 );
 const SettingsAccountsPage = lazy(() =>
   import('@/pages/SettingsAccountsPage').then((m) => ({ default: m.SettingsAccountsPage }))
+);
+const StatsPage = lazy(() =>
+  import('@/pages/StatsPage').then((m) => ({ default: m.StatsPage }))
 );
 const SignupPage = lazy(() =>
   import('@/pages/SignupPage').then((m) => ({ default: m.SignupPage }))
@@ -91,6 +97,8 @@ export function AppRouter() {
           <Route index element={<Navigate to="today" replace />} />
           <Route path="today" element={<TodayPage />} />
           <Route path="inbox/:segment?/:threadId?" element={<InboxPage />} />
+          <Route path="stats" element={<StatsPage />} />
+          <Route path="about" element={<AboutPage />} />
           <Route path="settings/accounts" element={<SettingsAccountsPage />} />
         </Route>
 
