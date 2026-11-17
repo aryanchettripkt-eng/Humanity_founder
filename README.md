@@ -4,9 +4,9 @@ Relay helps a personal assistant (PA) manage their clients' inboxes. For every c
 
 Built as a prototype for the *AI Full-Stack Engineer Intern* assignment (Humanity Founders).
 
-**Live demo:** https://web-one-zeta-74.vercel.app  ·  **API health:** https://relay-server-ybzf.onrender.com/api/health
+**Live demo:** https://web-one-zeta-74.vercel.app  ·  **API health:** https://relayserver-production-ab0bdc31.up.railway.app/api/health
 
-> The API runs on Render's free plan and sleeps when idle. The first request after a while can take ~50 seconds.
+> The API runs on Railway (see [docs/DEPLOY.md](docs/DEPLOY.md)).
 
 ---
 
@@ -66,7 +66,7 @@ flowchart LR
   C -- REST + JWT --> API
   A <-- Socket.io --> RT
   C <-- Socket.io, filtered --> RT
-  subgraph Server [Express on Render]
+  subgraph Server [Express on Railway]
     API[REST API<br/>zod validation, rate limits]
     RT[Realtime rooms<br/>assistants:clientId / client:clientId]
     CL[Classification pipeline<br/>rules → AI → threshold → sticky owners]
@@ -80,7 +80,7 @@ flowchart LR
   CL --> RT
 ```
 - **Web** (`/web`): React 18, TypeScript, Vite, Tailwind + shadcn/ui, TanStack Query, Zustand, Socket.io client. Deployed on Vercel.
-- **Server** (`/server`): Node + Express (ESM), Mongoose, zod, Socket.io, `groq-sdk`, `googleapis`. Deployed on Render.
+- **Server** (`/server`): Node + Express (ESM), Mongoose, zod, Socket.io, `groq-sdk`, `googleapis`. Deployed on Railway.
 - **Database:** MongoDB Atlas.
 - The client's socket room only receives cleaned-up thread data: no AI reasoning, history or other owners' threads.
 

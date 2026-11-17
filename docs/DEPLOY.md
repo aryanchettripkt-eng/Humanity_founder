@@ -30,6 +30,8 @@ GMAIL_IMPORT_LIMIT=20
 Only if real Gmail / Google sign-in was on: also `REAL_GMAIL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `TOKEN_ENC_KEY` (same values), and `GOOGLE_REDIRECT_URI=https://<railway-domain>/api/oauth/google/callback`.
 
 ### 3. Get a public URL
+Current: `https://relayserver-production-ab0bdc31.up.railway.app`.
+
 Service → **Settings → Networking → Generate Domain**. You get `https://<name>.up.railway.app`. Check `https://<name>.up.railway.app/api/health` returns `{"data":{"ok":true,...}}`.
 
 ### 4. Point the web app at it (Vercel)

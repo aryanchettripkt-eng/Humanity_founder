@@ -28,6 +28,11 @@ _None yet._
 
 ---
 
+### 2026-11-17 22:05 · claude · README points at Railway
+- Done: API live at `https://relayserver-production-ab0bdc31.up.railway.app`; README health link, hosting lines and GOOGLE_SETUP callback example now name Railway.
+- Changed contracts: none.
+- Next: Aryan updates Vercel `VITE_API_URL` / `VITE_SOCKET_URL`, `GOOGLE_REDIRECT_URI` on Railway and the Google OAuth redirect list.
+
 ### 2026-11-17 21:45 · claude · Move API host off Render
 - Done: Render free hours ran out and suspended `relay-server`. Added `railway.json` (Railpack build, `npm start`, `/health` healthcheck, redeploy only on server changes) and `docs/DEPLOY.md` with Aryan's setup steps for Railway + the Vercel env vars. No app code changed.
 - Changed contracts: none. New decision D24.

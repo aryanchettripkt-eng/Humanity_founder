@@ -24,7 +24,7 @@ Add:
 ## 5. OAuth client (Clients)
 1. **Clients → Create client** (older console: *Credentials → Create credentials → OAuth client ID*). Type: **Web application**, name `relay-web`.
 2. **Authorized JavaScript origins**: `http://localhost:5173`, plus later the deployed web URL (e.g. `https://<your-app>.vercel.app`).
-3. **Authorized redirect URIs**: `http://localhost:4000/api/oauth/google/callback`, plus later `https://<your-api>.onrender.com/api/oauth/google/callback`.
+3. **Authorized redirect URIs**: `http://localhost:4000/api/oauth/google/callback`, plus later `https://<your-api>.up.railway.app/api/oauth/google/callback`.
 4. **Create**, then copy the **Client ID** and **Client secret**.
 
 ## 6. Fill `server/.env` (never commit it)
@@ -38,7 +38,7 @@ TOKEN_ENC_KEY=<run: node -e "console.log(require('crypto').randomBytes(32).toStr
 GMAIL_IMPORT_LIMIT=50
 GMAIL_POLL_SECONDS=60
 ```
-On Render/Vercel, set the same values with the deployed URLs.
+On Railway/Vercel, set the same values with the deployed URLs.
 
 ## 7. What to expect
 - When you connect, Google shows **"Google hasn't verified this app"**. Click **Continue**. This is normal in Testing mode.
