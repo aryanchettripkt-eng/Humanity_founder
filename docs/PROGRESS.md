@@ -28,6 +28,12 @@ _None yet._
 
 ---
 
+### 2026-11-17 21:45 · claude · Move API host off Render
+- Done: Render free hours ran out and suspended `relay-server`. Added `railway.json` (Railpack build, `npm start`, `/health` healthcheck, redeploy only on server changes) and `docs/DEPLOY.md` with Aryan's setup steps for Railway + the Vercel env vars. No app code changed.
+- Changed contracts: none. New decision D24.
+- Next: Aryan creates the Railway service and sets the env vars (DEPLOY.md), then the README live/health links and "Deployed on Render" lines get the new URL.
+- Notes/risks: Railway trial is $5 one-time for 30 days, then $1/month Free plan. Render resets on the 1st; keeping only `relay-server` on Render's free plan fits in 750 h.
+
 ### 2026-11-16 05:35 · claude · Onboarding in the sign-in style
 - Done (Aryan: fix onboarding "in accordance of the login page"): `/onboarding` now uses the sign-in layout (headline and subline on the left, the same glass card on the right, same type scale from `auth.css`). Step pills (Welcome, Connect, Sync) with a tick on finished steps.
 - Connect step rebuilt: the squashed Gmail card is gone. Two clear rows: **Demo inbox** (lime, loads the sample emails directly, no pretend Google sign-in) and **Gmail · Beta** (read-only, approved test accounts; shown only when the server has Gmail set up). The simulated Outlook option and all "Simulated in prototype" copy are removed from onboarding (D20).
