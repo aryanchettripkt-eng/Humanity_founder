@@ -28,6 +28,12 @@ _None yet._
 
 ---
 
+### 2026-11-20 22:55 · claude · Groq model fallback (D25)
+- Done: benchmarked triage on 12 seed emails (gpt-oss-120b p50 1.2 s, gpt-oss-20b 0.8 s, muse-spark-1.3 12.3 s; scripts in project files `bench/`). Groq provider now falls through `GROQ_MODEL → GROQ_FAST_MODEL → GROQ_FALLBACK_MODELS` on 429, parking limited models until `retry-after`. New env `GROQ_FALLBACK_MODELS` (default `qwen/qwen3.8-27b`). `tests/groq.test.js` covers the chain.
+- Changed contracts: new optional env var (BACKEND §5.1, `.env.example`).
+- Next: Aryan runs `bench/groq-fallback-test.mjs` locally to confirm the Qwen model id and throughput with the real key; set `GROQ_FALLBACK_MODELS` on Railway only if the default needs changing.
+- Notes/risks: model ids on Groq's free tier change often (Llama left in Aug 2026); an unknown id is parked for 10 min and skipped, not fatal.
+
 ### 2026-11-17 22:05 · claude · README points at Railway
 - Done: API live at `https://relayserver-production-ab0bdc31.up.railway.app`; README health link, hosting lines and GOOGLE_SETUP callback example now name Railway.
 - Changed contracts: none.

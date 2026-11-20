@@ -242,12 +242,14 @@ Env:
 AI_PROVIDER=groq | gemini | anthropic | mock   # groq is the project default; falls back to mock if no key
 GROQ_API_KEY=...         GROQ_MODEL=<current Groq Llama 3.x 70B-class model>   # e.g. llama-3.3-70b-versatile; check console.groq.com/docs/models
 GROQ_FAST_MODEL=<small Groq model for bulk sync classification>          # optional, e.g. an 8B instant model
+GROQ_FALLBACK_MODELS=qwen/qwen3.8-27b   # comma-separated; tried after the two above when they are rate-limited (D25)
 GEMINI_API_KEY=...       GEMINI_MODEL=<current Gemini Flash model>
 ANTHROPIC_API_KEY=...    ANTHROPIC_MODEL=<current Claude Sonnet/Haiku model>
 AI_CONFIDENCE_THRESHOLD=0.7
 AI_TIMEOUT_MS=15000
 ```
 - **Groq (default)**: `groq-sdk` (OpenAI‑compatible chat completions) with `response_format: { type: "json_object" }`; put the JSON schema in the system prompt and validate with zod (Groq JSON mode guarantees valid JSON, not schema conformance). Respect free‑tier rate limits: sync classification runs with concurrency 2 and exponential backoff on HTTP 429; seed ships pre‑computed AI fields so first load doesn't hit limits.
+  - **Model fallback (D25):** free-tier limits are per model (≈8K tokens/min each), so every Groq call walks a chain: normal `GROQ_MODEL → GROQ_FAST_MODEL → GROQ_FALLBACK_MODELS`, fast `GROQ_FAST_MODEL → GROQ_MODEL → …`. A 429 parks that model until its `retry-after` and the next model takes the request; 404 parks it for 10 min; 400/5xx try the next model; 401 fails at once. If every model is parked the call waits for the earliest (max 3 rounds). gpt-oss models get `reasoning_effort: low`, Qwen models `reasoning_format: hidden`.
 - Gemini: `@google/genai` SDK with `responseMimeType: "application/json"` + response schema.
 - Anthropic: `@anthropic-ai/sdk` with a single tool / structured output for JSON.
 - **Mock**: deterministic keyword heuristics (newsletter/unsubscribe → none; "approve", "your decision", "sign", investor/board → client; schedule/reschedule/invoice/booking → assistant; else review @ 0.5). Generates template summaries. This guarantees the deployed demo never breaks (AC13).
