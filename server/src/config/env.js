@@ -21,6 +21,8 @@ const envSchema = z.object({
   GROQ_API_KEY: z.string().optional().default(''),
   GROQ_MODEL: z.string().default('openai/gpt-oss-120b'),
   GROQ_FAST_MODEL: z.string().default('openai/gpt-oss-20b'),
+  // Comma-separated Groq models tried after GROQ_MODEL / GROQ_FAST_MODEL when those are rate-limited.
+  GROQ_FALLBACK_MODELS: z.string().default('qwen/qwen3.8-27b'),
   GEMINI_API_KEY: z.string().optional().default(''),
   GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
   ANTHROPIC_API_KEY: z.string().optional().default(''),
