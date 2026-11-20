@@ -413,7 +413,7 @@ GMAIL_POLL_SECONDS=60
    - `gmail`: create `EmailAccount { provider:'gmail', simulated:false, address, google:{…} }` on the chosen client (default: assistant's first client, created if none), store encrypted refresh token, redirect to onboarding sync step, start import in the background.
 4. Errors map to `?error=` codes in §3.2a. `access_denied` with an unlisted account → `not_test_user` (FE explains the test-user limit and offers the demo inbox).
 
-### 11.3a Only your own mailbox (D25)
+### 11.3a Only your own mailbox (D26)
 - `gmail/start` sends `login_hint=<signed-in email>` so Google pre-selects the right account.
 - The hint can be overridden in Google's picker, so the callback checks the returned account (`services/gmail/ownership.js`): Google sign-in users need the same Google `sub` (`user.googleId`); email/password users need a verified Google email equal to their Relay email. A mismatch revokes the grant and redirects with `?error=account_mismatch`. `gmail/complete` re-checks and answers `403 ACCOUNT_MISMATCH`.
 - Connecting a client's or colleague's mailbox under your login is therefore not possible today; that would need its own invite flow where the mailbox owner signs in.

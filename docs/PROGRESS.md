@@ -28,6 +28,12 @@ _None yet._
 
 ---
 
+### 2026-11-20 23:05 · claude · Gmail connect ownership + switch off the demo inbox
+- Done (Aryan reported both bugs): connecting Gmail now pre-selects the signed-in account (`login_hint`) and the server rejects any other Google account (`account_mismatch`, grant revoked). Assistants still on the demo inbox are offered "Switch to your Gmail" after Google sign-in and in Settings › Accounts; connecting real Gmail removes the sample emails.
+- Changed contracts: new `?error=account_mismatch` and `403 ACCOUNT_MISMATCH` on `POST /accounts/gmail/complete`; demo inbox is cleared on real connect. BACKEND §3.2, §11.3a–b, DECISIONS D26.
+- Checked: lint, typecheck, server tests, web tests. Not run against real Google OAuth from here.
+- Notes/risks: mailboxes already connected under a different account before this change are not cleaned up automatically.
+
 ### 2026-11-20 22:55 · claude · Groq model fallback (D25)
 - Done: benchmarked triage on 12 seed emails (gpt-oss-120b p50 1.2 s, gpt-oss-20b 0.8 s, muse-spark-1.3 12.3 s; scripts in project files `bench/`). Groq provider now falls through `GROQ_MODEL → GROQ_FAST_MODEL → GROQ_FALLBACK_MODELS` on 429, parking limited models until `retry-after`. New env `GROQ_FALLBACK_MODELS` (default `qwen/qwen3.8-27b`). `tests/groq.test.js` covers the chain.
 - Changed contracts: new optional env var (BACKEND §5.1, `.env.example`).
