@@ -12,8 +12,14 @@ import {
   signOAuthState,
   verifyOAuthState,
 } from '../services/gmail/crypto.js';
+import { clearDemoInbox } from '../services/demo.service.js';
 import { importGmailAccount } from '../services/gmail/import.js';
-import { buildGoogleAuthUrl, exchangeCodeForTokens } from '../services/gmail/oauth.js';
+import {
+  buildGoogleAuthUrl,
+  exchangeCodeForTokens,
+  revokeGoogleToken,
+} from '../services/gmail/oauth.js';
+import { mailboxBelongsToUser } from '../services/gmail/ownership.js';
 import { AppError, badRequest, forbidden, notFound } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 
@@ -86,7 +92,11 @@ export async function startGmailConnect(req, res, next) {
       clientId: targetClient.id,
       returnTo: req.body?.returnTo || 'onboarding',
     });
-    const authUrl = buildGoogleAuthUrl({ purpose: 'gmail', state });
+    const authUrl = buildGoogleAuthUrl({
+      purpose: 'gmail',
+      state,
+      loginHint: req.user.email,
+    });
     res.json({ data: { authUrl } });
   } catch (err) {
     next(err);
@@ -169,6 +179,19 @@ export async function handleGoogleCallback(req, res) {
       return res.redirect(302, `${base}/login?error=state_invalid`);
     }
 
+    // Only the signed-in user's own mailbox can be connected (signed in as A ≠ inbox of B).
+    if (!mailboxBelongsToUser(user, userInfo)) {
+      logger.warn('Gmail connect rejected: Google account does not match the signed-in user', {
+        userId: String(user._id),
+      });
+      const grantedToken = tokens.refresh_token || tokens.access_token;
+      if (grantedToken) {
+        revokeGoogleToken(grantedToken).catch(() => {});
+      }
+      const sep = errorTarget.includes('?') ? '&' : '?';
+      return res.redirect(302, `${errorTarget}${sep}error=account_mismatch`);
+    }
+
     const refreshTokenEnc = tokens.refresh_token ? encryptToken(tokens.refresh_token) : undefined;
     const connectCode = signGmailConnectToken({
       userId: String(user._id),
@@ -218,6 +241,17 @@ export async function completeGmailConnect(req, res, next) {
       return next(notFound('User not found'));
     }
 
+    if (
+      !mailboxBelongsToUser(user, { id: payload.sub, email: payload.email, verified_email: true })
+    ) {
+      return next(
+        forbidden(
+          'You can only connect the Gmail inbox of the Google account you signed in with',
+          'ACCOUNT_MISMATCH'
+        )
+      );
+    }
+
     const client = await resolveOrCreateClient(
       user._id,
       user.name,
@@ -262,6 +296,15 @@ export async function completeGmailConnect(req, res, next) {
           refreshTokenEnc,
           scope: payload.scope || '',
         },
+      });
+    }
+
+    // Switching from the demo inbox: the sample emails go, the real inbox takes their place.
+    const cleared = await clearDemoInbox({ assistantId: user._id, clientId: client._id });
+    if (cleared.accounts > 0) {
+      logger.info('Cleared demo inbox after real Gmail connect', {
+        clientId: String(client._id),
+        ...cleared,
       });
     }
 

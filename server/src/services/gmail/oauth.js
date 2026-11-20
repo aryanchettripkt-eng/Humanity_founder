@@ -67,7 +67,12 @@ export function createOAuth2Client() {
   );
 }
 
-export function buildGoogleAuthUrl({ purpose, state }) {
+/**
+ * @param {{ purpose: 'login' | 'gmail', state: string, loginHint?: string }} params
+ * `loginHint` pre-selects the signed-in user's Google account on the Gmail consent screen.
+ * It is only a hint: the callback still checks the returned account (see ownership.js).
+ */
+export function buildGoogleAuthUrl({ purpose, state, loginHint }) {
   const client = createOAuth2Client();
   const scopes = purpose === 'gmail' ? GMAIL_SCOPES : LOGIN_SCOPES;
   return client.generateAuthUrl({
@@ -76,6 +81,7 @@ export function buildGoogleAuthUrl({ purpose, state }) {
     include_granted_scopes: true,
     scope: scopes,
     state,
+    ...(loginHint ? { login_hint: loginHint } : {}),
   });
 }
 

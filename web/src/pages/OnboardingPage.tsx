@@ -175,7 +175,10 @@ export function OnboardingPage() {
   };
 
   const demoBusy = connectMutation.isPending || authorizeMutation.isPending;
-  const connected = accounts?.find((a) => a.status === 'connected');
+  const connected =
+    accounts?.find((a) => a.status === 'connected' && !a.simulated) ||
+    accounts?.find((a) => a.status === 'connected');
+  const canSwitchFromDemo = Boolean(connected?.simulated && health?.gmail);
   const hero = HERO[step] ?? HERO.welcome;
 
   return (
@@ -242,11 +245,52 @@ export function OnboardingPage() {
             <div role="alert" className="onb-alert rounded-2xl border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] text-[var(--fg)]">
               {oauthError === 'not_test_user'
                 ? "Google didn't allow this account yet. Real Gmail only works for approved test accounts during the beta. You can use the demo inbox instead."
-                : "Google sign-in didn't finish. Try again, or use the demo inbox."}
+                : oauthError === 'account_mismatch'
+                  ? 'That Gmail belongs to a different Google account. You can only connect the inbox of the account you signed in with.'
+                  : "Google sign-in didn't finish. Try again, or use the demo inbox."}
             </div>
           )}
 
-          {connected ? (
+          {connected && canSwitchFromDemo ? (
+            <div className="onb-options">
+              <div className="onb-option flex flex-col rounded-2xl border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] sm:flex-row sm:items-center">
+                <div className="flex min-w-0 flex-1 items-start">
+                  <span className="onb-option-icon flex shrink-0 items-center justify-center rounded-full border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] text-[var(--fg)]">
+                    <Mail aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="onb-option-title text-[var(--fg)]">Switch to your Gmail</p>
+                    <p className="onb-option-body text-[var(--fg-muted)]">
+                      You&apos;re on the demo inbox. Connect the Gmail you signed in with and the
+                      sample emails are removed.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={startRealGmail}
+                  disabled={startGmailMutation.isPending}
+                  className={cn(LIME_BTN, 'onb-option-btn')}
+                >
+                  {startGmailMutation.isPending ? 'Opening Google…' : 'Connect Gmail'}
+                </button>
+              </div>
+              <div className="onb-option flex flex-col rounded-2xl border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)] sm:flex-row sm:items-center">
+                <div className="flex min-w-0 flex-1 items-start">
+                  <span className="onb-option-icon flex shrink-0 items-center justify-center rounded-full bg-[var(--chip-bg)] text-[var(--chip-fg)]">
+                    <Inbox aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="onb-option-title text-[var(--fg)]">Keep the demo inbox</p>
+                    <p className="onb-option-body truncate text-[var(--fg-muted)]">{connected.address}</p>
+                  </div>
+                </div>
+                <button type="button" onClick={() => navigate('/app/today')} className={cn(OUTLINE_BTN, 'onb-option-btn')}>
+                  Open Today
+                </button>
+              </div>
+            </div>
+          ) : connected ? (
             <div className="onb-option flex items-center rounded-2xl border border-[var(--card-glass-border)] bg-[var(--card-glass-bg)]">
               <span className="onb-option-icon flex shrink-0 items-center justify-center rounded-full bg-[var(--chip-bg)] text-[var(--chip-fg)]">
                 <CheckCircle2 aria-hidden="true" />

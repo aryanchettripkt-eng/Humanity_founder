@@ -28,6 +28,12 @@ _None yet._
 
 ---
 
+### 2026-11-20 17:35 · claude · Gmail connect ownership + switch off the demo inbox
+- Done (Aryan reported both bugs): connecting Gmail now pre-selects the signed-in account (`login_hint`) and the server rejects any other Google account (`account_mismatch`, grant revoked). Assistants still on the demo inbox are offered "Switch to your Gmail" after Google sign-in and in Settings › Accounts; connecting real Gmail removes the sample emails.
+- Changed contracts: new `?error=account_mismatch` and `403 ACCOUNT_MISMATCH` on `POST /accounts/gmail/complete`; demo inbox is cleared on real connect. BACKEND §3.2, §11.3a–b, DECISIONS D25.
+- Checked: lint, typecheck, server tests (43, 5 new), web tests (38). Not run against real Google OAuth from here.
+- Notes/risks: mailboxes already connected under a different account before this change are not cleaned up automatically.
+
 ### 2026-11-17 22:05 · claude · README points at Railway
 - Done: API live at `https://relayserver-production-ab0bdc31.up.railway.app`; README health link, hosting lines and GOOGLE_SETUP callback example now name Railway.
 - Changed contracts: none.

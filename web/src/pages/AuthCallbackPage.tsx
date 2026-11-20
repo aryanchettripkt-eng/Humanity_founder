@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthLayout } from '@/app/layouts/AuthLayout';
 import { Button } from '@/components/ui/button';
-import { useMe } from '@/features/auth/api';
+import { useAccounts } from '@/features/accounts/api';
+import { useHealth, useMe } from '@/features/auth/api';
 import { setAuthToken } from '@/lib/api';
 import { qk } from '@/lib/queryKeys';
 import { connectSocket } from '@/lib/socket';
@@ -17,6 +18,12 @@ export function AuthCallbackPage() {
 
   const errorCode = searchParams.get('error');
   const { data: me, isError: meError } = useMe();
+  const { data: health, isPending: healthPending } = useHealth();
+  const isAssistant = me?.user?.role === 'assistant';
+  const { data: accounts, isPending: accountsPending } = useAccounts(
+    undefined,
+    tokenReady && isAssistant
+  );
 
   useEffect(() => {
     if (errorCode) return;
@@ -39,9 +46,17 @@ export function AuthCallbackPage() {
     } else if (!me.user.onboarding.completed && me.clients.length === 0) {
       navigate('/onboarding', { replace: true });
     } else {
-      navigate('/app/today', { replace: true });
+      if (healthPending || accountsPending) return;
+      // Still on the demo inbox: offer the real Gmail again instead of locking them into sample mail.
+      const active = (accounts ?? []).filter((a) => a.status !== 'disconnected');
+      const demoOnly = active.length > 0 && active.every((a) => a.simulated);
+      if (demoOnly && health?.gmail) {
+        navigate('/onboarding?step=connect', { replace: true });
+      } else {
+        navigate('/app/today', { replace: true });
+      }
     }
-  }, [tokenReady, me, navigate]);
+  }, [tokenReady, me, navigate, health, healthPending, accounts, accountsPending]);
 
   if (errorCode || meError) {
     const message =

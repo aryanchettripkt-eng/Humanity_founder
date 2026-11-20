@@ -69,11 +69,12 @@ Auth required on all routes except `/auth/*` and `/health`. `role` checks noted 
 | POST | `/accounts/:id/sync` | – | `{ started: true }` |
 | DELETE | `/accounts/:id` | – | `{ ok: true }` (status `disconnected`, threads kept; for real Gmail also revokes + deletes tokens) |
 | POST | `/accounts/gmail/start` | `{ clientId? }` | `{ authUrl }` — FE does `window.location = authUrl`. Only when `REAL_GMAIL=true` and Google creds are set, else `409 GMAIL_DISABLED`. See §11 |
+| POST | `/accounts/gmail/complete` | `{ code }` | `EmailAccount` (status `syncing`). `403 ACCOUNT_MISMATCH` if the Google account isn't the signed-in user's (§11.3a). On success, removes the client's demo inbox (simulated accounts + their sample threads) before the import starts |
 
 ### 3.2a Google OAuth callback (public, no Bearer)
 | Method | Path | Query | Returns |
 |---|---|---|---|
-| GET | `/oauth/google/callback` | `code, state` or `error` | 302 redirect to the web app. Purpose comes from the signed `state`: `login` → `${WEB_URL}/auth/callback#token=…`; `gmail` → `${WEB_URL}/onboarding?step=sync&accountId=…`. On failure → same targets with `?error=<code>` (`access_denied`, `not_test_user`, `state_invalid`, `exchange_failed`). |
+| GET | `/oauth/google/callback` | `code, state` or `error` | 302 redirect to the web app. Purpose comes from the signed `state`: `login` → `${WEB_URL}/auth/callback#token=…`; `gmail` → `${WEB_URL}/onboarding?step=sync&accountId=…`. On failure → same targets with `?error=<code>` (`access_denied`, `not_test_user`, `state_invalid`, `exchange_failed`, `account_mismatch`). |
 
 ### 3.3 Threads [A]
 | Method | Path | Body / Query | Returns |
@@ -409,6 +410,15 @@ GMAIL_POLL_SECONDS=60
    - `login`: find user by `googleId`, else by verified email, else create assistant user; issue our JWT; redirect `${WEB_URL}/auth/callback#token=…` (fragment so it never hits server logs).
    - `gmail`: create `EmailAccount { provider:'gmail', simulated:false, address, google:{…} }` on the chosen client (default: assistant's first client, created if none), store encrypted refresh token, redirect to onboarding sync step, start import in the background.
 4. Errors map to `?error=` codes in §3.2a. `access_denied` with an unlisted account → `not_test_user` (FE explains the test-user limit and offers the demo inbox).
+
+### 11.3a Only your own mailbox (D25)
+- `gmail/start` sends `login_hint=<signed-in email>` so Google pre-selects the right account.
+- The hint can be overridden in Google's picker, so the callback checks the returned account (`services/gmail/ownership.js`): Google sign-in users need the same Google `sub` (`user.googleId`); email/password users need a verified Google email equal to their Relay email. A mismatch revokes the grant and redirects with `?error=account_mismatch`. `gmail/complete` re-checks and answers `403 ACCOUNT_MISMATCH`.
+- Connecting a client's or colleague's mailbox under your login is therefore not possible today; that would need its own invite flow where the mailbox owner signs in.
+
+### 11.3b Switching from the demo inbox
+- After Google sign-in, an assistant whose only accounts are demo ones (and `/health.gmail` is true) lands on `/onboarding?step=connect`, which offers "Switch to your Gmail" or "Keep the demo inbox".
+- Settings › Accounts offers the same switch. When the real Gmail connects, `services/demo.service.js#clearDemoInbox` deletes that client's simulated accounts and their threads, messages, drafts and activity. Real Gmail data is never touched.
 
 ### 11.4 Import (`services/gmail/import.js`)
 - `users.getProfile` → save `historyId`.

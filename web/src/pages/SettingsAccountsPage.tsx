@@ -42,6 +42,21 @@ export function SettingsAccountsPage() {
   const connectHandledRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const error = searchParams.get('error');
+    if (!error) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('error');
+    setSearchParams(next, { replace: true });
+    toast.error(
+      error === 'account_mismatch'
+        ? 'That Gmail belongs to a different Google account. Connect the inbox of the account you signed in with.'
+        : error === 'not_test_user'
+          ? "Google didn't allow this account yet. Real Gmail only works for approved test accounts during the beta."
+          : "Google sign-in didn't finish. Please try again."
+    );
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
     const code = searchParams.get('connect');
     if (!code || connectHandledRef.current === code) return;
     connectHandledRef.current = code;
@@ -161,6 +176,12 @@ export function SettingsAccountsPage() {
 
       <div className="space-y-3 pt-2">
         <h2 className="text-sm font-semibold text-foreground">Add a connection</h2>
+        {hasDemoGmail && health?.gmail && (
+          <p className="text-sm text-muted-foreground">
+            You&apos;re using the demo inbox. Connect the Gmail you signed in with to switch to your
+            real email; the sample emails are removed when it connects.
+          </p>
+        )}
         <ConnectProviderCard
           provider="gmail"
           demoAvailable={!hasDemoGmail}
